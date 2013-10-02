@@ -115,9 +115,9 @@ void Direct3D::init(Input* p_pInput)
 //Camera
 ///////////////////////////////////////////////////////////////////////////////////////////
 	m_pCamera = new Camera();
-	XMVECTOR cameraPos = XMLoadFloat3(&XMFLOAT3(0.f,0.f,-10.f));
-	XMVECTOR cameraDir = XMLoadFloat3(&XMFLOAT3(0.0f,0.0f,1.0f));
-	XMVECTOR cameraUp = XMLoadFloat3(&XMFLOAT3(0.f,1.f,0.f));
+	XMVECTOR cameraPos = XMVectorSet(0.0f, 0.0f, -10.0f, 0.0f);
+	XMVECTOR cameraDir = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+	XMVECTOR cameraUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	m_pCamera->init(cameraPos, cameraUp, cameraDir, (float)m_Width, (float)m_Height);
 
 	m_pInput->init(m_pCamera);
@@ -139,17 +139,45 @@ void Direct3D::init(Input* p_pInput)
 	bd.MiscFlags = 0;
 	
 	m_Device->CreateBuffer( &bd, NULL, &m_cBuffer);
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//Sphere
+///////////////////////////////////////////////////////////////////////////////////////////
+	m_sphere.center = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+	m_sphere.radius = 2.0f;
+	m_sphere.color = XMVectorSet(1.0f, 0.0f, 0.0f, 1.0f);
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//Triangle
+///////////////////////////////////////////////////////////////////////////////////////////
+	m_triangle.pos0 = XMVectorSet(-3.0f, -2.0f, 0.0f, 1.0f);
+	m_triangle.pos1 = XMVectorSet(-7.0f, -2.0f, 0.0f, 1.0f);
+	m_triangle.pos2 = XMVectorSet(-5.0f, 2.0f, 0.0f, 1.0f);
+	m_triangle.color = XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//Light
+///////////////////////////////////////////////////////////////////////////////////////////
+	m_light.pos = XMVectorSet(0.0f, 30.0f, 0.0f, 1.0f);
+	m_light.ambient = XMVectorSet(0.4f, 0.4f, 0.4f, 1.0f);
+	m_light.diffuse = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+	m_light.spec	= XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+	m_light.att		= XMVectorSet(0.0f, 0.1f, 0.0f, 0.0f);
+	m_light.range	= 50.0f;
 }
 
 void Direct3D::update()
 {
 	m_pCamera->update();
 	ConstBuffer cRayBufferStruct;
-	cRayBufferStruct.m_cameraPos = m_pCamera->getPosition();
-	cRayBufferStruct.m_IV = XMMatrixInverse(NULL, m_pCamera->getViewMat());
-	cRayBufferStruct.m_IP = XMMatrixInverse(NULL, m_pCamera->getProjMat());
-	cRayBufferStruct.m_IV = XMMatrixTranspose(cRayBufferStruct.m_IV);
-	cRayBufferStruct.m_IP = XMMatrixTranspose(cRayBufferStruct.m_IP);
+	cRayBufferStruct.cameraPos = m_pCamera->getPosition();
+	cRayBufferStruct.IV = XMMatrixInverse(NULL, m_pCamera->getViewMat());
+	cRayBufferStruct.IP = XMMatrixInverse(NULL, m_pCamera->getProjMat());
+	cRayBufferStruct.IV = XMMatrixTranspose(cRayBufferStruct.IV);
+	cRayBufferStruct.IP = XMMatrixTranspose(cRayBufferStruct.IP);
+	cRayBufferStruct.sphere = m_sphere;
+	cRayBufferStruct.triangle = m_triangle;
+	cRayBufferStruct.light = m_light;
 	m_DeviceContext->UpdateSubresource(m_cBuffer, 0, NULL, &cRayBufferStruct, 0, 0);
 	m_DeviceContext->CSSetConstantBuffers(0, 1, &m_cBuffer);
 
@@ -175,12 +203,14 @@ void Direct3D::draw()
 		return;
 
 	float x = XMVectorGetX(m_pCamera->getPosition());
+	float y = XMVectorGetY(m_pCamera->getPosition());
+	float z = XMVectorGetZ(m_pCamera->getPosition());
 	char title[256];
 	sprintf_s(
 		title,
 		sizeof(title),
-		"DirectCompute DEMO - Dispatch time: %f. X: %f",
-		m_Timer->GetTime(), x
+		"DirectCompute DEMO - Dispatch time: %f. CameraPos X: %f, Y: %f, Z: %f",
+		m_Timer->GetTime(), x, y, z
 	);
 	SetWindowText(m_hWnd, title);
 }

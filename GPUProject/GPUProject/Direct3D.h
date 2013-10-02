@@ -7,11 +7,41 @@
 #include "Input.h"
 #include "Camera.h"
 
+struct Light
+{
+	XMVECTOR pos;
+	XMVECTOR dir;
+	XMVECTOR ambient;
+	XMVECTOR diffuse;
+	XMVECTOR spec;
+	XMVECTOR att;
+	float range;
+};
+
+
+struct Sphere
+{
+	XMVECTOR center;
+	float radius;
+	XMVECTOR color;
+};
+
+struct Triangle
+{
+	XMVECTOR pos0;
+	XMVECTOR pos1;
+	XMVECTOR pos2;
+	XMVECTOR color;
+};
+
 struct ConstBuffer
 {
-	XMVECTOR m_cameraPos;
-	XMMATRIX m_IP;
-	XMMATRIX m_IV;
+	XMVECTOR cameraPos;
+	XMMATRIX IP;
+	XMMATRIX IV;
+	Sphere sphere;
+	Triangle triangle;
+	Light light;
 };
 
 class Direct3D
@@ -43,7 +73,9 @@ private:
 	int							m_Height;													
 	D3DTimer*					m_Timer;
 	Input*						m_pInput;
-
+	Sphere						m_sphere;
+	Triangle					m_triangle;
+	Light						m_light;
 	XMMATRIX					m_view;
 	XMMATRIX					m_proj;
 	XMMATRIX					m_IVP;

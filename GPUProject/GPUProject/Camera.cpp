@@ -24,7 +24,7 @@ void Camera::init(XMVECTOR p_pos, XMVECTOR p_up, XMVECTOR p_dir, float p_width, 
 
 void Camera::update()
 {
-	//m_right = XMVector3Cross(m_up, m_dir);
+	//m_right = XMVector3Cross(m_up, m_look);
 	m_lookAt = m_look + m_pos;
 	m_view = XMMatrixLookAtLH(m_pos, m_lookAt, m_up);
 }
@@ -90,7 +90,7 @@ void Camera::yaw(float radians)
 
 	//Do the transfrom.
 	XMMATRIX mat;
-	mat		= XMMatrixRotationAxis(m_up, radians);
+	mat		= XMMatrixRotationAxis(m_up, -radians);
 	m_right = XMVector3TransformNormal(m_right, mat);
 	m_look	= XMVector3TransformNormal(m_look, mat);
 }
