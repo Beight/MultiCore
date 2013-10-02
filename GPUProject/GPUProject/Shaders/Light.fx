@@ -21,8 +21,8 @@ float3 PointLight(HitData hd, Light L, Ray r)
 	//the distance deom surface to light
 	float d = length(lightVec);
 
-	if(d > L.range)
-		return float3(0.0f, 0.0f, 0.0f);
+	//if(d > L.range)
+		//return float3(0.0f, 0.0f, 0.0f);
 
 	//Normalize light vector
 	lightVec /= d;
@@ -31,6 +31,7 @@ float3 PointLight(HitData hd, Light L, Ray r)
 	litColor += hd.color * L.ambient; //hd.color = diffuse
 
 	float diffuseFactor = dot(lightVec, hd.normal);
+	
 	[branch]
 	if(diffuseFactor > 0.0f)
 	{

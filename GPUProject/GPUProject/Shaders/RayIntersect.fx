@@ -22,8 +22,8 @@ struct Triangle
 
 struct HitData
 {
-	float pos;
-	float normal;
+	float3 pos;
+	float3 normal;
 	float distance;
 	float4 color;
 };
@@ -57,17 +57,18 @@ HitData RaySphereIntersect(Ray p_ray, Sphere p_sphere)
 	if(lengthSquared > radiusSquared)
 	{
 		hd.distance = s - q;
-		hd.pos = p_ray.direction * hd.distance;
-		hd.normal = p_sphere.center - hd.pos;
+		hd.pos = p_ray.origin + p_ray.direction * hd.distance;
+		hd.normal = normalize(hd.pos - p_sphere.center);
 		hd.color = p_sphere.color;
 	}
 	else
 	{
-		hd.distance = s + q;
+		/*hd.distance = s + q;
 		hd.pos = p_ray.direction * hd.distance;
-		hd.normal = p_sphere.center - hd.pos;
-		hd.color = p_sphere.color;
+		hd.normal = normalize(hd.pos - p_sphere.center);
+		hd.color = p_sphere.color;*/
 	}
+	hd.pos = float3(1, 0, 0);
 	return hd;
 }
 

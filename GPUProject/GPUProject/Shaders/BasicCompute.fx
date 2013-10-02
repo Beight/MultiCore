@@ -42,10 +42,16 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	r.direction = rayDir;
 
 	hd = RaySphereIntersect(r, sphere);
-	if(hd.distance == -1.0f)
-		hd = RayTriangleIntersect(r, tri);
-
+	/*if(hd.distance != -1.0f)
+	{
+		float3 lightray = hd.pos - light.pos;
+		lightray = normalize(lightray);
+*/
+	//}
+	//	hd = RayTriangleIntersect(r, tri);
+	
+	hd.pos = float3(1, 0, 0);
 	float3 color = PointLight(hd, light, r);
-	//hd.color = float4(color, 1.0f);
+	hd.color = float4(color, 1.0f);
 	output[threadID.xy] = hd.color;
 }
