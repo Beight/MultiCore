@@ -28,11 +28,12 @@ struct HitData
 	float4 color;
 };
 
-HitData RaySphereIntersect(Ray p_ray, Sphere p_sphere, HitData h)
+HitData RaySphereIntersect(Ray p_ray, Sphere p_sphere, HitData p_hd)
 {
-	HitData hd;
-	hd.color = float4(0.0f, 0.0f, 0.0f, 0.0f);
-	hd.distance = -1.0f;
+	HitData l_hd;
+	l_hd.color = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	l_hd.distance = -1.0f;
+	float distanceDelta = 0.001f;
 	float4 length = p_sphere.center - p_ray.origin;
 	//s = Projection of length onto ray direction
 	float s = dot(length, p_ray.direction);
@@ -42,7 +43,7 @@ HitData RaySphereIntersect(Ray p_ray, Sphere p_sphere, HitData h)
 	if(s < 0 && lengthSquared > radiusSquared)
 	{
 		//miss
-		return h;
+		return p_hd;
 	}
 	//m = Squared distance from sphere center to projection
 	float m = lengthSquared - (s*s);
@@ -50,31 +51,32 @@ HitData RaySphereIntersect(Ray p_ray, Sphere p_sphere, HitData h)
 	if(m > radiusSquared)
 	{
 		//miss
-		return h;
+		return p_hd;
 	}
 	//q = Squared distance
 	float q = sqrt(radiusSquared - m);
 	if(lengthSquared > radiusSquared)
 	{
-		hd.distance = s - q;
-		if(hd.distance < h.distance)
+		l_hd.distance = s - q;
+		if(l_hd.distance < p_hd.distance || p_hd.distance < 0.0f && l_hd.distance > distanceDelta)
 		{
-			hd.pos = p_ray.origin + p_ray.direction * hd.distance;
-			hd.normal = normalize(hd.pos - p_sphere.center);
-			hd.color = p_sphere.color;
-			return hd;
+			l_hd.pos = p_ray.origin + p_ray.direction * l_hd.distance;
+			l_hd.normal = normalize(l_hd.pos - p_sphere.center);
+			l_hd.color = p_sphere.color;
+			return l_hd;
 		}
-		else return h;
+		else return p_hd;
 	}
 
-	return h;
+	return p_hd;
 }
 
-HitData RayTriangleIntersect(Ray p_ray, Triangle p_tri, HitData h)
+HitData RayTriangleIntersect(Ray p_ray, Triangle p_tri, HitData p_hd)
 {
-	HitData hd;
-	hd.distance = -1;
-	hd.color = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	HitData l_hd;
+	float distanceDelta = 0.001f;
+	l_hd.distance = -1;
+	l_hd.color = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
 
 	float4 e1 = p_tri.pos1 - p_tri.pos0;
@@ -84,7 +86,7 @@ HitData RayTriangleIntersect(Ray p_ray, Triangle p_tri, HitData h)
 	if(a > -0.00001f && a < 0.00001f)
 	{
 		//miss
-		return h;
+		return p_hd;
 	}
 
 	float f = 1/a;
@@ -93,23 +95,23 @@ HitData RayTriangleIntersect(Ray p_ray, Triangle p_tri, HitData h)
 	if(u < 0.0f)
 	{
 		//miss
-		return h;
+		return p_hd;
 	}
 	float3 r = cross(s.xyz, e1.xyz);
 	float v = f * (dot(p_ray.direction.xyz, r));
 	if(v < 0.0f || (u + v) > 1.0f)
 	{
 		//miss
-		return h;
+		return p_hd;
 	}
-	hd.distance = f * (dot(e2.xyz, r));
-	if(hd.distance < h.distance)
+	l_hd.distance = f * (dot(e2.xyz, r));
+	if(l_hd.distance < p_hd.distance && l_hd.distance > 0.0f || p_hd.distance < 0.0f && l_hd.distance > distanceDelta)
 	{
-		hd.pos = p_ray.origin + p_ray.direction * hd.distance;
+		l_hd.pos = p_ray.origin + p_ray.direction * l_hd.distance;
 		float3 temp = cross(e1.xyz, e2.xyz);
-		hd.normal = normalize(float4(temp, 1.0f));
-		hd.color = p_tri.color;
-		return hd;
+		l_hd.normal = normalize(float4(temp, 1.0f));
+		l_hd.color = p_tri.color;
+		return l_hd;
 	}
-	else return h;
+	else return p_hd;
 }

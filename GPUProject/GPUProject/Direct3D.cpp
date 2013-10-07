@@ -165,7 +165,7 @@ void Direct3D::init(Input* p_pInput)
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 	//Staticly adding light pos
-	m_lightList[0].pos = XMVectorSet(0.0f,		10.0f,	-8.0f, 1.0f);
+	m_lightList[0].pos = XMVectorSet(0.0f,		0.0f,	-8.0f, 1.0f);
 	m_lightList[1].pos = XMVectorSet(5.0f,		25.0f,	0.0f, 1.0f);
 	m_lightList[2].pos = XMVectorSet(10.0f,		20.0f,	0.0f, 1.0f);
 		   

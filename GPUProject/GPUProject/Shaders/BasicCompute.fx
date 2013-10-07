@@ -28,11 +28,11 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	///////////////////////////////////////////////
 
 	HitData hd, hds;
-	hd.distance = 1000.0;
+	hd.distance = -1.0;
 	hd.color	= (0.0f, 0.0f, 0.0f, 0.0f);
 	hd.pos		= (0.0f, 0.0f, 0.0f, 0.0f);
 	hd.normal	= (0.0f, 0.0f, 0.0f, 0.0f);
-	hds.distance = 1000.0;
+	hds.distance = -1.0;
 	hds.color	= (0.0f, 0.0f, 0.0f, 0.0f);
 	hds.pos		= (0.0f, 0.0f, 0.0f, 0.0f);
 	hds.normal	= (0.0f, 0.0f, 0.0f, 0.0f);
@@ -69,39 +69,31 @@ void main( uint3 threadID : SV_DispatchThreadID )
 
 	hd = RayTriangleIntersect(r, tri2, hd);
 
-	if(hd.distance !=  1000.0f)
+	if(hd.distance >  0.0f)
 	{
+		
+		///////////////////////////////////////////////
+		//Secondary Rays
+		///////////////////////////////////////////////
+		Ray lightRay;
 		float4 lightDir = float4(lightList[0].pos, 1.0f) - hd.pos;
 		lightDir = normalize(lightDir);
-		r.origin = hd.pos;
-		r.direction = lightDir;
-		color += PointLight(hd, lightList[0], r);
-		RaySphereIntersect(r, sphere, hds);
-		if(hds.distance != 1000.0f)
+		lightRay.origin = hd.pos;
+		lightRay.direction = lightDir;
+
+		hds = RaySphereIntersect(lightRay, sphere, hds);
+
+		hds = RayTriangleIntersect(lightRay, tri, hds);
+
+		hds = RayTriangleIntersect(lightRay, tri2, hds);
+		if(hds.distance > 0.0f)
 		{
-			//Sphere hits it self
-			// return shadow color SHadow color += PointLight(hd, lightList[0], r);
-			color = (0.0f, 0.0f, 0.0f, 0.0f);
-		}
-		hds = RayTriangleIntersect(r, tri, hds);
-		if(hds.distance != 1000.0f)
-		{
-			//LightRay hits triangle
-			//return shadow color SHadow color += PointLight(hd, lightList[0], r);
-			//color = (0.0f, 0.0f, 0.0f, 0.0f);
-		}
-		hds = RayTriangleIntersect(r, tri2, hds);
-		if(hds.distance != 1000.0f)
-		{
-			//LightRay hits triangle
-			//return shadow color SHadow color += PointLight(hd, lightList[0], r);
-			color = (0.0f, 0.0f, 0.0f, 0.0f);
-		}
-		
+			
+		}	
+		else 
+			color += PointLight(hd, lightList[0], r);
 	}
-	///////////////////////////////////////////////
-	//Secondary Rays
-	///////////////////////////////////////////////
+
 
 
 

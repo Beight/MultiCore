@@ -38,10 +38,10 @@ float3 PointLight(HitData hd, Light L, Ray r)
 		float specPower		= max(hd.color.a, 1.0f);
 		float3 toEye		= normalize(r.origin.xyz - hd.pos.xyz);
 		float3 R			= reflect(-lightVec, hd.normal.xyz);
-		float specFactor	= pow(max(dot(R, toEye), 0.0f), specPower);
+		float specFactor	= pow(max(dot(R, toEye), 0.0f), 5);
 
 		litColor += diffuseFactor * hd.color.xyz * L.diffuse.xyz; //hd.color = diffuse
-		litColor += specFactor * hd.color.xyz *	L.spec.xyz; //hd.color = spec
+		//litColor += specFactor * float3(1,1,1);// * hd.color.xyz *	L.spec.xyz; //hd.color = spec
 	}
 
 	return litColor / dot(L.att, float3(1.0f, d, d*d));
