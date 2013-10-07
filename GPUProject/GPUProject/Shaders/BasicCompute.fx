@@ -16,7 +16,8 @@ cbuffer ConstBuffer
 	float4x4 IV;
 	Sphere sphere;
 	Triangle tri;
-	Light light;
+	Triangle tri2;
+	Light lightList[10];
 };
 
 [numthreads(32, 32, 1)]
@@ -26,7 +27,17 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	//Primary rays stage
 	///////////////////////////////////////////////
 
-	HitData hd;
+	HitData hd, hds;
+	hd.distance = 1000.0;
+	hd.color	= (0.0f, 0.0f, 0.0f, 0.0f);
+	hd.pos		= (0.0f, 0.0f, 0.0f, 0.0f);
+	hd.normal	= (0.0f, 0.0f, 0.0f, 0.0f);
+	hds.distance = 1000.0;
+	hds.color	= (0.0f, 0.0f, 0.0f, 0.0f);
+	hds.pos		= (0.0f, 0.0f, 0.0f, 0.0f);
+	hds.normal	= (0.0f, 0.0f, 0.0f, 0.0f);
+
+
 	Ray r;
 	float norm_X, norm_Y;
 	norm_X = ((threadID.x / WIDTH)*2) - 1.0f;
@@ -49,18 +60,61 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	//Intersection stage
 	///////////////////////////////////////////////
 
+	float3 color = (0.0f, 0.0f, 0.0f);
 
-	hd = RaySphereIntersect(r, sphere);
-	if(hd.distance == -1.0f)
+
+	hd = RaySphereIntersect(r, sphere, hd);
+
+	hd = RayTriangleIntersect(r, tri, hd);
+
+	hd = RayTriangleIntersect(r, tri2, hd);
+
+	if(hd.distance !=  1000.0f)
 	{
-		hd = RayTriangleIntersect(r, tri);
+		float4 lightDir = float4(lightList[0].pos, 1.0f) - hd.pos;
+		lightDir = normalize(lightDir);
+		r.origin = hd.pos;
+		r.direction = lightDir;
+		color += PointLight(hd, lightList[0], r);
+		RaySphereIntersect(r, sphere, hds);
+		if(hds.distance != 1000.0f)
+		{
+			//Sphere hits it self
+			// return shadow color SHadow color += PointLight(hd, lightList[0], r);
+			color = (0.0f, 0.0f, 0.0f, 0.0f);
+		}
+		hds = RayTriangleIntersect(r, tri, hds);
+		if(hds.distance != 1000.0f)
+		{
+			//LightRay hits triangle
+			//return shadow color SHadow color += PointLight(hd, lightList[0], r);
+			//color = (0.0f, 0.0f, 0.0f, 0.0f);
+		}
+		hds = RayTriangleIntersect(r, tri2, hds);
+		if(hds.distance != 1000.0f)
+		{
+			//LightRay hits triangle
+			//return shadow color SHadow color += PointLight(hd, lightList[0], r);
+			color = (0.0f, 0.0f, 0.0f, 0.0f);
+		}
+		
 	}
+	///////////////////////////////////////////////
+	//Secondary Rays
+	///////////////////////////////////////////////
+
+
 
 	///////////////////////////////////////////////
 	//Coloring stage
 	///////////////////////////////////////////////
 	
-	float3 color = PointLight(hd, light, r);
+	//float3 color = PointLight(hd, lightList[0], r);
+	//color += PointLight(hd, lightList[0], r);
+	//for(int i = 1; i < 10; i++)
+	//{
+	//	color += PointLight(hd, lightList[i], r);
+	//}
 	hd.color = float4(color, 1.0f);
 	output[threadID.xy] = hd.color;
 }

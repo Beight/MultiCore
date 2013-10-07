@@ -28,7 +28,7 @@ struct HitData
 	float4 color;
 };
 
-HitData RaySphereIntersect(Ray p_ray, Sphere p_sphere)
+HitData RaySphereIntersect(Ray p_ray, Sphere p_sphere, HitData h)
 {
 	HitData hd;
 	hd.color = float4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -42,7 +42,7 @@ HitData RaySphereIntersect(Ray p_ray, Sphere p_sphere)
 	if(s < 0 && lengthSquared > radiusSquared)
 	{
 		//miss
-		return hd;
+		return h;
 	}
 	//m = Squared distance from sphere center to projection
 	float m = lengthSquared - (s*s);
@@ -50,28 +50,27 @@ HitData RaySphereIntersect(Ray p_ray, Sphere p_sphere)
 	if(m > radiusSquared)
 	{
 		//miss
-		return hd;
+		return h;
 	}
 	//q = Squared distance
 	float q = sqrt(radiusSquared - m);
 	if(lengthSquared > radiusSquared)
 	{
 		hd.distance = s - q;
-		hd.pos = p_ray.origin + p_ray.direction * hd.distance;
-		hd.normal = normalize(hd.pos - p_sphere.center);
-		hd.color = p_sphere.color;
+		if(hd.distance < h.distance)
+		{
+			hd.pos = p_ray.origin + p_ray.direction * hd.distance;
+			hd.normal = normalize(hd.pos - p_sphere.center);
+			hd.color = p_sphere.color;
+			return hd;
+		}
+		else return h;
 	}
-	else
-	{
-		/*hd.distance = s + q;
-		hd.pos = p_ray.direction * hd.distance;
-		hd.normal = normalize(hd.pos - p_sphere.center);
-		hd.color = p_sphere.color;*/
-	}
-	return hd;
+
+	return h;
 }
 
-HitData RayTriangleIntersect(Ray p_ray, Triangle p_tri)
+HitData RayTriangleIntersect(Ray p_ray, Triangle p_tri, HitData h)
 {
 	HitData hd;
 	hd.distance = -1;
@@ -85,7 +84,7 @@ HitData RayTriangleIntersect(Ray p_ray, Triangle p_tri)
 	if(a > -0.00001f && a < 0.00001f)
 	{
 		//miss
-		return hd;
+		return h;
 	}
 
 	float f = 1/a;
@@ -94,16 +93,23 @@ HitData RayTriangleIntersect(Ray p_ray, Triangle p_tri)
 	if(u < 0.0f)
 	{
 		//miss
-		return hd;
+		return h;
 	}
 	float3 r = cross(s.xyz, e1.xyz);
 	float v = f * (dot(p_ray.direction.xyz, r));
 	if(v < 0.0f || (u + v) > 1.0f)
 	{
 		//miss
-		return hd;
+		return h;
 	}
 	hd.distance = f * (dot(e2.xyz, r));
-	hd.color = p_tri.color;
-	return hd;
+	if(hd.distance < h.distance)
+	{
+		hd.pos = p_ray.origin + p_ray.direction * hd.distance;
+		float3 temp = cross(e1.xyz, e2.xyz);
+		hd.normal = normalize(float4(temp, 1.0f));
+		hd.color = p_tri.color;
+		return hd;
+	}
+	else return h;
 }

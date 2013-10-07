@@ -151,20 +151,42 @@ void Direct3D::init(Input* p_pInput)
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Triangle
 ///////////////////////////////////////////////////////////////////////////////////////////
-	m_triangle.pos0 = XMVectorSet(-3.0f, -2.0f, 0.0f, 1.0f);
-	m_triangle.pos1 = XMVectorSet(-7.0f, -2.0f, 0.0f, 1.0f);
-	m_triangle.pos2 = XMVectorSet(-5.0f, 2.0f, 0.0f, 1.0f);
-	m_triangle.color = XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f);
+	m_triangle.pos0 = XMVectorSet(4.0f,		-4.0f,	8.0f, 1.0f);
+	m_triangle.pos1 = XMVectorSet(-6.0f,	-4.0f,	8.0f, 1.0f);
+	m_triangle.pos2 = XMVectorSet(-6.0f,	4.0f,	8.0f, 1.0f);
+	m_triangle.color = XMVectorSet(0.0f,	1.0f,	0.0f, 1.0f);
 
+	m_triangle2.pos0 = XMVectorSet(4.0f,	-4.0f,	8.0f, 1.0f);
+	m_triangle2.pos2 = XMVectorSet(4.0f,	4.0f,	8.0f, 1.0f);
+	m_triangle2.pos1 = XMVectorSet(-6.0f,	4.0f,	8.0f, 1.0f);
+	m_triangle2.color = XMVectorSet(0.0f,	1.0f,	0.0f, 1.0f);
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Light
 ///////////////////////////////////////////////////////////////////////////////////////////
-	m_light.pos = XMVectorSet(0.0f, 30.0f, 0.0f, 1.0f);
-	m_light.ambient = XMVectorSet(0.4f, 0.4f, 0.4f, 1.0f);
-	m_light.diffuse = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
-	m_light.spec	= XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
-	m_light.att		= XMVectorSet(0.0f, 0.1f, 0.0f, 0.0f);
-	m_light.range	= 50.0f;
+
+	//Staticly adding light pos
+	m_lightList[0].pos = XMVectorSet(0.0f,		10.0f,	-8.0f, 1.0f);
+	m_lightList[1].pos = XMVectorSet(5.0f,		25.0f,	0.0f, 1.0f);
+	m_lightList[2].pos = XMVectorSet(10.0f,		20.0f,	0.0f, 1.0f);
+		   
+	m_lightList[3].pos = XMVectorSet(15.0f,		15.0f,	0.0f, 1.0f);
+	m_lightList[4].pos = XMVectorSet(20.0f,		10.0f,	0.0f, 1.0f);
+	m_lightList[5].pos = XMVectorSet(25.0f,		5.0f,	0.0f, 1.0f);
+		   
+	m_lightList[6].pos = XMVectorSet(30.0f,		0.0f,	0.0f, 1.0f);
+	m_lightList[7].pos = XMVectorSet(-5.0f,		30.0f,	0.0f, 1.0f);
+	m_lightList[8].pos = XMVectorSet(0.0f,		-30.0f, 0.0f, 1.0f);
+
+	m_lightList[9].pos = XMVectorSet(0.0f,		0.0f,	-30.0f, 1.0f);
+
+	for(int i = 0; i < m_nrLights; i++)
+	{
+		m_lightList[i].ambient = XMVectorSet(0.4f, 0.4f, 0.4f, 1.0f);
+		m_lightList[i].diffuse = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+		m_lightList[i].spec	= XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+		m_lightList[i].att		= XMVectorSet(0.0f, 0.25f, 0.0f, 0.0f);
+		m_lightList[i].range	= 50.0f;
+	}
 }
 
 void Direct3D::update()
@@ -178,7 +200,12 @@ void Direct3D::update()
 	cRayBufferStruct.IP = XMMatrixTranspose(cRayBufferStruct.IP);
 	cRayBufferStruct.sphere = m_sphere;
 	cRayBufferStruct.triangle = m_triangle;
-	cRayBufferStruct.light = m_light;
+	cRayBufferStruct.triangle2 = m_triangle2;
+	for(int i = 0; i < m_nrLights; i++)
+	{
+		cRayBufferStruct.lightList[i] = m_lightList[i];
+	}
+	
 	m_DeviceContext->UpdateSubresource(m_cBuffer, 0, NULL, &cRayBufferStruct, 0, 0);
 	m_DeviceContext->CSSetConstantBuffers(0, 1, &m_cBuffer);
 

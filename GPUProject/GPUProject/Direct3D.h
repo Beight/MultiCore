@@ -41,7 +41,8 @@ struct ConstBuffer
 	XMMATRIX IV;
 	Sphere sphere;
 	Triangle triangle;
-	Light light;
+	Triangle triangle2;
+	Light lightList[10];
 };
 
 class Direct3D
@@ -70,15 +71,19 @@ private:
 	ComputeWrap*				m_ComputeSys;
 	ComputeShader*				m_ComputeShader;
 	int							m_Width;
-	int							m_Height;													
+	int							m_Height;
 	D3DTimer*					m_Timer;
 	Input*						m_pInput;
+
 	Sphere						m_sphere;
 	Triangle					m_triangle;
-	Light						m_light;
+	Triangle					m_triangle2;
 	XMMATRIX					m_view;
 	XMMATRIX					m_proj;
 	XMMATRIX					m_IVP;
+
+	const static int			m_nrLights = 10;
+	Light						m_lightList[m_nrLights];
 
 	void						release();
 };
