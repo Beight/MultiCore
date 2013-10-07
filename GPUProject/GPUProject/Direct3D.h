@@ -55,7 +55,7 @@ public:
 	~Direct3D();
 
 	void init(Input* p_pInput);
-	void update();
+	void update(float dt);
 	void draw();
 
 private:

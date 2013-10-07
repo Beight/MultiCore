@@ -39,6 +39,11 @@ XMVECTOR Camera::getPosition()
 	return m_pos;
 }
 
+XMVECTOR Camera::getUp()
+{
+	return m_up;
+}
+
 XMMATRIX Camera::getProjMat()
 {
 	return m_proj;

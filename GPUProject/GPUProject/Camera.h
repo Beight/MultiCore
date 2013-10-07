@@ -23,7 +23,7 @@ public:
 	void		moveLeft();
 	void		moveRight();
 	void		moveDirection(float p_x, float p_y);
-
+	XMVECTOR    getUp();
 private:
 	XMMATRIX m_view;
 	XMMATRIX m_proj;

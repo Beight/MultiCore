@@ -44,7 +44,7 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 			float dt = (currTimeStamp - prevTimeStamp) * secsPerCnt;
 
 			//render
-			D3D.update();
+			D3D.update(dt);
 			D3D.draw();
 			SetCursorPos(400, 400);
 			prevTimeStamp = currTimeStamp;

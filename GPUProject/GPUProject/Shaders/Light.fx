@@ -2,12 +2,12 @@
 
 struct Light
 {
-	float3 pos;
-	float3 dir;
+	float4 pos;
+	float4 dir;
 	float4 ambient;
 	float4 diffuse;
 	float4 spec;
-	float3 att;
+	float4 att;
 	float range;
 };
 
@@ -16,7 +16,7 @@ float3 PointLight(HitData hd, Light L, Ray r)
 {
 	float3 litColor = float3(0.0f, 0.0f, 0.0f);
 	//The vector from surface to the light
-	float3 lightVec = L.pos - hd.pos.xyz;
+	float3 lightVec = L.pos.xyz - hd.pos.xyz;
 
 	//the distance deom surface to light
 	float d = length(lightVec);
@@ -44,5 +44,5 @@ float3 PointLight(HitData hd, Light L, Ray r)
 		//litColor += specFactor * float3(1,1,1);// * hd.color.xyz *	L.spec.xyz; //hd.color = spec
 	}
 
-	return litColor / dot(L.att, float3(1.0f, d, d*d));
+	return litColor / dot(L.att.xyz, float3(1.0f, d, d*d));
 }
