@@ -15,9 +15,9 @@ using namespace DirectX;
 #include <map>
 #include <fstream>
 
-#define SAFE_RELEASE(x) if( x ) { (x)->Release(); (x) = NULL; }
-#define SAFE_DELETE(x) if( x ) { delete(x); (x) = NULL; }
-#define SAFE_DELETE_ARRAY(x) if( x ) { delete[](x); (x) = NULL; }
+#define SAFE_RELEASE(x) if( x ) { (x)->Release(); (x) = nullptr; }
+#define SAFE_DELETE(x) if( x ) { delete(x); (x) = nullptr; }
+#define SAFE_DELETE_ARRAY(x) if( x ) { delete[](x); (x) = nullptr; }
 #define PI (3.14159265358979323846f)
 
 #pragma comment(lib, "d3d11.lib")

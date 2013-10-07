@@ -3,18 +3,19 @@
 Direct3D::Direct3D(HWND p_hwnd)
 {
 	m_hWnd			= p_hwnd;
-	m_SwapChain		= NULL;
-	m_Device		= NULL;
-	m_DeviceContext = NULL;
-	m_BackBufferUAV = NULL;
-	m_Timer			= NULL;
-	m_ComputeSys	= NULL;
-	m_ComputeShader	= NULL;
+	m_SwapChain		= nullptr;
+	m_Device		= nullptr;
+	m_DeviceContext = nullptr;
+	m_BackBufferUAV = nullptr;
+	m_Timer			= nullptr;
+	m_ComputeSys	= nullptr;
+	m_ComputeShader	= nullptr;
+	
 }
 
 Direct3D::~Direct3D()
 {
-
+	release();
 }
 
 void Direct3D::init(Input* p_pInput)
@@ -215,5 +216,16 @@ void Direct3D::draw()
 	SetWindowText(m_hWnd, title);
 }
 
+void Direct3D::release()
+{
+	SAFE_RELEASE(m_BackBufferUAV);
+	SAFE_RELEASE(m_cBuffer);
+	SAFE_RELEASE(m_SwapChain);
+	SAFE_RELEASE(m_Device);
+	SAFE_RELEASE(m_DeviceContext);
 
+	SAFE_DELETE(m_ComputeShader);
+	SAFE_DELETE(m_pCamera);
+	SAFE_DELETE(m_ComputeSys);
+}
 

@@ -22,6 +22,10 @@ cbuffer ConstBuffer
 [numthreads(32, 32, 1)]
 void main( uint3 threadID : SV_DispatchThreadID )
 {
+	///////////////////////////////////////////////
+	//Primary rays stage
+	///////////////////////////////////////////////
+
 	HitData hd;
 	Ray r;
 	float norm_X, norm_Y;
@@ -41,16 +45,21 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	r.origin = cameraPos;
 	r.direction = rayDir;
 
+	///////////////////////////////////////////////
+	//Intersection stage
+	///////////////////////////////////////////////
+
+
 	hd = RaySphereIntersect(r, sphere);
-	/*if(hd.distance != -1.0f)
+	if(hd.distance == -1.0f)
 	{
-		float3 lightray = hd.pos - light.pos;
-		lightray = normalize(lightray);
-*/
-	//}
-	//	hd = RayTriangleIntersect(r, tri);
+		hd = RayTriangleIntersect(r, tri);
+	}
+
+	///////////////////////////////////////////////
+	//Coloring stage
+	///////////////////////////////////////////////
 	
-	hd.pos = float3(1, 0, 0);
 	float3 color = PointLight(hd, light, r);
 	hd.color = float4(color, 1.0f);
 	output[threadID.xy] = hd.color;

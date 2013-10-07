@@ -22,8 +22,8 @@ struct Triangle
 
 struct HitData
 {
-	float3 pos;
-	float3 normal;
+	float4 pos;
+	float4 normal;
 	float distance;
 	float4 color;
 };
@@ -33,7 +33,7 @@ HitData RaySphereIntersect(Ray p_ray, Sphere p_sphere)
 	HitData hd;
 	hd.color = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	hd.distance = -1.0f;
-	float3 length = p_sphere.center - p_ray.origin;
+	float4 length = p_sphere.center - p_ray.origin;
 	//s = Projection of length onto ray direction
 	float s = dot(length, p_ray.direction);
 	float lengthSquared = dot(length, length);
@@ -68,7 +68,6 @@ HitData RaySphereIntersect(Ray p_ray, Sphere p_sphere)
 		hd.normal = normalize(hd.pos - p_sphere.center);
 		hd.color = p_sphere.color;*/
 	}
-	hd.pos = float3(1, 0, 0);
 	return hd;
 }
 
@@ -81,8 +80,8 @@ HitData RayTriangleIntersect(Ray p_ray, Triangle p_tri)
 
 	float4 e1 = p_tri.pos1 - p_tri.pos0;
 	float4 e2 = p_tri.pos2 - p_tri.pos0;
-	float3 q = cross(p_ray.direction, e2);
-	float a = dot(e1, q);
+	float3 q = cross(p_ray.direction.xyz, e2.xyz);
+	float a = dot(e1.xyz, q);
 	if(a > -0.00001f && a < 0.00001f)
 	{
 		//miss
@@ -91,20 +90,20 @@ HitData RayTriangleIntersect(Ray p_ray, Triangle p_tri)
 
 	float f = 1/a;
 	float4 s = p_ray.origin - p_tri.pos0;
-	float u = f *(dot(s, q));
+	float u = f *(dot(s.xyz, q));
 	if(u < 0.0f)
 	{
 		//miss
 		return hd;
 	}
-	float3 r = cross(s, e1);
-	float v = f * (dot(p_ray.direction, r));
+	float3 r = cross(s.xyz, e1.xyz);
+	float v = f * (dot(p_ray.direction.xyz, r));
 	if(v < 0.0f || (u + v) > 1.0f)
 	{
 		//miss
 		return hd;
 	}
-	hd.distance = f * (dot(e2, r));
+	hd.distance = f * (dot(e2.xyz, r));
 	hd.color = p_tri.color;
 	return hd;
 }

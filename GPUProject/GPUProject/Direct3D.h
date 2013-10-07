@@ -79,6 +79,8 @@ private:
 	XMMATRIX					m_view;
 	XMMATRIX					m_proj;
 	XMMATRIX					m_IVP;
+
+	void						release();
 };
 
 
