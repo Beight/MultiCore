@@ -6,7 +6,7 @@
 static const float WIDTH = 800.0f;
 static const float HEIGHT= 800.0f;
 #define NROFTRIANGLES 10
-#define NROFLIGHTS 4
+#define NROFLIGHTS 10
 
 RWTexture2D<float4> output : register(u0);
 
@@ -21,7 +21,7 @@ cbuffer ConstBuffer
 	Light lightList[NROFLIGHTS];
 };
 
-[numthreads(32, 32, 1)]
+[numthreads(16, 16, 1)]
 void main( uint3 threadID : SV_DispatchThreadID )
 {
 	///////////////////////////////////////////////
@@ -58,11 +58,11 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	hd = RaySphereIntersect(r, sphere, hd);
 	for(int i = 0; i < NROFTRIANGLES; i++)
 	{
-		hd = RayTriangleIntersect(r, triangles[i], hd);
+			hd = RayTriangleIntersect(r, triangles[i], hd);
 	}
 	if(hd.distance >  0.0f)
 	{
-		
+
 		///////////////////////////////////////////////
 		//Secondary Rays
 		///////////////////////////////////////////////
@@ -75,17 +75,24 @@ void main( uint3 threadID : SV_DispatchThreadID )
 			lightDir = normalize(lightDir);
 			lightRay.origin = hd.pos;
 			lightRay.direction = lightDir;
+			float lightLength = length(lightList[i].pos.xyz - hd.pos.xyz);
 
 			lightHit = RaySphereIntersect(lightRay, sphere, lightHit);
-
+			
 			for(int j = 0; j < NROFTRIANGLES; j++)
 			{
-				lightHit = RayTriangleIntersect(lightRay, triangles[j], lightHit);
+				if(hd.ID-j)
+				{
+					lightHit = RayTriangleIntersect(lightRay, triangles[j], lightHit);
+					//lightHit.distance = j;
+				}
+				
 			}
 
-			if(lightHit.distance > 0.0f)
+			if(lightHit.distance > 0.0f && lightLength > lightHit.distance)
 			{
 				color += (PointLight(hd, lightList[i], r)*0.1f);
+				
 			}	
 			else 
 				color += PointLight(hd, lightList[i], r);
@@ -99,7 +106,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	///////////////////////////////////////////////
 	//Coloring stage
 	///////////////////////////////////////////////
-	hd.color = float4(color, 1.0f);
+	//hd.color = float4(color, 1.0f);
 
-	output[threadID.xy] = hd.normal;
+	output[threadID.xy] = float4(color, 1.0f);
 }

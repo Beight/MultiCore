@@ -8,7 +8,7 @@
 #include "Camera.h"
 
 #define NROFTRIANGLES 10
-#define NROFLIGHTS 4
+#define NROFLIGHTS 10
 #define CUBESIZE 4
 
 struct Light
@@ -32,10 +32,11 @@ struct Sphere
 
 struct Triangle
 {
-	XMVECTOR pos0;
-	XMVECTOR pos1;
-	XMVECTOR pos2;
-	XMVECTOR color;
+	XMVECTOR	pos0;
+	XMVECTOR	pos1;
+	XMVECTOR	pos2;
+	XMVECTOR	color;
+	int			ID;
 };
 
 struct ConstBuffer

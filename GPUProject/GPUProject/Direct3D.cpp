@@ -181,53 +181,54 @@ void Direct3D::init(Input* p_pInput)
 	m_triangles[5].pos2 = XMVectorSet( 4.0f*CUBESIZE,	4.0f*CUBESIZE,  -4.0f*CUBESIZE, 1.0f);
 																 
 	////Top														 
-	m_triangles[6].pos0 = XMVectorSet( 4.0f*CUBESIZE,	-4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
-	m_triangles[6].pos1 = XMVectorSet(-4.0f*CUBESIZE,	-4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
-	m_triangles[6].pos2 = XMVectorSet(-4.0f*CUBESIZE,	-4.0f*CUBESIZE,  -4.0f*CUBESIZE, 1.0f);
+	m_triangles[6].pos0 = XMVectorSet( 4.0f*CUBESIZE,	4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
+	m_triangles[6].pos1 = XMVectorSet(-4.0f*CUBESIZE,	4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
+	m_triangles[6].pos2 = XMVectorSet(-4.0f*CUBESIZE,	4.0f*CUBESIZE,  -4.0f*CUBESIZE, 1.0f);
 	  															 
-	m_triangles[7].pos0 = XMVectorSet( 4.0f*CUBESIZE,	-4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
-	m_triangles[7].pos1 = XMVectorSet( -4.0f*CUBESIZE,	-4.0f*CUBESIZE,  -4.0f*CUBESIZE, 1.0f);
-	m_triangles[7].pos2 = XMVectorSet( 4.0f*CUBESIZE,	-4.0f*CUBESIZE,  -4.0f*CUBESIZE, 1.0f);
+	m_triangles[7].pos0 = XMVectorSet( 4.0f*CUBESIZE,	4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
+	m_triangles[7].pos1 = XMVectorSet( -4.0f*CUBESIZE,	4.0f*CUBESIZE,  -4.0f*CUBESIZE, 1.0f);
+	m_triangles[7].pos2 = XMVectorSet( 4.0f*CUBESIZE,	4.0f*CUBESIZE,  -4.0f*CUBESIZE, 1.0f);
 																 
 	////Bottom													 
-	m_triangles[8].pos0 = XMVectorSet( 4.0f*CUBESIZE,	4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
-	m_triangles[8].pos1 = XMVectorSet(-4.0f*CUBESIZE,	4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
-	m_triangles[8].pos2 = XMVectorSet(4.0f*CUBESIZE,	4.0f*CUBESIZE, -4.0f*CUBESIZE, 1.0f);
+	m_triangles[8].pos1 = XMVectorSet( 4.0f*CUBESIZE,	-4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
+	m_triangles[8].pos0 = XMVectorSet(-4.0f*CUBESIZE,	-4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
+	m_triangles[8].pos2 = XMVectorSet(4.0f*CUBESIZE,	-4.0f*CUBESIZE, -4.0f*CUBESIZE, 1.0f);
 	  															 
-	m_triangles[9].pos0 = XMVectorSet( -4.0f*CUBESIZE,	4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
-	m_triangles[9].pos1 = XMVectorSet( -4.0f*CUBESIZE,	4.0f*CUBESIZE, -4.0f*CUBESIZE, 1.0f);
-	m_triangles[9].pos2 = XMVectorSet( 4.0f*CUBESIZE,	4.0f*CUBESIZE, -4.0f*CUBESIZE, 1.0f);
+	m_triangles[9].pos1 = XMVectorSet( -4.0f*CUBESIZE,	-4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
+	m_triangles[9].pos0 = XMVectorSet( -4.0f*CUBESIZE,	-4.0f*CUBESIZE, -4.0f*CUBESIZE, 1.0f);
+	m_triangles[9].pos2 = XMVectorSet( 4.0f*CUBESIZE,	-4.0f*CUBESIZE, -4.0f*CUBESIZE, 1.0f);
 
 	for(int i = 0; i < NROFTRIANGLES; i++)
 	{
 		m_triangles[i].color = XMVectorSet(0.0f,	1.0f,		0.0f, 1.0f);
+		m_triangles[i].ID = i;
 	}
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Light
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 	//Staticly adding light pos
-	m_lightList[0].pos = XMVectorSet(-10.0f,	-10.0f,	 -20.0f, 1.0f);
+	m_lightList[0].pos = XMVectorSet(-5.0f,	-5.0f,	 -5.0f, 1.0f);
 	m_lightList[1].pos = XMVectorSet(10.0f,		10.0f,	 -20.0f, 1.0f);
 	m_lightList[2].pos = XMVectorSet(10.0f,	    -10.0f,	 -20.0f, 1.0f);
 
 	//Spinning outside
 	m_lightList[3].pos = XMVectorSet(-10.0f,		10.0f,	 -20.0f, 1.0f);
-	//m_lightList[4].pos = XMVectorSet(20.0f,		10.0f,	-15.0f, 1.0f);
-	//m_lightList[5].pos = XMVectorSet(25.0f,		5.0f,	-15.0f, 1.0f); 
+	m_lightList[4].pos = XMVectorSet(20.0f,		10.0f,	-15.0f, 1.0f);
+	m_lightList[5].pos = XMVectorSet(25.0f,		5.0f,	-15.0f, 1.0f); 
 
-	////Extra light inside
-	//m_lightList[6].pos = XMVectorSet(30.0f,		0.0f,	-15.0f, 1.0f);
-	//m_lightList[7].pos = XMVectorSet(-5.0f,		30.0f,	-15.0f, 1.0f);
-	//m_lightList[8].pos = XMVectorSet(0.0f,		-30.0f, -15.0f, 1.0f);
-	//m_lightList[9].pos = XMVectorSet(-30.0f,	0.0f,	-30.0f, 1.0f);
+	//Extra light inside
+	m_lightList[6].pos = XMVectorSet(30.0f,		0.0f,	-15.0f, 1.0f);
+	m_lightList[7].pos = XMVectorSet(-5.0f,		30.0f,	-15.0f, 1.0f);
+	m_lightList[8].pos = XMVectorSet(0.0f,		-30.0f, -15.0f, 1.0f);
+	m_lightList[9].pos = XMVectorSet(-30.0f,	0.0f,	-30.0f, 1.0f);
 
 	for(int i = 0; i < NROFLIGHTS; i++)
 	{
 		m_lightList[i].ambient  = XMVectorSet(0.4f, 0.4f, 0.4f, 1.0f);
 		m_lightList[i].diffuse  = XMVectorSet(0.5f, 0.5f, 0.5f, 1.0f);
 		m_lightList[i].spec		= XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
-		m_lightList[i].att		= XMVectorSet(0.0f, 0.1f, 0.0f, 0.0f);
+		m_lightList[i].att		= XMVectorSet(0.0f, 0.2f, 0.0f, 0.0f);
 		m_lightList[i].range	= 100.0f;
 	}
 	//ID3D11Debug* debug;
@@ -274,7 +275,7 @@ void Direct3D::draw()
 
 	m_ComputeShader->Set();
 	m_Timer->Start();
-	m_DeviceContext->Dispatch( 25, 25, 1 );
+	m_DeviceContext->Dispatch( 25*4, 25*4, 1 );
 	m_Timer->Stop();
 	m_ComputeShader->Unset();
 
