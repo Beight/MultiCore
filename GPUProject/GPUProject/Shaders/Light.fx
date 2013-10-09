@@ -21,8 +21,8 @@ float3 PointLight(HitData hd, Light L, Ray r)
 	//the distance deom surface to light
 	float d = length(lightVec);
 
-	//if(d > L.range)
-		//return float3(0.0f, 0.0f, 0.0f);
+	if(d > L.range)
+		return float3(0.0f, 0.0f, 0.0f);
 
 	//Normalize light vector
 	lightVec /= d;
@@ -41,7 +41,7 @@ float3 PointLight(HitData hd, Light L, Ray r)
 		float specFactor	= pow(max(dot(R, toEye), 0.0f), 5);
 
 		litColor += diffuseFactor * hd.color.xyz * L.diffuse.xyz; //hd.color = diffuse
-		//litColor += specFactor * float3(1,1,1);// * hd.color.xyz *	L.spec.xyz; //hd.color = spec
+		//litColor += specFactor *  hd.color.xyz *	L.spec.xyz; //hd.color = spec
 	}
 
 	return litColor / dot(L.att.xyz, float3(1.0f, d, d*d));

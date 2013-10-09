@@ -33,7 +33,7 @@ HitData RaySphereIntersect(Ray p_ray, Sphere p_sphere, HitData p_hd)
 	HitData l_hd;
 	l_hd.color = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	l_hd.distance = -1.0f;
-	float distanceDelta = 0.001f;
+	float distanceDelta = 0.01f;
 	float4 length = p_sphere.center - p_ray.origin;
 	//s = Projection of length onto ray direction
 	float s = dot(length, p_ray.direction);
@@ -109,6 +109,7 @@ HitData RayTriangleIntersect(Ray p_ray, Triangle p_tri, HitData p_hd)
 	{
 		l_hd.pos = p_ray.origin + p_ray.direction * l_hd.distance;
 		float3 temp = cross(e1.xyz, e2.xyz);
+		//temp = abs(temp);
 		l_hd.normal = normalize(float4(temp, 1.0f));
 		l_hd.color = p_tri.color;
 		return l_hd;

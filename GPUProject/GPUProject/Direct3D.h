@@ -7,6 +7,10 @@
 #include "Input.h"
 #include "Camera.h"
 
+#define NROFTRIANGLES 10
+#define NROFLIGHTS 4
+#define CUBESIZE 4
+
 struct Light
 {
 	XMVECTOR pos;
@@ -40,9 +44,8 @@ struct ConstBuffer
 	XMMATRIX IP;
 	XMMATRIX IV;
 	Sphere sphere;
-	Triangle triangle;
-	Triangle triangle2;
-	Light lightList[10];
+	Triangle triangles[NROFTRIANGLES];
+	Light lightList[NROFLIGHTS];
 };
 
 class Direct3D
@@ -76,14 +79,13 @@ private:
 	Input*						m_pInput;
 
 	Sphere						m_sphere;
-	Triangle					m_triangle;
-	Triangle					m_triangle2;
+	Triangle					m_triangles[NROFTRIANGLES];
+	
 	XMMATRIX					m_view;
 	XMMATRIX					m_proj;
 	XMMATRIX					m_IVP;
 
-	const static int			m_nrLights = 10;
-	Light						m_lightList[m_nrLights];
+	Light						m_lightList[NROFLIGHTS];
 
 	void						release();
 };

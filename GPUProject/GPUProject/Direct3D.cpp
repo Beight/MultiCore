@@ -116,7 +116,7 @@ void Direct3D::init(Input* p_pInput)
 //Camera
 ///////////////////////////////////////////////////////////////////////////////////////////
 	m_pCamera = new Camera();
-	XMVECTOR cameraPos = XMVectorSet(0.0f, 0.0f, -10.0f, 0.0f);
+	XMVECTOR cameraPos = XMVectorSet(0.0f,		0.0f,	 -20.0f, 0.0f);
 	XMVECTOR cameraDir = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 	XMVECTOR cameraUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	m_pCamera->init(cameraPos, cameraUp, cameraDir, (float)m_Width, (float)m_Height);
@@ -151,43 +151,88 @@ void Direct3D::init(Input* p_pInput)
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Triangle
 ///////////////////////////////////////////////////////////////////////////////////////////
-	float size = 10;
-	m_triangle.pos0 = XMVectorSet( 4.0f*size,	-4.0f*size,	8.0f, 1.0f);
-	m_triangle.pos1 = XMVectorSet(-6.0f*size,	-4.0f*size,	8.0f, 1.0f);
-	m_triangle.pos2 = XMVectorSet(-6.0f*size,	 4.0f*size,	8.0f, 1.0f);
-	m_triangle.color = XMVectorSet(0.0f,		 1.0f,		0.0f, 1.0f);
+	
+	
+	//Back
+	m_triangles[0].pos0 = XMVectorSet( 4.0f*CUBESIZE,	-4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
+	m_triangles[0].pos1 = XMVectorSet(-4.0f*CUBESIZE,	-4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
+	m_triangles[0].pos2 = XMVectorSet(-4.0f*CUBESIZE,	4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
+	  															 
+	m_triangles[1].pos0 = XMVectorSet( 4.0f*CUBESIZE,  -4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
+	m_triangles[1].pos1 = XMVectorSet(-4.0f*CUBESIZE,	4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
+	m_triangles[1].pos2 = XMVectorSet( 4.0f*CUBESIZE,	4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
+																 
+	//Left														 
+	m_triangles[2].pos0 = XMVectorSet(-4.0f*CUBESIZE,  -4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
+	m_triangles[2].pos1 = XMVectorSet(-4.0f*CUBESIZE,  -4.0f*CUBESIZE,  -4.0f*CUBESIZE, 1.0f);
+	m_triangles[2].pos2 = XMVectorSet(-4.0f*CUBESIZE,	4.0f*CUBESIZE,  -4.0f*CUBESIZE, 1.0f);
+		  														 
+	m_triangles[3].pos0 = XMVectorSet(-4.0f*CUBESIZE,  -4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
+	m_triangles[3].pos1 = XMVectorSet(-4.0f*CUBESIZE,	4.0f*CUBESIZE,  -4.0f*CUBESIZE, 1.0f);
+	m_triangles[3].pos2 = XMVectorSet(-4.0f*CUBESIZE,	4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
+																 
+	////Right													 
+	m_triangles[4].pos0 = XMVectorSet( 4.0f*CUBESIZE,  -4.0f*CUBESIZE,  -4.0f*CUBESIZE, 1.0f);
+	m_triangles[4].pos1 = XMVectorSet( 4.0f*CUBESIZE,	-4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
+	m_triangles[4].pos2 = XMVectorSet( 4.0f*CUBESIZE,	4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
+	  															 
+	m_triangles[5].pos0 = XMVectorSet( 4.0f*CUBESIZE,  -4.0f*CUBESIZE,  -4.0f*CUBESIZE, 1.0f);
+	m_triangles[5].pos1 = XMVectorSet( 4.0f*CUBESIZE,	4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
+	m_triangles[5].pos2 = XMVectorSet( 4.0f*CUBESIZE,	4.0f*CUBESIZE,  -4.0f*CUBESIZE, 1.0f);
+																 
+	////Top														 
+	m_triangles[6].pos0 = XMVectorSet( 4.0f*CUBESIZE,	-4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
+	m_triangles[6].pos1 = XMVectorSet(-4.0f*CUBESIZE,	-4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
+	m_triangles[6].pos2 = XMVectorSet(-4.0f*CUBESIZE,	-4.0f*CUBESIZE,  -4.0f*CUBESIZE, 1.0f);
+	  															 
+	m_triangles[7].pos0 = XMVectorSet( 4.0f*CUBESIZE,	-4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
+	m_triangles[7].pos1 = XMVectorSet( -4.0f*CUBESIZE,	-4.0f*CUBESIZE,  -4.0f*CUBESIZE, 1.0f);
+	m_triangles[7].pos2 = XMVectorSet( 4.0f*CUBESIZE,	-4.0f*CUBESIZE,  -4.0f*CUBESIZE, 1.0f);
+																 
+	////Bottom													 
+	m_triangles[8].pos0 = XMVectorSet( 4.0f*CUBESIZE,	4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
+	m_triangles[8].pos1 = XMVectorSet(-4.0f*CUBESIZE,	4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
+	m_triangles[8].pos2 = XMVectorSet(4.0f*CUBESIZE,	4.0f*CUBESIZE, -4.0f*CUBESIZE, 1.0f);
+	  															 
+	m_triangles[9].pos0 = XMVectorSet( -4.0f*CUBESIZE,	4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
+	m_triangles[9].pos1 = XMVectorSet( -4.0f*CUBESIZE,	4.0f*CUBESIZE, -4.0f*CUBESIZE, 1.0f);
+	m_triangles[9].pos2 = XMVectorSet( 4.0f*CUBESIZE,	4.0f*CUBESIZE, -4.0f*CUBESIZE, 1.0f);
 
-	m_triangle2.pos0 = XMVectorSet( 4.0f*size, -4.0f*size,	8.0f, 1.0f);
-	m_triangle2.pos2 = XMVectorSet( 4.0f*size,	4.0f*size,	8.0f, 1.0f);
-	m_triangle2.pos1 = XMVectorSet(-6.0f*size,	4.0f*size,	8.0f, 1.0f);
-	m_triangle2.color = XMVectorSet(0.0f,	1.0f,	0.0f, 1.0f);
+	for(int i = 0; i < NROFTRIANGLES; i++)
+	{
+		m_triangles[i].color = XMVectorSet(0.0f,	1.0f,		0.0f, 1.0f);
+	}
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Light
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 	//Staticly adding light pos
-	m_lightList[0].pos = XMVectorSet(0.0f,		0.0f,	-15.0f, 1.0f);
-	m_lightList[1].pos = XMVectorSet(5.0f,		25.0f,	-15.0f, 1.0f);
-	m_lightList[2].pos = XMVectorSet(10.0f,		20.0f,	-15.0f, 1.0f);
-		   
-	m_lightList[3].pos = XMVectorSet(15.0f,		15.0f,	-15.0f, 1.0f);
-	m_lightList[4].pos = XMVectorSet(20.0f,		10.0f,	-15.0f, 1.0f);
-	m_lightList[5].pos = XMVectorSet(25.0f,		5.0f,	-15.0f, 1.0f);
-		   												
-	m_lightList[6].pos = XMVectorSet(30.0f,		0.0f,	-15.0f, 1.0f);
-	m_lightList[7].pos = XMVectorSet(-5.0f,		30.0f,	-15.0f, 1.0f);
-	m_lightList[8].pos = XMVectorSet(0.0f,		-30.0f, -15.0f, 1.0f);
+	m_lightList[0].pos = XMVectorSet(-10.0f,	-10.0f,	 -20.0f, 1.0f);
+	m_lightList[1].pos = XMVectorSet(10.0f,		10.0f,	 -20.0f, 1.0f);
+	m_lightList[2].pos = XMVectorSet(10.0f,	    -10.0f,	 -20.0f, 1.0f);
 
-	m_lightList[9].pos = XMVectorSet(-30.0f,		0.0f,	-30.0f, 1.0f);
+	//Spinning outside
+	m_lightList[3].pos = XMVectorSet(-10.0f,		10.0f,	 -20.0f, 1.0f);
+	//m_lightList[4].pos = XMVectorSet(20.0f,		10.0f,	-15.0f, 1.0f);
+	//m_lightList[5].pos = XMVectorSet(25.0f,		5.0f,	-15.0f, 1.0f); 
 
-	for(int i = 0; i < m_nrLights; i++)
+	////Extra light inside
+	//m_lightList[6].pos = XMVectorSet(30.0f,		0.0f,	-15.0f, 1.0f);
+	//m_lightList[7].pos = XMVectorSet(-5.0f,		30.0f,	-15.0f, 1.0f);
+	//m_lightList[8].pos = XMVectorSet(0.0f,		-30.0f, -15.0f, 1.0f);
+	//m_lightList[9].pos = XMVectorSet(-30.0f,	0.0f,	-30.0f, 1.0f);
+
+	for(int i = 0; i < NROFLIGHTS; i++)
 	{
-		m_lightList[i].ambient = XMVectorSet(0.4f, 0.4f, 0.4f, 1.0f);
-		m_lightList[i].diffuse = XMVectorSet(0.5f, 0.5f, 0.5f, 1.0f);
-		m_lightList[i].spec		=   XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
-		m_lightList[i].att		= XMVectorSet(0.0f, 0.25f, 0.0f, 0.0f);
-		m_lightList[i].range	= 50.0f;
+		m_lightList[i].ambient  = XMVectorSet(0.4f, 0.4f, 0.4f, 1.0f);
+		m_lightList[i].diffuse  = XMVectorSet(0.5f, 0.5f, 0.5f, 1.0f);
+		m_lightList[i].spec		= XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+		m_lightList[i].att		= XMVectorSet(0.0f, 0.1f, 0.0f, 0.0f);
+		m_lightList[i].range	= 100.0f;
 	}
+	//ID3D11Debug* debug;
+	//m_Device->QueryInterface(__uuidof(ID3D11Debug), (void**)&debug);
+	//debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
 }
 
 void Direct3D::update(float dt)
@@ -196,9 +241,9 @@ void Direct3D::update(float dt)
 	static float rotDT = 0.0f;
 	rotDT = dt;
 	rot = XMMatrixRotationAxis(XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f), rotDT);
-	for(int i = 0; i < m_nrLights; i++)
+	for(int i = 0; i < NROFLIGHTS; i++)
 	{
-		m_lightList[i].pos = XMVector4Transform(m_lightList[i].pos, rot);
+		//m_lightList[i].pos = XMVector4Transform(m_lightList[i].pos, rot);
 	}
 	m_pCamera->update();
 	ConstBuffer cRayBufferStruct;
@@ -208,13 +253,14 @@ void Direct3D::update(float dt)
 	cRayBufferStruct.IV = XMMatrixTranspose(cRayBufferStruct.IV);
 	cRayBufferStruct.IP = XMMatrixTranspose(cRayBufferStruct.IP);
 	cRayBufferStruct.sphere = m_sphere;
-	cRayBufferStruct.triangle = m_triangle;
-	cRayBufferStruct.triangle2 = m_triangle2;
-	for(int i = 0; i < m_nrLights; i++)
+	for(int i = 0; i < NROFTRIANGLES; i++)
+	{
+		cRayBufferStruct.triangles[i] = m_triangles[i];
+	}
+	for(int i = 0; i < NROFLIGHTS; i++)
 	{
 		cRayBufferStruct.lightList[i] = m_lightList[i];
 	}
-	
 	m_DeviceContext->UpdateSubresource(m_cBuffer, 0, NULL, &cRayBufferStruct, 0, 0);
 	m_DeviceContext->CSSetConstantBuffers(0, 1, &m_cBuffer);
 

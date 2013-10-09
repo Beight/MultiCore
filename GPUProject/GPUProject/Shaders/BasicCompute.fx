@@ -5,6 +5,8 @@
 #include "Light.fx"
 static const float WIDTH = 800.0f;
 static const float HEIGHT= 800.0f;
+#define NROFTRIANGLES 10
+#define NROFLIGHTS 4
 
 RWTexture2D<float4> output : register(u0);
 
@@ -15,9 +17,8 @@ cbuffer ConstBuffer
 	float4x4 IP;
 	float4x4 IV;
 	Sphere sphere;
-	Triangle tri;
-	Triangle tri2;
-	Light lightList[10];
+	Triangle triangles[NROFTRIANGLES];
+	Light lightList[NROFLIGHTS];
 };
 
 [numthreads(32, 32, 1)]
@@ -55,18 +56,17 @@ void main( uint3 threadID : SV_DispatchThreadID )
 
 
 	hd = RaySphereIntersect(r, sphere, hd);
-
-	hd = RayTriangleIntersect(r, tri, hd);
-
-	hd = RayTriangleIntersect(r, tri2, hd);
-
+	for(int i = 0; i < NROFTRIANGLES; i++)
+	{
+		hd = RayTriangleIntersect(r, triangles[i], hd);
+	}
 	if(hd.distance >  0.0f)
 	{
 		
 		///////////////////////////////////////////////
 		//Secondary Rays
 		///////////////////////////////////////////////
-		for(int i = 0; i < 10; i++)
+		for(int i = 0; i < NROFLIGHTS; i++)
 		{
 			Ray lightRay;
 			HitData lightHit;
@@ -78,19 +78,19 @@ void main( uint3 threadID : SV_DispatchThreadID )
 
 			lightHit = RaySphereIntersect(lightRay, sphere, lightHit);
 
-			lightHit = RayTriangleIntersect(lightRay, tri, lightHit);
+			for(int j = 0; j < NROFTRIANGLES; j++)
+			{
+				lightHit = RayTriangleIntersect(lightRay, triangles[j], lightHit);
+			}
 
-			lightHit = RayTriangleIntersect(lightRay, tri2, lightHit);
 			if(lightHit.distance > 0.0f)
 			{
-				color += PointLight(hd, lightList[i], r);
-				color *= 0.8f;
+				color += (PointLight(hd, lightList[i], r)*0.1f);
 			}	
 			else 
 				color += PointLight(hd, lightList[i], r);
 		}
 		//Calculate bounce
-
 	}
 
 
@@ -101,5 +101,5 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	///////////////////////////////////////////////
 	hd.color = float4(color, 1.0f);
 
-	output[threadID.xy] = hd.color;
+	output[threadID.xy] = hd.normal;
 }

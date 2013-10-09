@@ -26,6 +26,7 @@ void Camera::update()
 {
 	//m_right = XMVector3Cross(m_up, m_look);
 	m_lookAt = m_look + m_pos;
+	//m_lookAt =XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
 	m_view = XMMatrixLookAtLH(m_pos, m_lookAt, m_up);
 }
 
