@@ -33,8 +33,13 @@ struct HitData
 HitData RaySphereIntersect(Ray p_ray, Sphere p_sphere, HitData p_hd)
 {
 	HitData l_hd;
-	l_hd.color = float4(0.0f, 0.0f, 0.0f, 0.0f);
-	l_hd.distance = -1.0f;
+	
+	l_hd.color		= float4(0.0f, 0.0f, 0.0f, 0.0f);
+	l_hd.distance	= -1.0f;
+	l_hd.ID			= -1;
+	l_hd.pos		= float4(0.0f, 0.0f, 0.0f, 0.0f);
+	l_hd.normal		= float4(0.0f, 0.0f, 0.0f, 0.0f);
+
 	float distanceDelta = 0.001f;
 	float4 length = p_sphere.center - p_ray.origin;
 	//s = Projection of length onto ray direction
@@ -75,8 +80,6 @@ HitData RaySphereIntersect(Ray p_ray, Sphere p_sphere, HitData p_hd)
 
 HitData RayTriangleIntersect(Ray p_ray, Triangle p_tri, HitData p_hd)
 {
-	/*if(p_hd.ID != p_tri.ID)
-	{*/
 	HitData l_hd;
 	float distanceDelta = 0.001f;
 	l_hd.distance = -1.0f;
@@ -120,7 +123,5 @@ HitData RayTriangleIntersect(Ray p_ray, Triangle p_tri, HitData p_hd)
 		l_hd.ID = p_tri.ID;
 		return l_hd;
 	}
-	
-	//}
 	return p_hd;
 }

@@ -154,49 +154,49 @@ void Direct3D::init(Input* p_pInput)
 	
 	
 	//Back
-	m_triangles[0].pos0 = XMVectorSet( 4.0f*CUBESIZE,	-4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
-	m_triangles[0].pos1 = XMVectorSet(-4.0f*CUBESIZE,	-4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
-	m_triangles[0].pos2 = XMVectorSet(-4.0f*CUBESIZE,	4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
-	  															 
-	m_triangles[1].pos0 = XMVectorSet( 4.0f*CUBESIZE,  -4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
-	m_triangles[1].pos1 = XMVectorSet(-4.0f*CUBESIZE,	4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
-	m_triangles[1].pos2 = XMVectorSet( 4.0f*CUBESIZE,	4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
-																 
-	//Left														 
-	m_triangles[2].pos0 = XMVectorSet(-4.0f*CUBESIZE,  -4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
-	m_triangles[2].pos1 = XMVectorSet(-4.0f*CUBESIZE,  -4.0f*CUBESIZE,  -4.0f*CUBESIZE, 1.0f);
-	m_triangles[2].pos2 = XMVectorSet(-4.0f*CUBESIZE,	4.0f*CUBESIZE,  -4.0f*CUBESIZE, 1.0f);
-		  														 
-	m_triangles[3].pos0 = XMVectorSet(-4.0f*CUBESIZE,  -4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
-	m_triangles[3].pos1 = XMVectorSet(-4.0f*CUBESIZE,	4.0f*CUBESIZE,  -4.0f*CUBESIZE, 1.0f);
-	m_triangles[3].pos2 = XMVectorSet(-4.0f*CUBESIZE,	4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
-																 
-	////Right													 
-	m_triangles[4].pos0 = XMVectorSet( 4.0f*CUBESIZE,  -4.0f*CUBESIZE,  -4.0f*CUBESIZE, 1.0f);
-	m_triangles[4].pos1 = XMVectorSet( 4.0f*CUBESIZE,	-4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
-	m_triangles[4].pos2 = XMVectorSet( 4.0f*CUBESIZE,	4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
-	  															 
-	m_triangles[5].pos0 = XMVectorSet( 4.0f*CUBESIZE,  -4.0f*CUBESIZE,  -4.0f*CUBESIZE, 1.0f);
-	m_triangles[5].pos1 = XMVectorSet( 4.0f*CUBESIZE,	4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
-	m_triangles[5].pos2 = XMVectorSet( 4.0f*CUBESIZE,	4.0f*CUBESIZE,  -4.0f*CUBESIZE, 1.0f);
-																 
-	////Top														 
-	m_triangles[6].pos0 = XMVectorSet( 4.0f*CUBESIZE,	4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
-	m_triangles[6].pos1 = XMVectorSet(-4.0f*CUBESIZE,	4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
-	m_triangles[6].pos2 = XMVectorSet(-4.0f*CUBESIZE,	4.0f*CUBESIZE,  -4.0f*CUBESIZE, 1.0f);
-	  															 
-	m_triangles[7].pos0 = XMVectorSet( 4.0f*CUBESIZE,	4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
-	m_triangles[7].pos1 = XMVectorSet( -4.0f*CUBESIZE,	4.0f*CUBESIZE,  -4.0f*CUBESIZE, 1.0f);
-	m_triangles[7].pos2 = XMVectorSet( 4.0f*CUBESIZE,	4.0f*CUBESIZE,  -4.0f*CUBESIZE, 1.0f);
-																 
-	////Bottom													 
-	m_triangles[8].pos1 = XMVectorSet( 4.0f*CUBESIZE,	-4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
-	m_triangles[8].pos0 = XMVectorSet(-4.0f*CUBESIZE,	-4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
-	m_triangles[8].pos2 = XMVectorSet(4.0f*CUBESIZE,	-4.0f*CUBESIZE, -4.0f*CUBESIZE, 1.0f);
-	  															 
-	m_triangles[9].pos1 = XMVectorSet( -4.0f*CUBESIZE,	-4.0f*CUBESIZE,	 4.0f*CUBESIZE, 1.0f);
-	m_triangles[9].pos0 = XMVectorSet( -4.0f*CUBESIZE,	-4.0f*CUBESIZE, -4.0f*CUBESIZE, 1.0f);
-	m_triangles[9].pos2 = XMVectorSet( 4.0f*CUBESIZE,	-4.0f*CUBESIZE, -4.0f*CUBESIZE, 1.0f);
+	m_triangles[0].pos0 = XMVectorSet( 1.0f*CUBESIZE,	-1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
+	m_triangles[0].pos1 = XMVectorSet(-1.0f*CUBESIZE,	-1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
+	m_triangles[0].pos2 = XMVectorSet(-1.0f*CUBESIZE,	1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
+	  															 		 
+	m_triangles[1].pos0 = XMVectorSet( 1.0f*CUBESIZE,  -1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
+	m_triangles[1].pos1 = XMVectorSet(-1.0f*CUBESIZE,	1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
+	m_triangles[1].pos2 = XMVectorSet( 1.0f*CUBESIZE,	1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
+																 		 
+	//Left														 		 
+	m_triangles[2].pos0 = XMVectorSet(-1.0f*CUBESIZE,  -1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
+	m_triangles[2].pos1 = XMVectorSet(-1.0f*CUBESIZE,  -1.0f*CUBESIZE,  -1.0f*CUBESIZE, 1.0f);
+	m_triangles[2].pos2 = XMVectorSet(-1.0f*CUBESIZE,	1.0f*CUBESIZE,  -1.0f*CUBESIZE, 1.0f);
+		  														 		 
+	m_triangles[3].pos0 = XMVectorSet(-1.0f*CUBESIZE,  -1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
+	m_triangles[3].pos1 = XMVectorSet(-1.0f*CUBESIZE,	1.0f*CUBESIZE,  -1.0f*CUBESIZE, 1.0f);
+	m_triangles[3].pos2 = XMVectorSet(-1.0f*CUBESIZE,	1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
+																 		 
+	////Right													 		 
+	m_triangles[4].pos0 = XMVectorSet( 1.0f*CUBESIZE,  -1.0f*CUBESIZE,  -1.0f*CUBESIZE, 1.0f);
+	m_triangles[4].pos1 = XMVectorSet( 1.0f*CUBESIZE,	-1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
+	m_triangles[4].pos2 = XMVectorSet( 1.0f*CUBESIZE,	1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
+	  															 		 
+	m_triangles[5].pos0 = XMVectorSet( 1.0f*CUBESIZE,  -1.0f*CUBESIZE,  -1.0f*CUBESIZE, 1.0f);
+	m_triangles[5].pos1 = XMVectorSet( 1.0f*CUBESIZE,	1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
+	m_triangles[5].pos2 = XMVectorSet( 1.0f*CUBESIZE,	1.0f*CUBESIZE,  -1.0f*CUBESIZE, 1.0f);
+																 		 
+	////Top														 		 
+	m_triangles[6].pos0 = XMVectorSet( 1.0f*CUBESIZE,	1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
+	m_triangles[6].pos1 = XMVectorSet(-1.0f*CUBESIZE,	1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
+	m_triangles[6].pos2 = XMVectorSet(-1.0f*CUBESIZE,	1.0f*CUBESIZE,  -1.0f*CUBESIZE, 1.0f);
+	  															 		 
+	m_triangles[7].pos0 = XMVectorSet( 1.0f*CUBESIZE,	1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
+	m_triangles[7].pos1 = XMVectorSet(-1.0f*CUBESIZE,	1.0f*CUBESIZE,  -1.0f*CUBESIZE, 1.0f);
+	m_triangles[7].pos2 = XMVectorSet( 1.0f*CUBESIZE,	1.0f*CUBESIZE,  -1.0f*CUBESIZE, 1.0f);
+																 		 
+	////Bottom													 		 
+	m_triangles[8].pos1 = XMVectorSet( 1.0f*CUBESIZE,	-1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
+	m_triangles[8].pos0 = XMVectorSet(-1.0f*CUBESIZE,	-1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
+	m_triangles[8].pos2 = XMVectorSet( 1.0f*CUBESIZE,	-1.0f*CUBESIZE, -1.0f*CUBESIZE, 1.0f);
+	  														 			 
+	m_triangles[9].pos1 = XMVectorSet(-1.0f*CUBESIZE,	-1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
+	m_triangles[9].pos0 = XMVectorSet(-1.0f*CUBESIZE,	-1.0f*CUBESIZE, -1.0f*CUBESIZE, 1.0f);
+	m_triangles[9].pos2 = XMVectorSet( 1.0f*CUBESIZE,	-1.0f*CUBESIZE, -1.0f*CUBESIZE, 1.0f);
 
 	for(int i = 0; i < NROFTRIANGLES; i++)
 	{
@@ -213,15 +213,16 @@ void Direct3D::init(Input* p_pInput)
 	m_lightList[2].pos = XMVectorSet(10.0f,	    -10.0f,	 -20.0f, 1.0f);
 
 	//Spinning outside
-	m_lightList[3].pos = XMVectorSet(-10.0f,		10.0f,	 -20.0f, 1.0f);
-	m_lightList[4].pos = XMVectorSet(20.0f,		10.0f,	-15.0f, 1.0f);
-	m_lightList[5].pos = XMVectorSet(25.0f,		5.0f,	-15.0f, 1.0f); 
+	m_lightList[3].pos = XMVectorSet(-10.0f,	10.0f,	 -20.0f, 1.0f);
+
+	m_lightList[4].pos = XMVectorSet(0.0f,		-5.0f,	-50.0f, 1.0f);
+	m_lightList[5].pos = XMVectorSet(25.0f,		5.0f,	-50.0f, 1.0f); 
 
 	//Extra light inside
-	m_lightList[6].pos = XMVectorSet(30.0f,		0.0f,	-15.0f, 1.0f);
-	m_lightList[7].pos = XMVectorSet(-5.0f,		30.0f,	-15.0f, 1.0f);
-	m_lightList[8].pos = XMVectorSet(0.0f,		-30.0f, -15.0f, 1.0f);
-	m_lightList[9].pos = XMVectorSet(-30.0f,	0.0f,	-30.0f, 1.0f);
+	m_lightList[6].pos = XMVectorSet(30.0f,		0.0f,	-50.0f, 1.0f);
+	m_lightList[7].pos = XMVectorSet(-5.0f,		30.0f,	-50.0f, 1.0f);
+	m_lightList[8].pos = XMVectorSet(0.0f,		-30.0f, -50.0f, 1.0f);
+	m_lightList[9].pos = XMVectorSet(-30.0f,	0.0f,	-50.0f, 1.0f);
 
 	for(int i = 0; i < NROFLIGHTS; i++)
 	{
@@ -231,9 +232,12 @@ void Direct3D::init(Input* p_pInput)
 		m_lightList[i].att		= XMVectorSet(0.0f, 0.2f, 0.0f, 0.0f);
 		m_lightList[i].range	= 100.0f;
 	}
-	//ID3D11Debug* debug;
-	//m_Device->QueryInterface(__uuidof(ID3D11Debug), (void**)&debug);
-	//debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+	
+	
+	ID3D11Debug* debug;
+	m_Device->QueryInterface(__uuidof(ID3D11Debug), (void**)&debug);
+	debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
+	SAFE_RELEASE(debug);
 }
 
 void Direct3D::update(float dt)
@@ -244,7 +248,7 @@ void Direct3D::update(float dt)
 	rot = XMMatrixRotationAxis(XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f), rotDT);
 	for(int i = 0; i < NROFLIGHTS; i++)
 	{
-		//m_lightList[i].pos = XMVector4Transform(m_lightList[i].pos, rot);
+		m_lightList[i].pos = XMVector4Transform(m_lightList[i].pos, rot);
 	}
 	m_pCamera->update();
 	ConstBuffer cRayBufferStruct;
@@ -275,11 +279,11 @@ void Direct3D::draw()
 
 	m_ComputeShader->Set();
 	m_Timer->Start();
-	m_DeviceContext->Dispatch( 25*4, 25*4, 1 );
+	m_DeviceContext->Dispatch( 25, 25, 1 );
 	m_Timer->Stop();
 	m_ComputeShader->Unset();
 
-	uav[0] = NULL;
+	uav[0] = nullptr;
 	m_DeviceContext->CSSetUnorderedAccessViews(0, 1, uav, NULL);
 
 

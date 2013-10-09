@@ -21,7 +21,7 @@ cbuffer ConstBuffer
 	Light lightList[NROFLIGHTS];
 };
 
-[numthreads(16, 16, 1)]
+[numthreads(32, 32, 1)]
 void main( uint3 threadID : SV_DispatchThreadID )
 {
 	///////////////////////////////////////////////
@@ -56,7 +56,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 
 
 	hd = RaySphereIntersect(r, sphere, hd);
-	for(int i = 0; i < NROFTRIANGLES; i++)
+	for(int i = 0; i < 10; i++)
 	{
 			hd = RayTriangleIntersect(r, triangles[i], hd);
 	}
@@ -66,7 +66,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 		///////////////////////////////////////////////
 		//Secondary Rays
 		///////////////////////////////////////////////
-		for(int i = 0; i < NROFLIGHTS; i++)
+		[unroll]for(int i = 0; i < NROFLIGHTS; i++)
 		{
 			Ray lightRay;
 			HitData lightHit;
@@ -84,9 +84,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 				if(hd.ID-j)
 				{
 					lightHit = RayTriangleIntersect(lightRay, triangles[j], lightHit);
-					//lightHit.distance = j;
 				}
-				
 			}
 
 			if(lightHit.distance > 0.0f && lightLength > lightHit.distance)
@@ -97,7 +95,6 @@ void main( uint3 threadID : SV_DispatchThreadID )
 			else 
 				color += PointLight(hd, lightList[i], r);
 		}
-		//Calculate bounce
 	}
 
 

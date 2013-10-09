@@ -9,7 +9,7 @@
 
 #define NROFTRIANGLES 10
 #define NROFLIGHTS 10
-#define CUBESIZE 4
+#define CUBESIZE 16
 
 struct Light
 {

@@ -46,7 +46,6 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 			//render
 			D3D.update(dt);
 			D3D.draw();
-			SetCursorPos(400, 400);
 			prevTimeStamp = currTimeStamp;
 		}
 	}

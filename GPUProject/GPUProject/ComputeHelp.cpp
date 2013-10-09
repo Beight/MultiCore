@@ -19,6 +19,7 @@ ComputeShader::ComputeShader()
 ComputeShader::~ComputeShader()
 {
 	SAFE_RELEASE(mD3DDevice);
+	SAFE_RELEASE(mD3DDeviceContext);
 }
 
 bool ComputeShader::Init(TCHAR* shaderFile, char* blobFileAppendix, char* pFunctionName, D3D10_SHADER_MACRO* pDefines,
