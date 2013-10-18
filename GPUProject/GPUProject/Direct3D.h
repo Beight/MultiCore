@@ -81,6 +81,8 @@ private:
 	int							m_Height;
 	D3DTimer*					m_Timer;
 	Input*						m_pInput;
+	float						m_fps;
+	float						m_time;
 
 	Sphere						m_sphere;
 	Triangle					m_triangles[NROFTRIANGLES];

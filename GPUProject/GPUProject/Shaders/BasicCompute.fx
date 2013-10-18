@@ -65,7 +65,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 		hd.color = sphere.color;
 		hd.distance = hit;
 	}
-
+	
 	for(int i = 0; i < 10; i++)
 	{
 			float3 paddy = triangles[i].pad;
@@ -89,24 +89,52 @@ void main( uint3 threadID : SV_DispatchThreadID )
 		//First Light Ray
 		///////////////////////////////////////////////
 		finalColor += LightStage(hd, r);
-		for(int j = 0; j < 1; j++)
+		///////////////////////////////////////////////
+		//Bounce Rays
+		///////////////////////////////////////////////
+		Ray bounceRay;
+		bounceRay = r;
+		HitData bounceHit;
+		bounceHit.distance = -1.0f;
+		bounceHit.pos = hd.pos;
+		bounceHit.color = hd.color;
+		bounceHit.normal = hd.normal;
+		bounceHit.ID = -1;
+		for(int j = 0; j < 5; j++)
 		{
-			Ray bounceRay;
-			float hit = -1.0f;
-			HitData bounceHit;
+			float bHit = -1.0f;
 			bounceHit.distance = -1.0f;
-			float4 bounceDir = reflect(r.direction, hd.normal);
+			bounceHit.ID = -1;
+			float4 bounceDir = reflect(bounceRay.direction, bounceHit.normal);
 			bounceDir = normalize(bounceDir);
-			bounceRay.origin = hd.pos;
+			bounceRay.origin = bounceHit.pos;
 			bounceRay.direction = bounceDir;
 
-			bounceHit = RaySphereIntersect(bounceRay, sphere, bounceHit);
+			bHit = RaySphereIntersect(bounceRay, sphere, bounceHit.distance);
+			if(bHit > -1.0f)
+			{
+				bounceHit.pos = bounceRay.origin + bounceRay.direction * bHit;
+				bounceHit.normal = normalize(bounceHit.pos - sphere.center);
+				bounceHit.color = sphere.color;
+				bounceHit.distance = bHit;
+			}
 			for(int i = 0; i < 10; i++)
 			{
 				float3 paddy = triangles[i].pad;
-				bounceHit = RayTriangleIntersect(bounceRay, triangles[i], bounceHit);
+				bHit = RayTriangleIntersect(bounceRay, triangles[i], bounceHit.distance);
+				if(bHit > -1.0f)
+				{
+					bounceHit.pos = bounceRay.origin + bounceRay.direction * bHit;
+					float4 e1 = triangles[i].pos1 - triangles[i].pos0;
+					float4 e2 = triangles[i].pos2 - triangles[i].pos0;
+					float3 temp = cross(e1.xyz, e2.xyz);
+					bounceHit.normal = normalize(float4(temp, 1.0f));
+					bounceHit.color = triangles[i].color;
+					bounceHit.ID = triangles[i].ID;
+					bounceHit.distance = hit;
+				}
 			}
-			finalColor += LightStage(bounceHit, bounceRay) * 0.5f;
+			finalColor += LightStage(bounceHit, bounceRay) * 0.99f;
 		}
 	}
 
@@ -140,8 +168,8 @@ float3 LightStage(HitData hd, Ray r)
 				lightHit.normal = normalize(lightHit.pos - sphere.center);
 				lightHit.color = sphere.color;
 				lightHit.distance = hit;
+				lightHit.ID = 5000;
 			}	
-			
 			for(int j = 0; j < NROFTRIANGLES; j++)
 			{
 				if(hd.ID-j)

@@ -10,7 +10,8 @@ Direct3D::Direct3D(HWND p_hwnd)
 	m_Timer			= nullptr;
 	m_ComputeSys	= nullptr;
 	m_ComputeShader	= nullptr;
-	
+	m_time = 0.0f;
+	m_fps = 0.0f;
 }
 
 Direct3D::~Direct3D()
@@ -253,8 +254,21 @@ void Direct3D::update(float dt)
 		m_lightList[i].pos = XMVector4Transform(m_lightList[i].pos, rot);
 	}
 	m_pCamera->update();
-	ConstBuffer cRayBufferStruct;
+	//m_fps = 1/dt;
+	m_time += dt;
+	static int frameCnt = 0;
+    static float t_base = 0.0f;
+	frameCnt++;
+	
+	if(m_time - t_base >= 1.0f)
+	{
+		frameCnt /= 1;
+		m_fps = frameCnt;
+		frameCnt = 0;
+		t_base += 1.0f;
+	}
 
+	ConstBuffer cRayBufferStruct;
 	cRayBufferStruct.cameraPos = m_pCamera->getPosition();
 	cRayBufferStruct.IV = XMMatrixInverse(NULL, m_pCamera->getViewMat());
 	cRayBufferStruct.IP = XMMatrixInverse(NULL, m_pCamera->getProjMat());
@@ -300,8 +314,8 @@ void Direct3D::draw()
 	sprintf_s(
 		title,
 		sizeof(title),
-		"DirectCompute DEMO - Dispatch time: %f. CameraPos X: %f, Y: %f, Z: %f",
-		m_Timer->GetTime(), x, y, z
+		"DirectCompute DEMO - Dispatch time: %f. CameraPos X: %f, Y: %f, Z: %f, fps: %f",
+		m_Timer->GetTime(), x, y, z, m_fps
 	);
 	SetWindowText(m_hWnd, title);
 }
