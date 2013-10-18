@@ -30,6 +30,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	///////////////////////////////////////////////
 
 	HitData hd;
+	float hit = -1.0f;
 	hd.distance = -1.0;
 	Ray r;
 	float norm_X, norm_Y;
@@ -56,11 +57,30 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	float3 finalColor = float3(0.0f, 0.0f, 0.0f);
 
 	float3 paddy = sphere.pad;
-	hd = RaySphereIntersect(r, sphere, hd);
+	hit = RaySphereIntersect(r, sphere, hd.distance);
+	if(hit > -1.0f)
+	{
+		hd.pos = r.origin + r.direction * hit;
+		hd.normal = normalize(hd.pos - sphere.center);
+		hd.color = sphere.color;
+		hd.distance = hit;
+	}
+
 	for(int i = 0; i < 10; i++)
 	{
 			float3 paddy = triangles[i].pad;
-			hd = RayTriangleIntersect(r, triangles[i], hd);
+			hit = RayTriangleIntersect(r, triangles[i], hd.distance);
+			if(hit > -1.0f)
+			{
+				hd.pos = r.origin + r.direction * hit;
+				float4 e1 = triangles[i].pos1 - triangles[i].pos0;
+				float4 e2 = triangles[i].pos2 - triangles[i].pos0;
+				float3 temp = cross(e1.xyz, e2.xyz);
+				hd.normal = normalize(float4(temp, 1.0f));
+				hd.color = triangles[i].color;
+				hd.ID = triangles[i].ID;
+				hd.distance = hit;
+			}
 	}
 	if(hd.distance >  0.0f)
 	{
@@ -72,6 +92,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 		for(int j = 0; j < 1; j++)
 		{
 			Ray bounceRay;
+			float hit = -1.0f;
 			HitData bounceHit;
 			bounceHit.distance = -1.0f;
 			float4 bounceDir = reflect(r.direction, hd.normal);
@@ -97,11 +118,13 @@ void main( uint3 threadID : SV_DispatchThreadID )
 
 float3 LightStage(HitData hd, Ray r)
 {
+		
 		float3 final = float3(0.f,0.f,0.f);
 		for(int i = 1; i < 2; i++)
 		{
 			float3 color = float3(0.0f, 0.0f, 0.0f);
 			Ray lightRay;
+			float hit = -1.0f;
 			HitData lightHit;
 			lightHit.distance = -1.0f;
 			float4 lightDir = lightList[i].pos - hd.pos;
@@ -110,13 +133,31 @@ float3 LightStage(HitData hd, Ray r)
 			lightRay.direction = lightDir;
 			float lightLength = length(lightList[i].pos.xyz - hd.pos.xyz);
 
-			lightHit = RaySphereIntersect(lightRay, sphere, lightHit);
+			hit = RaySphereIntersect(lightRay, sphere, hd.distance);
+			if(hit > -1.0f)
+			{
+				lightHit.pos = lightRay.origin + lightRay.direction * hit;
+				lightHit.normal = normalize(lightHit.pos - sphere.center);
+				lightHit.color = sphere.color;
+				lightHit.distance = hit;
+			}	
 			
 			for(int j = 0; j < NROFTRIANGLES; j++)
 			{
 				if(hd.ID-j)
 				{
-					lightHit = RayTriangleIntersect(lightRay, triangles[j], lightHit);
+					hit = RayTriangleIntersect(lightRay, triangles[j], hd.distance);
+					if(hit > -1.0f)
+					{
+						lightHit.pos = r.origin + r.direction * hit;
+						float4 e1 = triangles[j].pos1 - triangles[j].pos0;
+						float4 e2 = triangles[j].pos2 - triangles[j].pos0;
+						float3 temp = cross(e1.xyz, e2.xyz);
+						lightHit.normal = normalize(float4(temp, 1.0f));
+						lightHit.color = triangles[j].color;
+						lightHit.ID = triangles[j].ID;
+						hd.distance = hit;
+					}
 				}
 			}
 
