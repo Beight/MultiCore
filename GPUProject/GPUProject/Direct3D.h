@@ -29,7 +29,8 @@ struct Sphere
 	XMVECTOR center;
 	XMVECTOR color;
 	float radius;
-	XMFLOAT3 pad;
+	int		ID;
+	XMFLOAT2 pad;
 };
 
 struct Triangle

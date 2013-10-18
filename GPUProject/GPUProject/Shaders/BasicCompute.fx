@@ -56,7 +56,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 
 	float3 finalColor = float3(0.0f, 0.0f, 0.0f);
 
-	float3 paddy = sphere.pad;
+	float2 paddy = sphere.pad;
 	hit = RaySphereIntersect(r, sphere, hd.distance);
 	if(hit > -1.0f)
 	{
@@ -100,7 +100,8 @@ void main( uint3 threadID : SV_DispatchThreadID )
 		bounceHit.color = hd.color;
 		bounceHit.normal = hd.normal;
 		bounceHit.ID = -1;
-		for(int j = 0; j < 5; j++)
+
+		for(int j = 0; j < 1; j++)
 		{
 			float bHit = -1.0f;
 			bounceHit.distance = -1.0f;
@@ -109,32 +110,41 @@ void main( uint3 threadID : SV_DispatchThreadID )
 			bounceDir = normalize(bounceDir);
 			bounceRay.origin = bounceHit.pos;
 			bounceRay.direction = bounceDir;
-
-			bHit = RaySphereIntersect(bounceRay, sphere, bounceHit.distance);
-			if(bHit > -1.0f)
+			if(bounceHit.ID != -2)
 			{
-				bounceHit.pos = bounceRay.origin + bounceRay.direction * bHit;
-				bounceHit.normal = normalize(bounceHit.pos - sphere.center);
-				bounceHit.color = sphere.color;
-				bounceHit.distance = bHit;
+				bHit = RaySphereIntersect(bounceRay, sphere, bounceHit.distance);
+				if(bHit > -1.0f)
+				{
+					bounceHit.pos = bounceRay.origin + bounceRay.direction * bHit;
+					bounceHit.normal = normalize(bounceHit.pos - sphere.center);
+					bounceHit.color = sphere.color;
+					bounceHit.distance = bHit;
+					bounceHit.ID = -2;
+				}
 			}
 			for(int i = 0; i < 10; i++)
 			{
 				float3 paddy = triangles[i].pad;
-				bHit = RayTriangleIntersect(bounceRay, triangles[i], bounceHit.distance);
-				if(bHit > -1.0f)
-				{
-					bounceHit.pos = bounceRay.origin + bounceRay.direction * bHit;
-					float4 e1 = triangles[i].pos1 - triangles[i].pos0;
-					float4 e2 = triangles[i].pos2 - triangles[i].pos0;
-					float3 temp = cross(e1.xyz, e2.xyz);
-					bounceHit.normal = normalize(float4(temp, 1.0f));
-					bounceHit.color = triangles[i].color;
-					bounceHit.ID = triangles[i].ID;
-					bounceHit.distance = hit;
-				}
+					if(bounceHit.ID != i)
+					{
+						bHit = RayTriangleIntersect(bounceRay, triangles[i], bounceHit.distance);
+						if(bHit > -1.0f)
+						{
+							bounceHit.pos = bounceRay.origin + bounceRay.direction * bHit;
+							float4 e1 = triangles[i].pos1 - triangles[i].pos0;
+							float4 e2 = triangles[i].pos2 - triangles[i].pos0;
+							float3 temp = cross(e1.xyz, e2.xyz);
+							bounceHit.normal = normalize(float4(temp, 1.0f));
+							bounceHit.color = triangles[i].color;
+							bounceHit.ID = triangles[i].ID;
+							bounceHit.distance = bHit;
+						}
+					}
 			}
-			finalColor += LightStage(bounceHit, bounceRay) * 0.99f;
+			//if(bounceHit.ID == -1)
+				//finalColor = float4(1,0,0,1);
+			//else
+				finalColor += LightStage(bounceHit, bounceRay) * 0.2f;
 		}
 	}
 
@@ -161,6 +171,7 @@ float3 LightStage(HitData hd, Ray r)
 			lightRay.direction = lightDir;
 			float lightLength = length(lightList[i].pos.xyz - hd.pos.xyz);
 
+			
 			hit = RaySphereIntersect(lightRay, sphere, hd.distance);
 			if(hit > -1.0f)
 			{
@@ -168,7 +179,6 @@ float3 LightStage(HitData hd, Ray r)
 				lightHit.normal = normalize(lightHit.pos - sphere.center);
 				lightHit.color = sphere.color;
 				lightHit.distance = hit;
-				lightHit.ID = 5000;
 			}	
 			for(int j = 0; j < NROFTRIANGLES; j++)
 			{

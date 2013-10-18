@@ -10,7 +10,8 @@ struct Sphere
 	float4 center;
 	float4 color;
 	float radius;
-	float3 pad;
+	int		ID;
+	float2 pad;
 };
 
 struct Triangle

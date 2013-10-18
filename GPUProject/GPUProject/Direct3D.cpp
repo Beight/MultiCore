@@ -148,7 +148,8 @@ void Direct3D::init(Input* p_pInput)
 	m_sphere.center = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 	m_sphere.radius = 2.0f;
 	m_sphere.color = XMVectorSet(1.0f, 0.0f, 0.0f, 1.0f);
-	m_sphere.pad = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	m_sphere.pad = XMFLOAT2(0.0f, 0.0f);
+	m_sphere.ID = -2;
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Triangle
 ///////////////////////////////////////////////////////////////////////////////////////////
