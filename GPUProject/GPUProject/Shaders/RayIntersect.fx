@@ -8,8 +8,9 @@ struct Ray
 struct Sphere
 {
 	float4 center;
-	float radius;
 	float4 color;
+	float radius;
+	float3 pad;
 };
 
 struct Triangle
@@ -19,6 +20,7 @@ struct Triangle
 	float4	pos2;
 	float4	color;
 	int		ID;
+	float3	pad;
 };
 
 struct HitData
@@ -50,7 +52,7 @@ HitData RaySphereIntersect(Ray p_ray, Sphere p_sphere, HitData p_hd)
 	if(s < 0 && lengthSquared > radiusSquared)
 	{
 		//miss
-		return p_hd;
+		return NULL;
 	}
 	//m = Squared distance from sphere center to projection
 	float m = lengthSquared - (s*s);

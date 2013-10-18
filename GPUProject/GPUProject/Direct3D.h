@@ -20,14 +20,16 @@ struct Light
 	XMVECTOR spec;
 	XMVECTOR att;
 	float range;
+	XMFLOAT3 pad;
 };
 
 
 struct Sphere
 {
 	XMVECTOR center;
-	float radius;
 	XMVECTOR color;
+	float radius;
+	XMFLOAT3 pad;
 };
 
 struct Triangle
@@ -37,6 +39,7 @@ struct Triangle
 	XMVECTOR	pos2;
 	XMVECTOR	color;
 	int			ID;
+	XMFLOAT3	pad;
 };
 
 struct ConstBuffer

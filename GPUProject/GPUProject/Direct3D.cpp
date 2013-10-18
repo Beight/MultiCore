@@ -147,7 +147,7 @@ void Direct3D::init(Input* p_pInput)
 	m_sphere.center = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
 	m_sphere.radius = 2.0f;
 	m_sphere.color = XMVectorSet(1.0f, 0.0f, 0.0f, 1.0f);
-
+	m_sphere.pad = XMFLOAT3(0.0f, 0.0f, 0.0f);
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Triangle
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -202,13 +202,14 @@ void Direct3D::init(Input* p_pInput)
 	{
 		m_triangles[i].color = XMVectorSet(0.0f,	1.0f,		0.0f, 1.0f);
 		m_triangles[i].ID = i;
+		m_triangles[i].pad = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	}
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Light
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 	//Staticly adding light pos
-	m_lightList[0].pos = XMVectorSet(-5.0f,	-5.0f,	 -5.0f, 1.0f);
+	m_lightList[0].pos = XMVectorSet(0.0f,	0.0f,	 -20.0f, 1.0f);
 	m_lightList[1].pos = XMVectorSet(10.0f,		10.0f,	 -20.0f, 1.0f);
 	m_lightList[2].pos = XMVectorSet(10.0f,	    -10.0f,	 -20.0f, 1.0f);
 
@@ -226,11 +227,12 @@ void Direct3D::init(Input* p_pInput)
 
 	for(int i = 0; i < NROFLIGHTS; i++)
 	{
-		m_lightList[i].ambient  = XMVectorSet(0.4f, 0.4f, 0.4f, 1.0f);
-		m_lightList[i].diffuse  = XMVectorSet(0.5f, 0.5f, 0.5f, 1.0f);
-		m_lightList[i].spec		= XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+		m_lightList[i].ambient  = XMVectorSet(0.15f, 0.15f, 0.15f, 1.0f);
+		m_lightList[i].diffuse  = XMVectorSet(0.15f, 0.15f, 0.15f, 1.0f);
+		m_lightList[i].spec		= XMVectorSet(.1f, .1f, .1f, 1.0f);
 		m_lightList[i].att		= XMVectorSet(0.0f, 0.2f, 0.0f, 0.0f);
-		m_lightList[i].range	= 100.0f;
+		m_lightList[i].range	= 75.0f;
+		m_lightList[i].pad		= XMFLOAT3(0.0f, 0.0f, 0.0f);
 	}
 	
 	
@@ -252,6 +254,7 @@ void Direct3D::update(float dt)
 	}
 	m_pCamera->update();
 	ConstBuffer cRayBufferStruct;
+
 	cRayBufferStruct.cameraPos = m_pCamera->getPosition();
 	cRayBufferStruct.IV = XMMatrixInverse(NULL, m_pCamera->getViewMat());
 	cRayBufferStruct.IP = XMMatrixInverse(NULL, m_pCamera->getProjMat());

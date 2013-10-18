@@ -10,6 +10,7 @@ static const float HEIGHT= 800.0f;
 
 RWTexture2D<float4> output : register(u0);
 
+float3 LightStage(HitData hd, Ray r);
 
 cbuffer ConstBuffer
 {
@@ -52,22 +53,54 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	//Intersection stage
 	///////////////////////////////////////////////
 
-	float3 color = float3(0.0f, 0.0f, 0.0f);
+	float3 finalColor = float3(0.0f, 0.0f, 0.0f);
 
-
+	float3 paddy = sphere.pad;
 	hd = RaySphereIntersect(r, sphere, hd);
 	for(int i = 0; i < 10; i++)
 	{
+			float3 paddy = triangles[i].pad;
 			hd = RayTriangleIntersect(r, triangles[i], hd);
 	}
 	if(hd.distance >  0.0f)
 	{
 
 		///////////////////////////////////////////////
-		//Secondary Rays
+		//First Light Ray
 		///////////////////////////////////////////////
-		[unroll]for(int i = 0; i < NROFLIGHTS; i++)
+		finalColor += LightStage(hd, r);
+		for(int j = 0; j < 1; j++)
 		{
+			Ray bounceRay;
+			HitData bounceHit;
+			bounceHit.distance = -1.0f;
+			float4 bounceDir = reflect(r.direction, hd.normal);
+			bounceDir = normalize(bounceDir);
+			bounceRay.origin = hd.pos;
+			bounceRay.direction = bounceDir;
+
+			bounceHit = RaySphereIntersect(bounceRay, sphere, bounceHit);
+			for(int i = 0; i < 10; i++)
+			{
+				float3 paddy = triangles[i].pad;
+				bounceHit = RayTriangleIntersect(bounceRay, triangles[i], bounceHit);
+			}
+			finalColor += LightStage(bounceHit, bounceRay) * 0.5f;
+		}
+	}
+
+	///////////////////////////////////////////////
+	//Coloring stage
+	///////////////////////////////////////////////
+	output[threadID.xy] = float4(finalColor, 1.0f);
+}
+
+float3 LightStage(HitData hd, Ray r)
+{
+		float3 final = float3(0.f,0.f,0.f);
+		for(int i = 1; i < 2; i++)
+		{
+			float3 color = float3(0.0f, 0.0f, 0.0f);
 			Ray lightRay;
 			HitData lightHit;
 			lightHit.distance = -1.0f;
@@ -89,21 +122,12 @@ void main( uint3 threadID : SV_DispatchThreadID )
 
 			if(lightHit.distance > 0.0f && lightLength > lightHit.distance)
 			{
-				color += (PointLight(hd, lightList[i], r)*0.1f);
+				color = (PointLightR(hd, lightList[i], r)*0.5f);
 				
 			}	
 			else 
-				color += PointLight(hd, lightList[i], r);
+				color = PointLightR(hd, lightList[i], r);
+			final += color;
 		}
-	}
-
-
-
-
-	///////////////////////////////////////////////
-	//Coloring stage
-	///////////////////////////////////////////////
-	//hd.color = float4(color, 1.0f);
-
-	output[threadID.xy] = float4(color, 1.0f);
+		return final;
 }
