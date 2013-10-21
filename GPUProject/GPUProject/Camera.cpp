@@ -18,7 +18,7 @@ void Camera::init(XMVECTOR p_pos, XMVECTOR p_up, XMVECTOR p_dir, float p_width, 
 	m_look	= p_dir;
 
 	m_right = XMVector3Cross(m_up, m_look);
-	m_proj = XMMatrixPerspectiveFovLH(0.4f*3.14, p_width / p_height, 1.0f, 1000.0f);
+	m_proj = XMMatrixPerspectiveFovLH(0.4f*3.14, p_width / p_height, 1.0f, 500.0f);
 	m_speed = 1.f;
 }
 

@@ -76,7 +76,7 @@ private:
 	ID3D11DeviceContext*		m_DeviceContext;
 	ID3D11Buffer*				m_cBuffer;											
 	ID3D11UnorderedAccessView*  m_BackBufferUAV;  // compute output
-													
+	ID3D11ShaderResourceView*	m_meshTexture;												
 	ComputeWrap*				m_ComputeSys;
 	ComputeShader*				m_ComputeShader;
 	int							m_Width;
@@ -96,6 +96,7 @@ private:
 	Light						m_lightList[NROFLIGHTS];
 	Mesh						m_mesh;
 	ComputeBuffer*				m_meshBuffer;
+
 
 	void						release();
 };

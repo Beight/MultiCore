@@ -20,7 +20,6 @@ struct MeshTriangle
 	XMFLOAT2	textureCoordinate2;
 	XMVECTOR	normal;
 	int			ID;
-	XMFLOAT3	pad;
 };
 
 struct Material
@@ -65,6 +64,7 @@ public:
 	vector<MeshTriangle>* getTriangles();
 	Material* getMaterial();
 	int getFaces();
+	MeshTriangle* getTriangles2();
 private:
 	int m_nrOfFaces;
 	void loadMaterial(string filename);

@@ -94,6 +94,7 @@ void Mesh::loadObj(char* textFile)
 			id++;
 		}
 	}
+	m_meshTriangles.shrink_to_fit();
 	file.close();
 	positions.clear();
 	normals.clear();
@@ -171,6 +172,11 @@ void Mesh::loadMaterial(string filename)
 vector<MeshTriangle>* Mesh::getTriangles()
 {
 	return &m_meshTriangles;
+}
+
+MeshTriangle* Mesh::getTriangles2()
+{
+	return &m_meshTriangles[0];
 }
 
 Material* Mesh::getMaterial()
