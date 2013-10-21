@@ -169,7 +169,7 @@ public:
 		mD3DDevice = d3dDevice;
 		mD3DDeviceContext = d3dContext;
 	}
-
+	void setShaderResourceView(ID3D11ShaderResourceView* p_SRV);
 	ComputeShader* CreateComputeShader(TCHAR* shaderFile, char* blobFileAppendix, char* pFunctionName, D3D10_SHADER_MACRO* pDefines);
 
 	ID3D11Buffer* CreateConstantBuffer(UINT uSize, VOID* pInitData, char* debugName = NULL);

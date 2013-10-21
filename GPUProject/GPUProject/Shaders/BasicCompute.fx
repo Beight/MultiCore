@@ -9,6 +9,8 @@ static const float HEIGHT= 800.0f;
 #define NROFLIGHTS 10
 
 RWTexture2D<float4> output : register(u0);
+StructuredBuffer<MeshTriangle> input : register(t0);
+
 
 float3 LightStage(HitData hd, Ray r);
 
@@ -20,6 +22,7 @@ cbuffer ConstBuffer
 	Sphere sphere;
 	Triangle triangles[NROFTRIANGLES];
 	Light lightList[NROFLIGHTS];
+	int nrOfFaces;
 };
 
 [numthreads(32, 32, 1)]
@@ -83,13 +86,25 @@ void main( uint3 threadID : SV_DispatchThreadID )
 				hd.distance = hit;
 			}
 	}
+	for(int j = 0; j < nrOfFaces; j++)
+	{
+			hit = RayTriangleIntersects(r, input[j], hd.distance);
+			if(hit > -1.0f)
+			{
+				hd.pos = r.origin + r.direction * hit;
+				hd.normal = input[j].normal;
+				hd.color = float4(1.0f,	0.0f, 0.0f, 1.0f);
+				hd.ID = input[j].ID;
+				hd.distance = hit;
+			}
+	}
 	if(hd.distance >  0.0f)
 	{
 
 		///////////////////////////////////////////////
 		//First Light Ray
 		///////////////////////////////////////////////
-		finalColor += LightStage(hd, r);
+		//finalColor += LightStage(hd, r);
 		///////////////////////////////////////////////
 		//Bounce Rays
 		///////////////////////////////////////////////
@@ -103,7 +118,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 		bounceHit.ID = hd.ID;
 		int tempID = -1;
 
-		for(int j = 0; j < 1; j++)
+		for(int j = 0; j < 0; j++)
 		{
 			float bHit = -1.0f;
 			bounceHit.distance = -1.0f;
@@ -127,21 +142,21 @@ void main( uint3 threadID : SV_DispatchThreadID )
 			for(int i = 0; i < 10; i++)
 			{
 				float3 paddy = triangles[i].pad;
-					if(bounceHit.ID != i)
+				if(bounceHit.ID != i)
+				{
+					bHit = RayTriangleIntersect(bounceRay, triangles[i], bounceHit.distance);
+					if(bHit > -1.0f)
 					{
-						bHit = RayTriangleIntersect(bounceRay, triangles[i], bounceHit.distance);
-						if(bHit > -1.0f)
-						{
-							bounceHit.pos = bounceRay.origin + bounceRay.direction * bHit;
-							float4 e1 = triangles[i].pos1 - triangles[i].pos0;
-							float4 e2 = triangles[i].pos2 - triangles[i].pos0;
-							float3 temp = cross(e1.xyz, e2.xyz);
-							bounceHit.normal = normalize(float4(temp, 1.0f));
-							bounceHit.color = triangles[i].color;
-							tempID = triangles[i].ID;
-							bounceHit.distance = bHit;
-						}
+						bounceHit.pos = bounceRay.origin + bounceRay.direction * bHit;
+						float4 e1 = triangles[i].pos1 - triangles[i].pos0;
+						float4 e2 = triangles[i].pos2 - triangles[i].pos0;
+						float3 temp = cross(e1.xyz, e2.xyz);
+						bounceHit.normal = normalize(float4(temp, 1.0f));
+						bounceHit.color = triangles[i].color;
+						tempID = triangles[i].ID;
+						bounceHit.distance = bHit;
 					}
+				}
 			}
 			if(bounceHit.ID != -1)
 				bounceHit.ID = tempID;
@@ -153,16 +168,16 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	}
 
 	
-	output[threadID.xy] = float4(finalColor, 1.0f);
+	output[threadID.xy] = hd.color;//float4(hd.color, 1.0f);
 }
 
 float3 LightStage(HitData hd, Ray r)
 {
 		
 		float3 final = float3(0.f,0.f,0.f);
-		for(int i = 0; i < 1; i++)
-		{
-			float2 paddy = lightList[i].pad;
+		float3 paddy = lightList[0].pad;
+		for(int i = 0; i < 2; i++)
+		{	
 			float3 color = float3(0.0f, 0.0f, 0.0f);
 			Ray lightRay;
 			float hit = -1.0f;

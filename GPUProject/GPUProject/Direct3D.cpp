@@ -10,8 +10,10 @@ Direct3D::Direct3D(HWND p_hwnd)
 	m_Timer			= nullptr;
 	m_ComputeSys	= nullptr;
 	m_ComputeShader	= nullptr;
-	m_time = 0.0f;
-	m_fps = 0.0f;
+	m_time			= 0.0f;
+	m_fps			= 0.0f;
+	m_mesh			= Mesh();
+	m_meshBuffer	= nullptr;
 }
 
 Direct3D::~Direct3D()
@@ -117,7 +119,7 @@ void Direct3D::init(Input* p_pInput)
 //Camera
 ///////////////////////////////////////////////////////////////////////////////////////////
 	m_pCamera = new Camera();
-	XMVECTOR cameraPos = XMVectorSet(0.0f,		0.0f,	 -20.0f, 0.0f);
+	XMVECTOR cameraPos = XMVectorSet(0.0f,		0.0f,	 -1000.0f, 0.0f);
 	XMVECTOR cameraDir = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
 	XMVECTOR cameraUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
 	m_pCamera->init(cameraPos, cameraUp, cameraDir, (float)m_Width, (float)m_Height);
@@ -231,17 +233,19 @@ void Direct3D::init(Input* p_pInput)
 	{
 		m_lightList[i].ambient  = XMVectorSet(0.15f, 0.15f, 0.15f, 1.0f);
 		m_lightList[i].diffuse  = XMVectorSet(0.15f, 0.15f, 0.15f, 1.0f);
-		m_lightList[i].spec		= XMVectorSet(.1f, .1f, .1f, 1.0f);
-		m_lightList[i].att		= XMVectorSet(0.0f, 0.2f, 0.0f, 0.0f);
 		m_lightList[i].range	= 75.0f;
 		m_lightList[i].pad		= XMFLOAT3(0.0f, 0.0f, 0.0f);
 	}
 	
-	
+	m_mesh.loadObj("Meshi/bth.obj");
+	m_meshBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(MeshTriangle), m_mesh.getFaces(), true, false, m_mesh.getTriangles()->data(), false, 0);//50588 = faces
+
 	ID3D11Debug* debug;
 	m_Device->QueryInterface(__uuidof(ID3D11Debug), (void**)&debug);
 	debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
 	SAFE_RELEASE(debug);
+
+
 }
 
 void Direct3D::update(float dt)
@@ -284,6 +288,7 @@ void Direct3D::update(float dt)
 	{
 		cRayBufferStruct.lightList[i] = m_lightList[i];
 	}
+	cRayBufferStruct.nrOfFaces = m_mesh.getFaces();
 	m_DeviceContext->UpdateSubresource(m_cBuffer, 0, NULL, &cRayBufferStruct, 0, 0);
 	m_DeviceContext->CSSetConstantBuffers(0, 1, &m_cBuffer);
 
@@ -294,6 +299,7 @@ void Direct3D::draw()
 {
 	ID3D11UnorderedAccessView* uav[] = { m_BackBufferUAV };
 	m_DeviceContext->CSSetUnorderedAccessViews(0, 1, uav, NULL);
+	m_ComputeSys->setShaderResourceView(m_meshBuffer->GetResourceView());
 
 	m_ComputeShader->Set();
 	m_Timer->Start();
@@ -332,5 +338,6 @@ void Direct3D::release()
 	SAFE_DELETE(m_ComputeShader);
 	SAFE_DELETE(m_pCamera);
 	SAFE_DELETE(m_ComputeSys);
+	SAFE_DELETE(m_meshBuffer);
 }
 

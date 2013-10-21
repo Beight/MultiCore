@@ -6,6 +6,7 @@
 #include "ComputeHelp.h"
 #include "Input.h"
 #include "Camera.h"
+#include "Mesh.h"
 
 #define NROFTRIANGLES 10
 #define NROFLIGHTS 10
@@ -14,11 +15,8 @@
 struct Light
 {
 	XMVECTOR pos;
-	XMVECTOR dir;
 	XMVECTOR ambient;
 	XMVECTOR diffuse;
-	XMVECTOR spec;
-	XMVECTOR att;
 	float range;
 	XMFLOAT3 pad;
 };
@@ -43,6 +41,8 @@ struct Triangle
 	XMFLOAT3	pad;
 };
 
+
+
 struct ConstBuffer
 {
 	XMVECTOR cameraPos;
@@ -51,6 +51,7 @@ struct ConstBuffer
 	Sphere sphere;
 	Triangle triangles[NROFTRIANGLES];
 	Light lightList[NROFLIGHTS];
+	int nrOfFaces;
 };
 
 class Direct3D
@@ -93,6 +94,8 @@ private:
 	XMMATRIX					m_IVP;
 
 	Light						m_lightList[NROFLIGHTS];
+	Mesh						m_mesh;
+	ComputeBuffer*				m_meshBuffer;
 
 	void						release();
 };

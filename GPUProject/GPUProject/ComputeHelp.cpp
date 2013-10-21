@@ -443,3 +443,8 @@ ComputeShader* ComputeWrap::CreateComputeShader(TCHAR* shaderFile, char* blobFil
 
 	return cs;
 }
+
+void ComputeWrap::setShaderResourceView(ID3D11ShaderResourceView* p_SRV)
+{
+	mD3DDeviceContext->CSSetShaderResources(0, 1, &p_SRV);
+}
