@@ -125,7 +125,7 @@ float RayTriangleIntersect(Ray p_ray, Triangle p_tri, float p_dist)
 	return -1.0f;
 }
 
-float RayTriangleIntersects(Ray p_ray, MeshTriangle p_tri, float p_dist)
+float3 RayTriangleIntersects(Ray p_ray, MeshTriangle p_tri, float p_dist)
 {
 	float distanceDelta = 0.001f;
 	float l_t;
@@ -137,7 +137,7 @@ float RayTriangleIntersects(Ray p_ray, MeshTriangle p_tri, float p_dist)
 	if(a > -0.00001f && a < 0.00001f)
 	{
 		//miss
-		return -1.0f;
+		return float3(-1.0f, 0.0f, 0.0f);
 	}
 
 	float f = 1/a;
@@ -146,20 +146,21 @@ float RayTriangleIntersects(Ray p_ray, MeshTriangle p_tri, float p_dist)
 	if(u < 0.0f)
 	{
 		//miss
-		return -1.0f;
+		return float3(-1.0f, 0.0f, 0.0f);
 	}
 	float3 r = cross(s.xyz, e1.xyz);
 	float v = f * (dot(p_ray.direction.xyz, r));
 	if(v < 0.0f || (u + v) > 1.0f)
 	{
 		//miss
-		return -1.0f;
+		return float3(-1.0f, 0.0f, 0.0f);
 	}
 	l_t = f * (dot(e2.xyz, r));
 	
 	if((l_t < p_dist && l_t > 0.0f) || (p_dist < 0.0f && l_t > distanceDelta))
-	{		
-		return l_t;
+	{	
+		float2 index = ((1-u-v) * p_tri.textureCoordinate0) + (u * p_tri.textureCoordinate1) + (v * p_tri.textureCoordinate2);
+		return float3(l_t, index);
 	}
-	return -1.0f;
+	return float3(-1.0f, 0.0f, 0.0f);
 }
