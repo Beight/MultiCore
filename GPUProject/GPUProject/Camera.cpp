@@ -75,6 +75,17 @@ void Camera::moveRight()
 	m_pos += m_right * m_speed;
 }
 
+void Camera::moveUp()
+{
+	m_pos.m128_f32[1] += m_up.m128_f32[1] * m_speed;
+}
+
+void Camera::moveDown()
+{
+	m_pos.m128_f32[1] -= m_up.m128_f32[1] * m_speed;
+}
+
+
 void Camera::moveDirection(float p_x, float p_y)
 {
 	if(p_x != m_mousePrevX || p_y != m_mousePrevY)

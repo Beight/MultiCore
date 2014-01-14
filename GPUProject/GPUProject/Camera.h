@@ -22,6 +22,8 @@ public:
 	void		moveBackward();
 	void		moveLeft();
 	void		moveRight();
+	void		moveUp();
+	void		moveDown();
 	void		moveDirection(float p_x, float p_y);
 	XMVECTOR    getUp();
 private:

@@ -148,11 +148,30 @@ void Direct3D::init(Input* p_pInput)
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Sphere
 ///////////////////////////////////////////////////////////////////////////////////////////
-	m_sphere.center = XMVectorSet(10.0f, 10.0f, 10.0f, 1.0f);
+	m_sphere.center = XMVectorSet(10.0f, 0.0f, 0.0f, 1.0f);
 	m_sphere.radius = 2.0f;
 	m_sphere.color = XMVectorSet(1.0f, 0.0f, 0.0f, 1.0f);
 	m_sphere.pad = XMFLOAT2(0.0f, 0.0f);
 	m_sphere.ID = -2;
+
+///////////////////////////////////////////////////////////////////////////////////////////
+//Mesh Triangle
+///////////////////////////////////////////////////////////////////////////////////////////
+	m_meshTri = MeshTriangle();
+	m_meshTri.pos0 = XMVectorSet( 1.0f,	-1.0f,	 1.0f, 1.0f);
+	m_meshTri.pos1 = XMVectorSet(-1.0f,	-1.0f,	 1.0f, 1.0f);
+	m_meshTri.pos2 = XMVectorSet(-1.0f,	1.0f,	 1.0f, 1.0f);
+
+	m_meshTri.ID = 72;
+	XMVECTOR e1 = m_meshTri.pos1 - m_meshTri.pos0;
+	XMVECTOR e2 = m_meshTri.pos2 - m_meshTri.pos0;
+	m_meshTri.normal = XMVector3Cross(e1,e2);
+	m_meshTri.normal = XMVector4Normalize(m_meshTri.normal);
+	
+	m_meshTri.textureCoordinate0 = XMFLOAT2( 0.0f,	0.0f);
+	m_meshTri.textureCoordinate1 = XMFLOAT2(0.0f,	0.0f);
+	m_meshTri.textureCoordinate2 = XMFLOAT2(0.0f,	0.0f );
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Triangle
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -238,11 +257,21 @@ void Direct3D::init(Input* p_pInput)
 		m_lightList[i].pad		= XMFLOAT3(0.0f, 0.0f, 0.0f);
 	}
 
-	m_mesh.loadObj("Meshi/Key_B_02.obj");
-	m_meshBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(MeshTriangle), m_mesh.getFaces(), true, false, m_mesh.getTriangles2(), false, 0);//50588 = faces
+	
+///////////////////////////////////////////////////////////////////////////////////////////
+//Mesh
+///////////////////////////////////////////////////////////////////////////////////////////
+	//m_mesh.loadObj("Meshi/StoneBrick.obj");
 
-	D3DX11CreateShaderResourceViewFromFile(m_Device, m_mesh.getMaterial()->map_Kd.c_str(), NULL, NULL, &m_meshTexture, &hr);
+	//m_meshBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(MeshTriangle), m_mesh.getFaces(), true, false, m_mesh.getTriangles2(), false, 0);
+	//
+	//D3DX11CreateShaderResourceViewFromFile(m_Device, m_mesh.getMaterial()->map_Kd.c_str(), NULL, NULL, &m_meshTexture, &hr);
+	
+	m_meshBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(MeshTriangle), 1, true, false, &m_meshTri, false, 0);
 
+///////////////////////////////////////////////////////////////////////////////////////////
+// Debug
+///////////////////////////////////////////////////////////////////////////////////////////
 	ID3D11Debug* debug;
 	m_Device->QueryInterface(__uuidof(ID3D11Debug), (void**)&debug);
 	debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
@@ -283,6 +312,7 @@ void Direct3D::update(float dt)
 	cRayBufferStruct.IV = XMMatrixTranspose(cRayBufferStruct.IV);
 	cRayBufferStruct.IP = XMMatrixTranspose(cRayBufferStruct.IP);
 	cRayBufferStruct.sphere = m_sphere;
+
 	for(int i = 0; i < NROFTRIANGLES; i++)
 	{
 		cRayBufferStruct.triangles[i] = m_triangles[i];
@@ -291,6 +321,7 @@ void Direct3D::update(float dt)
 	{
 		cRayBufferStruct.lightList[i] = m_lightList[i];
 	}
+
 	cRayBufferStruct.nrOfFaces = m_mesh.getFaces();
 	m_DeviceContext->UpdateSubresource(m_cBuffer, 0, NULL, &cRayBufferStruct, 0, 0);
 	m_DeviceContext->CSSetConstantBuffers(0, 1, &m_cBuffer);
@@ -302,10 +333,15 @@ void Direct3D::draw()
 {
 	ID3D11UnorderedAccessView* uav[] = { m_BackBufferUAV };
 	m_DeviceContext->CSSetUnorderedAccessViews(0, 1, uav, NULL);
-	ID3D11ShaderResourceView* srv[] = { m_meshBuffer->GetResourceView(),
+	/*ID3D11ShaderResourceView* srv[] = { m_meshBuffer->GetResourceView(),
 										m_meshTexture };
 
-	m_DeviceContext->CSSetShaderResources(0, 2, srv);
+	m_DeviceContext->CSSetShaderResources(0, 2, srv);*/
+
+	ID3D11ShaderResourceView* srv[] = { m_meshBuffer->GetResourceView()};
+
+	m_DeviceContext->CSSetShaderResources(0, 1, srv);
+
 	//SAFE_DELETE_ARRAY(srv);
 
 

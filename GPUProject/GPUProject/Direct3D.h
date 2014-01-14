@@ -87,6 +87,7 @@ private:
 	float						m_time;
 
 	Sphere						m_sphere;
+	MeshTriangle				m_meshTri;
 	Triangle					m_triangles[NROFTRIANGLES];
 	
 	XMMATRIX					m_view;

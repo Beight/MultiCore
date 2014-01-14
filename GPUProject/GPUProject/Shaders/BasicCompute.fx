@@ -63,16 +63,16 @@ void main( uint3 threadID : SV_DispatchThreadID )
 
 	float2 paddy = sphere.pad;
 	// ## SPHERE ## //
-	//hit = RaySphereIntersect(r, sphere, hd.distance);
-	//if(hit > -1.0f)
-	//{
-	//	hd.pos = r.origin + r.direction * hit;
-	//	hd.normal = normalize(hd.pos - sphere.center);
-	//	hd.color = sphere.color;
-	//	hd.distance = hit;
-	//	hd.ID = sphere.ID;
-	//}
-	//					w
+	hit = RaySphereIntersect(r, sphere, hd.distance);
+	if(hit > -1.0f)
+	{
+		hd.pos = r.origin + r.direction * hit;
+		hd.normal = normalize(hd.pos - sphere.center);
+		hd.color = sphere.color;
+		hd.distance = hit;
+		hd.ID = sphere.ID;
+	}
+	//					
 	// ## CUBE ## // 
 	for(int i = 0; i < NROFTRIANGLES; i++)
 	{
@@ -90,24 +90,46 @@ void main( uint3 threadID : SV_DispatchThreadID )
 				hd.distance = hit;
 			}
 	}
-	// ## MESH ## // ptriangle = (1-u-v)A+uB+vC
-	for(int j = 0; j < nrOfFaces; j++)
+
+	
+	// ## Single Mesh Triangle ## //
+	if(hd.ID != 72)
 	{
-			float3 temp;
-			temp = RayTriangleIntersects(r, input[j], hd.distance);
-			hit = temp.x;
-			if(hit > -1.0f)
-			{
-				hd.pos = r.origin + r.direction * hit;
-				float4 e1 = input[j].pos1 - input[j].pos0;
-				float4 e2 = input[j].pos2 - input[j].pos0;
-				float3 temp = cross(e1.xyz, e2.xyz);
-				hd.normal = normalize(float4(temp, 1.0f));
-				hd.color = meshTexture[temp.yz*512.0f];
-				hd.ID = input[j].ID;
-				hd.distance = hit;
-			}
+		float3 temp;
+		temp = RayTriangleIntersects(r, input[0], hd.distance);
+		hit = temp.x;
+		if(hit > -1.0f)
+		{
+			hd.pos = r.origin + r.direction * hit;
+			/*float4 e1 = input[j].pos1 - input[j].pos0;
+			float4 e2 = input[j].pos2 - input[j].pos0;
+			float3 temp = cross(e1.xyz, e2.xyz);*/
+			hd.normal = normalize(input[0].normal);
+			hd.color = float4(0.f, 0.f, 1.f, 0.f);//meshTexture[temp.yz*256.0f];
+			hd.ID = input[0].ID;
+			hd.distance = hit;
+		}
 	}
+	
+
+	// ## MESH ## // ptriangle = (1-u-v)A+uB+vC
+	//for(int j = 0; j < nrOfFaces; j++)
+	//{
+	//		float3 temp;
+	//		temp = RayTriangleIntersects(r, input[j], hd.distance);
+	//		hit = temp.x;
+	//		if(hit > -1.0f)
+	//		{
+	//			hd.pos = r.origin + r.direction * hit;
+	//			float4 e1 = input[j].pos1 - input[j].pos0;
+	//			float4 e2 = input[j].pos2 - input[j].pos0;
+	//			float3 temp = cross(e1.xyz, e2.xyz);
+	//			hd.normal = normalize(float4(temp, 1.0f));
+	//			hd.color = meshTexture[temp.yz*256.0f];
+	//			hd.ID = input[j].ID;
+	//			hd.distance = hit;
+	//		}
+	//}
 	if(hd.distance >  0.0f)
 	{
 
@@ -127,8 +149,10 @@ void main( uint3 threadID : SV_DispatchThreadID )
 		bounceHit.normal = hd.normal;
 		bounceHit.ID = hd.ID;
 		int tempID = -1;
-
-		for(int j = 0; j < 1; j++)
+		///////////////////////////////////////////////
+		//Number of Bounces
+		///////////////////////////////////////////////
+		for(int j = 0; j < 0; j++)
 		{
 			float bHit = -1.0f;
 			bounceHit.distance = -1.0f;
@@ -137,18 +161,18 @@ void main( uint3 threadID : SV_DispatchThreadID )
 			bounceRay.origin = bounceHit.pos;
 			bounceRay.direction = bounceDir;
 			// ## SPHERE ## //
-			//if(bounceHit.ID != -2)
-			//{
-			//	bHit = RaySphereIntersect(bounceRay, sphere, bounceHit.distance);
-			//	if(bHit > -1.0f)
-			//	{
-			//		bounceHit.pos = bounceRay.origin + bounceRay.direction * bHit;
-			//		bounceHit.normal = normalize(bounceHit.pos - sphere.center);
-			//		bounceHit.color = sphere.color;
-			//		bounceHit.distance = bHit;
-			//		tempID = sphere.ID;
-			//	}
-			//}
+			if(bounceHit.ID != -2)
+			{
+				bHit = RaySphereIntersect(bounceRay, sphere, bounceHit.distance);
+				if(bHit > -1.0f)
+				{
+					bounceHit.pos = bounceRay.origin + bounceRay.direction * bHit;
+					bounceHit.normal = normalize(bounceHit.pos - sphere.center);
+					bounceHit.color = sphere.color;
+					bounceHit.distance = bHit;
+					tempID = sphere.ID;
+				}
+			}
 			// ## CUBE ## //
 			for(int i = 0; i < NROFTRIANGLES; i++)
 			{
@@ -169,24 +193,43 @@ void main( uint3 threadID : SV_DispatchThreadID )
 					}
 				}
 			}
-			// ## MESH ## //
-			for(int j = 0; j < nrOfFaces; j++)
+
+			// ## Single Mesh Triangle ## //
+			if(bounceHit.ID != input[0].ID)
 			{
-					float3 temp;
-					temp = RayTriangleIntersects(bounceRay, input[j], bounceHit.distance);
-					bHit = temp.x;
-					if(bHit > -1.0f)
-					{
-						bounceHit.pos = r.origin + r.direction * hit;
-						float4 e1 = input[j].pos1 - input[j].pos0;
-						float4 e2 = input[j].pos2 - input[j].pos0;
-						float3 temp = cross(e1.xyz, e2.xyz);
-						bounceHit.normal = normalize(float4(temp, 1.0f));
-						bounceHit.color = meshTexture[temp.yz*512.0f];
-						tempID = input[j].ID;
-						bounceHit.distance = hit;
-					}
+				float3 temp;
+				temp = RayTriangleIntersects(bounceRay, input[0], bounceHit.distance);
+				hit = temp.x;
+				if(hit > -1.0f)
+				{
+					bounceHit.pos = bounceRay.origin + bounceRay.direction * hit; ///////////////////////////////////////////////###### OBS!!! r
+					/*float4 e1 = input[j].pos1 - input[j].pos0;
+					float4 e2 = input[j].pos2 - input[j].pos0;
+					float3 temp = cross(e1.xyz, e2.xyz);*/
+					bounceHit.normal = normalize(input[0].normal);
+					bounceHit.color = float4(0.f, 0.f, 1.f, 0.f);//meshTexture[temp.yz*256.0f];
+					bounceHit.ID = input[0].ID;
+					bounceHit.distance = hit;
+				}
 			}
+			// ## MESH ## //
+			//for(int j = 0; j < nrOfFaces; j++)
+			//{
+			//		float3 temp;
+			//		temp = RayTriangleIntersects(bounceRay, input[j], bounceHit.distance);
+			//		bHit = temp.x;
+			//		if(bHit > -1.0f)
+			//		{
+			//			bounceHit.pos = r.origin + r.direction * hit;
+			//			float4 e1 = input[j].pos1 - input[j].pos0;
+			//			float4 e2 = input[j].pos2 - input[j].pos0;
+			//			float3 temp = cross(e1.xyz, e2.xyz);
+			//			bounceHit.normal = normalize(float4(temp, 1.0f));
+			//			bounceHit.color = meshTexture[temp.yz*256.0f];
+			//			tempID = input[j].ID;
+			//			bounceHit.distance = hit;
+			//		}
+			//}
 			if(bounceHit.ID != -1)
 				bounceHit.ID = tempID;
 			///////////////////////////////////////////////
@@ -204,7 +247,9 @@ float3 LightStage(HitData hd, Ray r)
 		
 		float3 final = float3(0.f,0.f,0.f);
 		float3 paddy = lightList[0].pad;
-		for(int i = 1; i < 2; i++)
+
+		/// ## NUMBER OF LIGHTS ## //
+		for(int i = 0; i < 1; i++)
 		{	
 			float3 color = float3(0.0f, 0.0f, 0.0f);
 			Ray lightRay;
@@ -217,18 +262,18 @@ float3 LightStage(HitData hd, Ray r)
 			lightRay.direction = lightDir;
 			float lightLength = length(lightList[i].pos.xyz - hd.pos.xyz);
 			// ## SPHERE ## //
-			//if(hd.ID != -2)
-			//{
-			//	hit = RaySphereIntersect(lightRay, sphere, hd.distance);
-			//	if(hit > -1.0f)
-			//	{
-			//		lightHit.pos = lightRay.origin + lightRay.direction * hit;
-			//		lightHit.normal = normalize(lightHit.pos - sphere.center);
-			//		lightHit.color = sphere.color;
-			//		lightHit.distance = hit;
-			//		lightHit.ID	= sphere.ID;
-			//	}
-			//}
+			if(hd.ID != -2)
+			{
+				hit = RaySphereIntersect(lightRay, sphere, hd.distance);
+				if(hit > -1.0f)
+				{
+					lightHit.pos = lightRay.origin + lightRay.direction * hit;
+					lightHit.normal = normalize(lightHit.pos - sphere.center);
+					lightHit.color = sphere.color;
+					lightHit.distance = hit;
+					lightHit.ID	= sphere.ID;
+				}
+			}
 			// ## CUBE ## //
 			for(int j = 0; j < NROFTRIANGLES; j++)
 			{
@@ -237,38 +282,59 @@ float3 LightStage(HitData hd, Ray r)
 					hit = RayTriangleIntersect(lightRay, triangles[j], hd.distance);
 					if(hit > -1.0f)
 					{
-						lightHit.pos = r.origin + r.direction * hit;
+						lightHit.pos = lightRay.origin + lightRay.direction * hit;  ///////////////////////////////////////////////###### OBS!!! r
 						float4 e1 = triangles[j].pos1 - triangles[j].pos0;
 						float4 e2 = triangles[j].pos2 - triangles[j].pos0;
 						float3 temp = cross(e1.xyz, e2.xyz);
 						lightHit.normal = normalize(float4(temp, 1.0f));
 						lightHit.color = triangles[j].color;
 						lightHit.ID = triangles[j].ID;
-						hd.distance = hit;
+						lightHit.distance = hit;
 					}
 				}
 			}
-			// ## MESH ## //
-			for(int k = 0; k < nrOfFaces; k++)
+
+
+			// ## Single Mesh Triangle ## //
+			if(hd.ID != input[0].ID)
 			{
-				if(hd.ID != k)
+				float3 temp;
+				temp = RayTriangleIntersects(lightRay, input[0], hd.distance);
+				hit = temp.x;
+				if(hit > -1.0f)
 				{
-					float3 temp;
-					temp = RayTriangleIntersects(r, input[k], hd.distance);
-					hit = temp.x;
-					if(hit > -1.0f)
-					{
-						lightHit.pos = r.origin + r.direction * hit;
-						float4 e1 = input[k].pos1 - input[k].pos0;
-						float4 e2 = input[k].pos2 - input[k].pos0;
-						float3 temp = cross(e1.xyz, e2.xyz);
-						lightHit.normal = normalize(float4(temp, 1.0f));
-						lightHit.color = meshTexture[temp.yz*512.0f];
-						lightHit.ID = input[k].ID;
-						hd.distance = hit;
-					}
+					lightHit.pos = lightRay.origin + lightRay.direction * hit; ///////////////////////////////////////////////###### OBS!!! r
+					/*float4 e1 = input[j].pos1 - input[j].pos0;
+					float4 e2 = input[j].pos2 - input[j].pos0;
+					float3 temp = cross(e1.xyz, e2.xyz);*/
+					lightHit.normal = normalize(input[0].normal);
+					lightHit.color = float4(0.f, 0.f, 1.f, 0.f);//meshTexture[temp.yz*256.0f];
+					lightHit.ID = input[0].ID;
+					lightHit.distance = hit;
 				}
 			}
+
+			// ## MESH ## //
+			//for(int k = 0; k < nrOfFaces; k++)
+			//{
+			//	if(hd.ID != k)
+			//	{
+			//		float3 temp;
+			//		temp = RayTriangleIntersects(r, input[k], hd.distance);
+			//		hit = temp.x;
+			//		if(hit > -1.0f)
+			//		{
+			//			lightHit.pos = r.origin + r.direction * hit;
+			//			float4 e1 = input[k].pos1 - input[k].pos0;
+			//			float4 e2 = input[k].pos2 - input[k].pos0;
+			//			float3 temp = cross(e1.xyz, e2.xyz);
+			//			lightHit.normal = normalize(float4(temp, 1.0f));
+			//			lightHit.color = meshTexture[temp.yz*256.0f];
+			//			lightHit.ID = input[k].ID;
+			//			hd.distance = hit;
+			//		}
+			//	}
+			//}
 			if(lightHit.distance > 0.0f && lightLength > lightHit.distance)
 			{
 				color = (PointLightR(hd.pos, hd.normal, hd.color, lightList[i], r)*0.5f);
