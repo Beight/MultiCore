@@ -38,6 +38,15 @@ struct MeshTriangle
 
 };
 
+struct Material
+{
+	float4	kd;
+	float4	ka;
+	float4	tf;
+	float	illum;
+	float3  pad;
+};
+
 struct HitData
 {
 	float4	pos;

@@ -274,12 +274,19 @@ void Direct3D::init(Input* p_pInput)
 	m_meshBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(MeshTriangle), m_mesh.getFaces(), true, false, m_mesh.getTriangles2(), false, 0);
 	
 	D3DX11CreateShaderResourceViewFromFile(m_Device, m_mesh.getMaterial()->map_Kd.c_str(), NULL, NULL, &m_meshTexture, &hr);
-	
+	if(FAILED(hr))
+	{
+		int lol = 0;
+	}
 	/*m_meshBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(MeshTriangle), 1, true, false, &m_meshTri, false, 0);*/
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // Debug
 ///////////////////////////////////////////////////////////////////////////////////////////
+	m_materialBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(Material2), 1, true, false, &m_mesh.getMaterial2(), false, 0);
+
+
+
 	ID3D11Debug* debug;
 	m_Device->QueryInterface(__uuidof(ID3D11Debug), (void**)&debug);
 	debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
@@ -345,14 +352,14 @@ void Direct3D::draw()
 {
 	ID3D11UnorderedAccessView* uav[] = { m_BackBufferUAV };
 	m_DeviceContext->CSSetUnorderedAccessViews(0, 1, uav, NULL);
-	/*ID3D11ShaderResourceView* srv[] = { m_meshBuffer->GetResourceView(),
-										m_meshTexture };
+	ID3D11ShaderResourceView* srv[] = { m_meshBuffer->GetResourceView(),
+		m_materialBuffer->GetResourceView() };
 
-	m_DeviceContext->CSSetShaderResources(0, 2, srv);*/
+	m_DeviceContext->CSSetShaderResources(0, 2, srv);
 
-	ID3D11ShaderResourceView* srv[] = { m_meshBuffer->GetResourceView()};
+	//ID3D11ShaderResourceView* srv[] = { m_meshBuffer->GetResourceView()};
 
-	m_DeviceContext->CSSetShaderResources(0, 1, srv);
+	//m_DeviceContext->CSSetShaderResources(0, 1, srv);
 
 	//SAFE_DELETE_ARRAY(srv);
 

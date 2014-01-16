@@ -55,6 +55,18 @@ struct Material
 	}
 };
 
+
+struct Material2
+{
+	float	illum;
+	float   ni;
+	XMFLOAT2  pad;
+	XMVECTOR kd;
+	XMVECTOR ka;
+	XMVECTOR tf;
+};
+
+
 class Mesh
 {
 public:
@@ -66,11 +78,12 @@ public:
 	Material* getMaterial();
 	int getFaces();
 	MeshTriangle* getTriangles2();
+	Material2 getMaterial2();
 private:
 	int m_nrOfFaces;
 	void loadMaterial(string filename);
 	Material m_material;
-	
+	Material2 m_material2;
 	vector<MeshTriangle> m_meshTriangles;
 
 };

@@ -11,6 +11,7 @@ static const float HEIGHT= 800.0f;
 RWTexture2D<float4> output : register(u0);
 StructuredBuffer<MeshTriangle> input : register(t0);
 Texture2D meshTexture : register(t1);
+StructuredBuffer<Material> material : register (t3);
 
 
 
@@ -140,7 +141,8 @@ void main( uint3 threadID : SV_DispatchThreadID )
 			//float3 temp = cross(e1.xyz, e2.xyz);
 			//hd.normal = normalize(float4(temp, 0.0f));
 			hd.normal = input[j].normal;
-			hd.color = float4(0.f, 0.f, 1.f, 0.f);//meshTexture[temp.yz*512.0f];
+			//hd.color = float4(0.f, 0.f, 1.f, 0.f);
+			hd.color = meshTexture[temp.yz*512.0f];
 			hd.ID = input[j].ID;
 			hd.distance = hit;
 		}
@@ -167,7 +169,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 		///////////////////////////////////////////////
 		//Number of Bounces
 		///////////////////////////////////////////////
-		for(int j = 0; j < 1; j++)
+		for(int j = 0; j < 0; j++)
 		{
 			float bHit = -1.0f;
 			bounceHit.distance = -1.0f;
@@ -245,7 +247,8 @@ void main( uint3 threadID : SV_DispatchThreadID )
 						//float3 temp = cross(e1.xyz, e2.xyz);
 						//bounceHit.normal = normalize(float4(temp, 0.0f));
 						bounceHit.normal = input[j].normal;
-						bounceHit.color = float4(0.f, 0.f, 1.f, 0.f);//meshTexture[temp.yz*512.0f];
+						//bounceHit.color = float4(0.f, 0.f, 1.f, 0.f);
+						bounceHit.color = meshTexture[temp.yz*512.0f];
 						tempID = input[j].ID;
 						bounceHit.distance = hit;
 					}
@@ -270,7 +273,7 @@ float3 LightStage(HitData hd, Ray r)
 		float3 paddy = lightList[0].pad;
 
 		/// ## NUMBER OF LIGHTS ## //
-		for(int i = 1; i < 2; i++)
+		for(int i = 0; i < 1; i++)
 		{	
 			float3 color = float3(0.0f, 0.0f, 0.0f);
 			Ray lightRay;
@@ -351,7 +354,8 @@ float3 LightStage(HitData hd, Ray r)
 						//float3 temp = cross(e1.xyz, e2.xyz);
 						//lightHit.normal = normalize(float4(temp, 0.0f));
 						lightHit.normal = input[k].normal;
-						lightHit.color = float4(0.f, 0.f, 1.f, 0.f);//meshTexture[temp.yz*512.0f];
+						//lightHit.color = float4(0.f, 0.f, 1.f, 0.f);
+						lightHit.color = meshTexture[temp.yz*512.0f];
 						lightHit.ID = input[k].ID;
 						lightHit.distance = hit;
 					}

@@ -98,7 +98,7 @@ private:
 
 	Light						m_lightList[NROFLIGHTS];
 	Mesh						m_mesh;
-	ComputeBuffer*				m_meshBuffer;
+	ComputeBuffer				*m_meshBuffer, *m_materialBuffer;
 
 
 	void						release();
