@@ -155,6 +155,15 @@ void Direct3D::init(Input* p_pInput)
 	m_sphere.ID = -2;
 
 ///////////////////////////////////////////////////////////////////////////////////////////
+//Sphere 2 light
+///////////////////////////////////////////////////////////////////////////////////////////
+	m_spherel0.center = XMVectorSet(0.0f,	0.0f,	 -20.0f, 1.0f);
+	m_spherel0.radius = 1.0f;
+	m_spherel0.color = XMVectorSet(1.0f, 0.0f, 0.0f, 1.0f);
+	m_spherel0.pad = XMFLOAT2(0.0f, 0.0f);
+	m_spherel0.ID = -5;
+
+///////////////////////////////////////////////////////////////////////////////////////////
 //Mesh Triangle
 ///////////////////////////////////////////////////////////////////////////////////////////
 	m_meshTri = MeshTriangle();
@@ -239,7 +248,6 @@ void Direct3D::init(Input* p_pInput)
 
 	//Spinning outside
 	m_lightList[3].pos = XMVectorSet(-10.0f,	10.0f,	 -20.0f, 1.0f);
-
 	m_lightList[4].pos = XMVectorSet(0.0f,		-5.0f,	-50.0f, 1.0f);
 	m_lightList[5].pos = XMVectorSet(25.0f,		5.0f,	-50.0f, 1.0f); 
 
@@ -261,13 +269,13 @@ void Direct3D::init(Input* p_pInput)
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Mesh
 ///////////////////////////////////////////////////////////////////////////////////////////
-	//m_mesh.loadObj("Meshi/StoneBrick.obj");
+	m_mesh.loadObj("Meshi/kub.obj");
 
-	//m_meshBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(MeshTriangle), m_mesh.getFaces(), true, false, m_mesh.getTriangles2(), false, 0);
-	//
-	//D3DX11CreateShaderResourceViewFromFile(m_Device, m_mesh.getMaterial()->map_Kd.c_str(), NULL, NULL, &m_meshTexture, &hr);
+	m_meshBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(MeshTriangle), m_mesh.getFaces(), true, false, m_mesh.getTriangles2(), false, 0);
 	
-	m_meshBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(MeshTriangle), 1, true, false, &m_meshTri, false, 0);
+	D3DX11CreateShaderResourceViewFromFile(m_Device, m_mesh.getMaterial()->map_Kd.c_str(), NULL, NULL, &m_meshTexture, &hr);
+	
+	/*m_meshBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(MeshTriangle), 1, true, false, &m_meshTri, false, 0);*/
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // Debug
@@ -312,6 +320,10 @@ void Direct3D::update(float dt)
 	cRayBufferStruct.IV = XMMatrixTranspose(cRayBufferStruct.IV);
 	cRayBufferStruct.IP = XMMatrixTranspose(cRayBufferStruct.IP);
 	cRayBufferStruct.sphere = m_sphere;
+
+	
+	m_spherel0.center = m_lightList[0].pos;
+	cRayBufferStruct.spherel0 = m_spherel0;
 
 	for(int i = 0; i < NROFTRIANGLES; i++)
 	{

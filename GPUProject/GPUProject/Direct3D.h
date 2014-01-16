@@ -49,6 +49,7 @@ struct ConstBuffer
 	XMMATRIX IP;
 	XMMATRIX IV;
 	Sphere sphere;
+	Sphere spherel0;
 	Triangle triangles[NROFTRIANGLES];
 	Light lightList[NROFLIGHTS];
 	int nrOfFaces;
@@ -87,6 +88,7 @@ private:
 	float						m_time;
 
 	Sphere						m_sphere;
+	Sphere						m_spherel0;
 	MeshTriangle				m_meshTri;
 	Triangle					m_triangles[NROFTRIANGLES];
 	

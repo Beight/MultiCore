@@ -32,10 +32,10 @@ struct MeshTriangle
 	float2	textureCoordinate0;
 	float2	textureCoordinate1;
 	float2	textureCoordinate2;
-	float4	normal;
 	int		ID;
-	float4  b1;
-	float	b2;
+	float	pad;
+	float4	normal;
+
 };
 
 struct HitData

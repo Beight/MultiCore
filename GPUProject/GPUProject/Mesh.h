@@ -18,8 +18,9 @@ struct MeshTriangle
 	XMFLOAT2	textureCoordinate0;
 	XMFLOAT2	textureCoordinate1;
 	XMFLOAT2	textureCoordinate2;
-	XMVECTOR	normal;
 	int			ID;
+	float		pad;
+	XMVECTOR	normal;
 };
 
 struct Material

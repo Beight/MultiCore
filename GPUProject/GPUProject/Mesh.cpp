@@ -60,7 +60,7 @@ void Mesh::loadObj(char* textFile)
 		{
 			XMVECTOR normal;
 			lineStream >> normal.m128_f32[0] >> normal.m128_f32[1] >> normal.m128_f32[2];
-			normal.m128_f32[3] = 1.0f;
+			normal.m128_f32[3] = 0.0f;
 			normals.push_back( normal );
 		}
 		else if( prefix == "vt" )
@@ -92,6 +92,7 @@ void Mesh::loadObj(char* textFile)
 			vertex.ID = id;
 			m_meshTriangles.push_back( vertex );
 			id++;
+			vertex.pad = 1.0f;
 		}
 	}
 	m_meshTriangles.shrink_to_fit();
