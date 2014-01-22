@@ -97,7 +97,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 			{
 				hd.pos = r.origin + r.direction * hit.x;
 				hd.normal = triangles[i].normal;
-				hd.color = triangles[i].color;
+				hd.color = triangles[i].color;					
 				hd.ID = triangles[i].ID;
 				hd.distance = hit;
 				hd.materialID = -1;
@@ -232,17 +232,15 @@ void main( uint3 threadID : SV_DispatchThreadID )
 				{
 					//padding
 					float paddy = input[j].pad;
-					float3 temp;
-					temp = RayTriangleIntersects(bounceRay, input[j], bounceHit.distance);
-					bHit = temp.x;
-					if(bHit > -1.0f)
+					float3 temp = RayTriangleIntersects(bounceRay, input[j], bounceHit.distance);
+					if(temp.x > -1.0f)
 					{
 						bounceHit.pos = bounceRay.origin + bounceRay.direction * hit;
 						bounceHit.normal = normalize(input[j].normal);
 						//bounceHit.color = float4(0.f, 0.f, 1.f, 0.f);
 						bounceHit.color = meshTexture[temp.yz*512.f];
 						tempID = input[j].ID;
-						bounceHit.distance = hit;
+						bounceHit.distance = temp.x;
 						bounceHit.materialID = 1;
 					}
 				}
@@ -275,9 +273,7 @@ float3 LightStage(HitData hd, Ray r)
 			lightHit.distance = -1.0f;
 			lightRay.origin = hd.pos;
 			lightRay.direction = normalize(lightList[i].pos - hd.pos);
-
 			float lightLength = length(lightList[i].pos.xyz - hd.pos.xyz);
-
 			// ## SPHERE ## //
 			if(hd.ID != -2)
 			{

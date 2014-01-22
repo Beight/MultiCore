@@ -285,12 +285,14 @@ void Direct3D::init(Input* p_pInput)
 	
 	D3DX11CreateShaderResourceViewFromFile(m_Device, m_mesh.getMaterial()->map_Kd.c_str(), NULL, NULL, &m_meshTexture, &hr);
 
+	m_materialBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(Material2), 1, true, false, &m_mesh.getMaterial2(), false, 0);
+
 	/*m_meshBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(MeshTriangle), 1, true, false, &m_meshTri, false, 0);*/
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // Debug
 ///////////////////////////////////////////////////////////////////////////////////////////
-	m_materialBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(Material2), 1, true, false, &m_mesh.getMaterial2(), false, 0);
+
 
 
 
@@ -310,7 +312,7 @@ void Direct3D::update(float dt)
 	rot = XMMatrixRotationAxis(XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f), rotDT);
 	for(int i = 0; i < NROFLIGHTS; i++)
 	{
-		m_lightList[i].pos = XMVector4Transform(m_lightList[i].pos, rot);
+		//m_lightList[i].pos = XMVector4Transform(m_lightList[i].pos, rot);
 	}
 	m_pCamera->update();
 	//m_fps = 1/dt;
