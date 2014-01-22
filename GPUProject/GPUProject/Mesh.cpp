@@ -67,7 +67,7 @@ void Mesh::loadObj(char* textFile)
 		{
 			XMFLOAT2 texC;
 			lineStream >> texC.x >> texC.y;
-			texC.y *= -1;
+			//texC.y *= -1;
 			texCoords.push_back( texC );
 		}
 		else if( prefix == "f" )

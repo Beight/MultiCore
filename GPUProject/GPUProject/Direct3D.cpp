@@ -14,7 +14,7 @@ Direct3D::Direct3D(HWND p_hwnd)
 	m_fps			= 0.0f;
 	m_mesh			= Mesh();
 	m_meshBuffer	= nullptr;
-
+	m_materialBuffer= nullptr;
 }
 
 Direct3D::~Direct3D()
@@ -190,46 +190,56 @@ void Direct3D::init(Input* p_pInput)
 	m_triangles[0].pos0 = XMVectorSet( 1.0f*CUBESIZE,	-1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
 	m_triangles[0].pos1 = XMVectorSet(-1.0f*CUBESIZE,	-1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
 	m_triangles[0].pos2 = XMVectorSet(-1.0f*CUBESIZE,	1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
-	  															 		 
+	m_triangles[0].normal = XMVectorSet(0.f, 0.f, -1.f, 0.f);
+
 	m_triangles[1].pos0 = XMVectorSet( 1.0f*CUBESIZE,  -1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
 	m_triangles[1].pos1 = XMVectorSet(-1.0f*CUBESIZE,	1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
 	m_triangles[1].pos2 = XMVectorSet( 1.0f*CUBESIZE,	1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
+	m_triangles[1].normal = XMVectorSet(0.f, 0.f, -1.f, 0.f);
 																 		 
 	//Left														 		 
 	m_triangles[2].pos0 = XMVectorSet(-1.0f*CUBESIZE,  -1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
 	m_triangles[2].pos1 = XMVectorSet(-1.0f*CUBESIZE,  -1.0f*CUBESIZE,  -1.0f*CUBESIZE, 1.0f);
 	m_triangles[2].pos2 = XMVectorSet(-1.0f*CUBESIZE,	1.0f*CUBESIZE,  -1.0f*CUBESIZE, 1.0f);
-		  														 		 
+	m_triangles[2].normal = XMVectorSet(1.f, 0.f, 0.f, 0.f);
+
 	m_triangles[3].pos0 = XMVectorSet(-1.0f*CUBESIZE,  -1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
 	m_triangles[3].pos1 = XMVectorSet(-1.0f*CUBESIZE,	1.0f*CUBESIZE,  -1.0f*CUBESIZE, 1.0f);
 	m_triangles[3].pos2 = XMVectorSet(-1.0f*CUBESIZE,	1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
+	m_triangles[3].normal = XMVectorSet(1.f, 0.f, 0.f, 0.f);
 																 		 
 	////Right													 		 
 	m_triangles[4].pos0 = XMVectorSet( 1.0f*CUBESIZE,  -1.0f*CUBESIZE,  -1.0f*CUBESIZE, 1.0f);
 	m_triangles[4].pos1 = XMVectorSet( 1.0f*CUBESIZE,	-1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
 	m_triangles[4].pos2 = XMVectorSet( 1.0f*CUBESIZE,	1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
+	m_triangles[4].normal = XMVectorSet(-1.f, 0.f, 0.f, 0.f);
 	  															 		 
 	m_triangles[5].pos0 = XMVectorSet( 1.0f*CUBESIZE,  -1.0f*CUBESIZE,  -1.0f*CUBESIZE, 1.0f);
 	m_triangles[5].pos1 = XMVectorSet( 1.0f*CUBESIZE,	1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
 	m_triangles[5].pos2 = XMVectorSet( 1.0f*CUBESIZE,	1.0f*CUBESIZE,  -1.0f*CUBESIZE, 1.0f);
+	m_triangles[5].normal = XMVectorSet(-1.f, 0.f, 0.f, 0.f);
 																 		 
 	////Top														 		 
 	m_triangles[6].pos0 = XMVectorSet( 1.0f*CUBESIZE,	1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
 	m_triangles[6].pos1 = XMVectorSet(-1.0f*CUBESIZE,	1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
 	m_triangles[6].pos2 = XMVectorSet(-1.0f*CUBESIZE,	1.0f*CUBESIZE,  -1.0f*CUBESIZE, 1.0f);
+	m_triangles[6].normal = XMVectorSet(0.f, -1.f, 0.f, 0.f);
 	  															 		 
 	m_triangles[7].pos0 = XMVectorSet( 1.0f*CUBESIZE,	1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
 	m_triangles[7].pos1 = XMVectorSet(-1.0f*CUBESIZE,	1.0f*CUBESIZE,  -1.0f*CUBESIZE, 1.0f);
 	m_triangles[7].pos2 = XMVectorSet( 1.0f*CUBESIZE,	1.0f*CUBESIZE,  -1.0f*CUBESIZE, 1.0f);
+	m_triangles[7].normal = XMVectorSet(0.f, -1.f, 0.f, 0.f);
 																 		 
 	////Bottom													 		 
 	m_triangles[8].pos1 = XMVectorSet( 1.0f*CUBESIZE,	-1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
 	m_triangles[8].pos0 = XMVectorSet(-1.0f*CUBESIZE,	-1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
 	m_triangles[8].pos2 = XMVectorSet( 1.0f*CUBESIZE,	-1.0f*CUBESIZE, -1.0f*CUBESIZE, 1.0f);
+	m_triangles[8].normal = XMVectorSet(0.f, 1.f, 0.f, 0.f);
 	  														 			 
 	m_triangles[9].pos1 = XMVectorSet(-1.0f*CUBESIZE,	-1.0f*CUBESIZE,	 1.0f*CUBESIZE, 1.0f);
 	m_triangles[9].pos0 = XMVectorSet(-1.0f*CUBESIZE,	-1.0f*CUBESIZE, -1.0f*CUBESIZE, 1.0f);
 	m_triangles[9].pos2 = XMVectorSet( 1.0f*CUBESIZE,	-1.0f*CUBESIZE, -1.0f*CUBESIZE, 1.0f);
+	m_triangles[9].normal = XMVectorSet(0.f, 1.f, 0.f, 0.f);
 
 	for(int i = 0; i < NROFTRIANGLES; i++)
 	{
@@ -274,10 +284,7 @@ void Direct3D::init(Input* p_pInput)
 	m_meshBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(MeshTriangle), m_mesh.getFaces(), true, false, m_mesh.getTriangles2(), false, 0);
 	
 	D3DX11CreateShaderResourceViewFromFile(m_Device, m_mesh.getMaterial()->map_Kd.c_str(), NULL, NULL, &m_meshTexture, &hr);
-	if(FAILED(hr))
-	{
-		int lol = 0;
-	}
+
 	/*m_meshBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(MeshTriangle), 1, true, false, &m_meshTri, false, 0);*/
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -353,9 +360,11 @@ void Direct3D::draw()
 	ID3D11UnorderedAccessView* uav[] = { m_BackBufferUAV };
 	m_DeviceContext->CSSetUnorderedAccessViews(0, 1, uav, NULL);
 	ID3D11ShaderResourceView* srv[] = { m_meshBuffer->GetResourceView(),
-		m_materialBuffer->GetResourceView() };
+										m_meshTexture,
+										m_materialBuffer->GetResourceView()
+										 };
 
-	m_DeviceContext->CSSetShaderResources(0, 2, srv);
+	m_DeviceContext->CSSetShaderResources(0, 3, srv);
 
 	//ID3D11ShaderResourceView* srv[] = { m_meshBuffer->GetResourceView()};
 
@@ -397,6 +406,7 @@ void Direct3D::release()
 	SAFE_RELEASE(m_SwapChain);
 	SAFE_RELEASE(m_Device);
 	SAFE_RELEASE(m_DeviceContext);
+	SAFE_RELEASE(m_meshTexture);
 
 	SAFE_DELETE(m_ComputeShader);
 	SAFE_DELETE(m_pCamera);

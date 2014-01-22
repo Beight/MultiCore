@@ -68,12 +68,13 @@ void Input::update(LPARAM lParam)
 			case 'D':
 				m_pCamera->moveRight();
 				break;
+			case 17:
+				m_pCamera->moveDown();
+				break;
 			case VK_SPACE:
 				m_pCamera->moveUp();
 				break;
-			case VK_LCONTROL:
-				m_pCamera->moveDown();
-				break;
+	
 		}
 		
 	}

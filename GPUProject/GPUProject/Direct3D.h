@@ -37,6 +37,7 @@ struct Triangle
 	XMVECTOR	pos1;
 	XMVECTOR	pos2;
 	XMVECTOR	color;
+	XMVECTOR	normal;
 	int			ID;
 	XMFLOAT3	pad;
 };

@@ -64,6 +64,11 @@ struct Material2
 	XMVECTOR kd;
 	XMVECTOR ka;
 	XMVECTOR tf;
+
+	Material2()
+	{
+		pad = XMFLOAT2(0.f, 0.f);
+	}
 };
 
 

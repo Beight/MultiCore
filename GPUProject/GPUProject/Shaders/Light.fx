@@ -9,7 +9,7 @@ struct Light
 	float3 pad;
 };
 
-float3 PointLightR(float4 pos, float4 norm, float4 color, Light L, Ray r)
+float3 PointLightR(float4 pos, float4 norm, float4 color, int materialID, Light L, Ray r, Material m)
 {
 	float3 litColor = float3(0.0f, 0.0f, 0.0f);
 	//The vector from surface to the light
@@ -18,6 +18,14 @@ float3 PointLightR(float4 pos, float4 norm, float4 color, Light L, Ray r)
 	float3 lightDir;
 	float3 reflection;
 	float4 specular;
+	float3 ambient = L.ambient.xyz;
+	float3 diffuse = L.diffuse.xyz;
+	float shininess = 32;
+	if(materialID != -1)
+	{
+		diffuse *= m.kd.xyz;
+		ambient *= m.ka.xyz;
+	}
 	//the distance deom surface to light
 	float d = length(lightVec);
 	float fade;
@@ -28,14 +36,13 @@ float3 PointLightR(float4 pos, float4 norm, float4 color, Light L, Ray r)
 	lightVec /= d;
 
 	//Add ambient light term
-	litColor = L.ambient.xyz;
+	litColor = ambient;
 
 	lightintensity = saturate(dot(norm.xyz, lightVec));
-	litColor += L.diffuse.xyz * lightintensity;
+	litColor += diffuse * lightintensity;
 	lightDir = -lightVec;
 	if(lightintensity > 0.0f)
 	{
-		float shininess = 32;
 		float3 viewDir = normalize(pos.xyz - r.origin.xyz);
 		float3 ref = reflect(-lightDir, normalize(norm.xyz));
 		float specFac = pow(max(dot(ref, viewDir), 0.0f), shininess);

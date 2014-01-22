@@ -20,6 +20,7 @@ struct Triangle
 	float4	pos1;
 	float4	pos2;
 	float4	color;
+	float4	normal;
 	int		ID;
 	float3	pad;
 };
@@ -40,11 +41,12 @@ struct MeshTriangle
 
 struct Material
 {
+	float	illum;
+	float	ni;
+	float2	pad;
 	float4	kd;
 	float4	ka;
 	float4	tf;
-	float	illum;
-	float3  pad;
 };
 
 struct HitData
@@ -54,6 +56,7 @@ struct HitData
 	float	distance;
 	float4	color;
 	int		ID;
+	int		materialID;
 };
 
 float RaySphereIntersect(Ray p_ray, Sphere p_sphere, float p_dist)
