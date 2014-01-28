@@ -312,7 +312,7 @@ void Direct3D::update(float dt)
 	rot = XMMatrixRotationAxis(XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f), rotDT);
 	for(int i = 0; i < NROFLIGHTS; i++)
 	{
-		//m_lightList[i].pos = XMVector4Transform(m_lightList[i].pos, rot);
+		m_lightList[i].pos = XMVector4Transform(m_lightList[i].pos, rot);
 	}
 	m_pCamera->update();
 	//m_fps = 1/dt;

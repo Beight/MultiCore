@@ -53,6 +53,7 @@ void Mesh::loadObj(char* textFile)
 		{
 			XMVECTOR pos;
 			lineStream >> pos.m128_f32[0] >> pos.m128_f32[1] >> pos.m128_f32[2];
+			pos.m128_f32[2] *= -1.f;
 			pos.m128_f32[3] = 1.0f;
 			positions.push_back( pos );
 		}
@@ -60,6 +61,7 @@ void Mesh::loadObj(char* textFile)
 		{
 			XMVECTOR normal;
 			lineStream >> normal.m128_f32[0] >> normal.m128_f32[1] >> normal.m128_f32[2];
+			normal.m128_f32[2] *= -1.f;
 			normal.m128_f32[3] = 0.0f;
 			normals.push_back( normal );
 		}
@@ -67,7 +69,7 @@ void Mesh::loadObj(char* textFile)
 		{
 			XMFLOAT2 texC;
 			lineStream >> texC.x >> texC.y;
-			//texC.y *= -1;
+			texC.y = 1 - texC.y;
 			texCoords.push_back( texC );
 		}
 		else if( prefix == "f" )
