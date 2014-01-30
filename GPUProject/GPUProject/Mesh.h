@@ -7,7 +7,6 @@
 #include <sstream>
 #include <DirectXMath.h>
 
-using namespace std;
 using namespace DirectX;
 
 struct MeshTriangle
@@ -35,8 +34,8 @@ struct Material
 	XMFLOAT3 Kd;
 	XMFLOAT3 Ks;
 	XMFLOAT3 Ke;
-	string map_Ka;
-	string map_Kd;
+	std::string map_Ka;
+	std::string map_Kd;
 
 	Material()
 	{
@@ -58,7 +57,7 @@ struct Material
 
 struct Material2
 {
-	float	illum;
+	int	illum;
 	float   ni;
 	XMFLOAT2  pad;
 	XMVECTOR kd;
@@ -79,17 +78,17 @@ public:
 	~Mesh();
 	void init();
 	void loadObj(char* textFile);
-	vector<MeshTriangle>* getTriangles();
+	std::vector<MeshTriangle>* getTriangles();
 	Material* getMaterial();
 	int getFaces();
 	MeshTriangle* getTriangles2();
 	Material2 getMaterial2();
 private:
 	int m_nrOfFaces;
-	void loadMaterial(string filename);
+	void loadMaterial(std::string filename);
 	Material m_material;
 	Material2 m_material2;
-	vector<MeshTriangle> m_meshTriangles;
+	std::vector<MeshTriangle> m_meshTriangles;
 
 };
 

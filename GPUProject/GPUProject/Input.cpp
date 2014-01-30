@@ -53,7 +53,6 @@ void Input::update(LPARAM lParam)
 	if(raw->header.dwType == RIM_TYPEKEYBOARD)
 	{
 		USHORT keyCode = raw->data.keyboard.VKey;
-		int lol = 0;
 		switch(keyCode)
 		{
 			case 'W':

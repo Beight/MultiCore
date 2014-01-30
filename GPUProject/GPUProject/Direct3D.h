@@ -54,6 +54,7 @@ struct ConstBuffer
 	Triangle triangles[NROFTRIANGLES];
 	Light lightList[NROFLIGHTS];
 	int nrOfFaces;
+	XMFLOAT3 pad;
 };
 
 class Direct3D

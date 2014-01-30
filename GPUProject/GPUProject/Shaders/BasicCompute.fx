@@ -12,7 +12,6 @@ RWTexture2D<float4> output : register(u0);
 StructuredBuffer<MeshTriangle> input : register(t0);
 Texture2D meshTexture : register(t1);
 StructuredBuffer<Material> material : register (t2);
-SamplerState diffuseMap : register (s0);
 
 
 float3 LightStage(HitData hd, Ray r);
@@ -27,6 +26,7 @@ cbuffer ConstBuffer
 	Triangle triangles[NROFTRIANGLES];
 	Light lightList[NROFLIGHTS];
 	int nrOfFaces;
+	float3 extra;
 };
 
 [numthreads(32, 32, 1)]
@@ -35,6 +35,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	///////////////////////////////////////////////
 	//Primary rays stage
 	///////////////////////////////////////////////
+	float3 padX = extra;
 	HitData hd;
 	float hit;
 	hd.distance = -1.0;
@@ -91,7 +92,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	for(int i = 0; i < NROFTRIANGLES; i++)
 	{
 			//padding
-			float3 paddy = triangles[i].pad;
+			float3 paddy = triangles[i].pad + padX;
 			hit = RayTriangleIntersect(r, triangles[i], hd.distance);
 			if(hit > -1.0f)
 			{
@@ -105,19 +106,19 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	}
 
 	// ## MESH ## //
-	for(int j = 0; j < nrOfFaces; j++)
+	for(i = 0; i < nrOfFaces; i++)
 	{
 		//padding
-		float paddy = input[j].pad;
+		float paddy = input[i].pad;
 		float3 temp;
-		temp = RayTriangleIntersects(r, input[j], hd.distance);
+		temp = RayTriangleIntersects(r, input[i], hd.distance);
 		hit = temp.x;
 		if(hit > -1.0f)
 		{
 			hd.pos = r.origin + r.direction * hit;
-			hd.normal = normalize(input[j].normal);
-			hd.color = /*float4(temp.yz, 0.f, 1.f);//*/ meshTexture[temp.yz*512.f];
-			hd.ID = input[j].ID;
+			hd.normal = normalize(input[i].normal);
+			hd.color = meshTexture[temp.yz*512.f];
+			hd.ID = input[i].ID;
 			hd.distance = hit;
 			hd.materialID = 1;
 		}
@@ -145,7 +146,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 		///////////////////////////////////////////////
 		//Number of Bounces
 		///////////////////////////////////////////////
-		for(int j = 0; j < 10; j++)
+		for(int i = 0; i < 1; i++)
 		{
 			float bHit = -1.0f;
 			bounceHit.distance = -1.0f;
@@ -168,36 +169,36 @@ void main( uint3 threadID : SV_DispatchThreadID )
 				}
 			}
 			// ## CUBE ## //
-			for(int i = 0; i < NROFTRIANGLES; i++)
+			for(int j = 0; j < NROFTRIANGLES; j++)
 			{
-				float3 paddy = triangles[i].pad;
-				if(bounceHit.ID != triangles[i].ID)
+				float3 paddy = triangles[j].pad;
+				if(bounceHit.ID != triangles[j].ID)
 				{
-					bHit = RayTriangleIntersect(bounceRay, triangles[i], bounceHit.distance);
+					bHit = RayTriangleIntersect(bounceRay, triangles[j], bounceHit.distance);
 					if(bHit > -1.0f)
 					{
 						bounceHit.pos = bounceRay.origin + bounceRay.direction * bHit;
-						bounceHit.normal = triangles[i].normal;
-						bounceHit.color = triangles[i].color;
-						tempID = triangles[i].ID;
+						bounceHit.normal = triangles[j].normal;
+						bounceHit.color = triangles[j].color;
+						tempID = triangles[j].ID;
 						bounceHit.distance = bHit;
 						bounceHit.materialID = -1;
 					}
 				}
 			}
 			// ## MESH ## //
-			for(int j = 0; j < nrOfFaces; j++)
+			for(j = 0; j < nrOfFaces; j++)
 			{
+				//padding
+				float paddy = input[j].pad;
 				if(bounceHit.ID != input[j].ID)
 				{
-					//padding
-					float paddy = input[j].pad;
 					float3 temp = RayTriangleIntersects(bounceRay, input[j], bounceHit.distance);
 					bHit = temp.x;
 					if(bHit > -1.0f)
 					{
 						bounceHit.pos = bounceRay.origin + bounceRay.direction * bHit;
-						bounceHit.normal = normalize(input[j].normal);
+						bounceHit.normal = input[j].normal;
 						bounceHit.color = meshTexture[temp.yz*512.f];
 						tempID = input[j].ID;
 						bounceHit.distance = bHit;
@@ -210,7 +211,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 			///////////////////////////////////////////////
 			//Bounce Light
 			///////////////////////////////////////////////
-			finalColor += LightStage(bounceHit, bounceRay) * 0.2f;
+			finalColor += LightStage(bounceHit, bounceRay) * 1.0f;
 		}
 	}
 	
@@ -228,7 +229,7 @@ float3 LightStage(HitData hd, Ray r)
 		float3 paddy = lightList[0].pad;
 
 		/// ## NUMBER OF LIGHTS ## //
-		for(int i = 1; i < 2; i++)
+		for(int i = 0; i < 2; i++)
 		{	
 			float3 color = float3(0.0f, 0.0f, 0.0f);
 			Ray lightRay;
@@ -252,7 +253,7 @@ float3 LightStage(HitData hd, Ray r)
 			{
 				if(hd.ID != triangles[j].ID)
 				{
-					hit = RayTriangleIntersect(r, triangles[j], hd.distance);
+					hit = RayTriangleIntersect(lightRay, triangles[j], hd.distance);
 					if(hit > -1.0f)
 					{
 						lightHit.distance = hit;
@@ -260,25 +261,25 @@ float3 LightStage(HitData hd, Ray r)
 				}
 			}
 			// ## MESH ## //
-			for(int k = 0; k < nrOfFaces; k++)
+			for(j = 0; j < nrOfFaces; j++)
 			{
-				if(hd.ID != input[k].ID)
+				if(hd.ID != input[j].ID)
 				{
-					float3 temp = RayTriangleIntersects(lightRay, input[k], hd.distance);
+					float3 temp = RayTriangleIntersects(lightRay, input[j], hd.distance);
 					if(temp.x > -1.0f)
 					{
 						lightHit.distance = temp.x;
 					}
 				}
 			}
-			//float3 diff = tex2D(diffuseMap, )
+			//float3 diff = MeshTexture.Sample(DiffuseMap, ;
 			if(lightHit.distance > 0.0001f && lightLength > lightHit.distance)
 			{
-				color = (PointLightR(hd.pos, hd.normal, hd.color, hd.materialID, lightList[i], r, material[0]) * 0.5f);//, diff)*0.5f);
+				color = (PointLightR(hd.pos, hd.normal, hd.color, hd.materialID, lightList[i], material[0]) * 0.5f);//, diff)*0.5f);
 				
 			}	
 			else 
-				color = PointLightR(hd.pos, hd.normal, hd.color, hd.materialID, lightList[i], r, material[0]);//, diff);
+				color = PointLightR(hd.pos, hd.normal, hd.color, hd.materialID, lightList[i], material[0]);//, diff);
 		
 
 			final += color;

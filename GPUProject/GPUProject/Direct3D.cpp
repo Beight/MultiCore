@@ -252,7 +252,7 @@ void Direct3D::init(Input* p_pInput)
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 	//Staticly adding light pos
-	m_lightList[0].pos = XMVectorSet(0.0f,	0.0f,	 -20.0f, 1.0f);
+	m_lightList[0].pos = XMVectorSet(0.0f,	0.0f,	 -2000.0f, 1.0f);
 	m_lightList[1].pos = XMVectorSet(10.0f,		10.0f,	 -20.0f, 1.0f);
 	m_lightList[2].pos = XMVectorSet(10.0f,	    -10.0f,	 -20.0f, 1.0f);
 
@@ -284,6 +284,11 @@ void Direct3D::init(Input* p_pInput)
 	m_meshBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(MeshTriangle), m_mesh.getFaces(), true, false, m_mesh.getTriangles2(), false, 0);
 	
 	D3DX11CreateShaderResourceViewFromFile(m_Device, m_mesh.getMaterial()->map_Kd.c_str(), NULL, NULL, &m_meshTexture, &hr);
+
+	if(FAILED(hr))
+	{
+		int lol = 0;
+	}
 
 	m_materialBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(Material2), 1, true, false, &m_mesh.getMaterial2(), false, 0);
 

@@ -41,7 +41,7 @@ struct MeshTriangle
 
 struct Material
 {
-	float	illum;
+	int		illum;
 	float	ni;
 	float2	pad;
 	float4	kd;
