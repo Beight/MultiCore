@@ -12,77 +12,93 @@ Camera::~Camera()
 
 void Camera::init(XMVECTOR p_pos, XMVECTOR p_up, XMVECTOR p_dir, float p_width, float p_height)
 {
-	m_pos	= p_pos;
-	m_up	= p_up;
-	
-	m_look	= p_dir;
-
-	m_right = XMVector3Cross(m_up, m_look);
-	m_proj = XMMatrixPerspectiveFovLH(0.4f*3.14, p_width / p_height, 1.0f, 500.0f);
+	XMStoreFloat4(&m_pos, p_pos);
+	XMStoreFloat4(&m_up, p_up);
+	XMStoreFloat4(&m_look, p_dir);
+	XMVECTOR vRight = XMVector3Cross(p_up, p_dir);
+	XMStoreFloat4(&m_right, vRight);
+	XMMATRIX mProj = XMMatrixPerspectiveFovLH(0.4f*3.14f, p_width / p_height, 1.f, 500.f);
+	XMStoreFloat4x4(&m_proj, mProj);
 	m_speed = 1.f;
 }
 
 void Camera::update()
 {
-	//m_right = XMVector3Cross(m_up, m_look);
-	m_lookAt = m_look + m_pos;
-	//m_lookAt =XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-	m_view = XMMatrixLookAtLH(m_pos, m_lookAt, m_up);
+	XMVECTOR vLook = XMLoadFloat4(&m_look);
+	XMVECTOR vUp = XMLoadFloat4(&m_up);
+	XMVECTOR vPos = XMLoadFloat4(&m_pos);
+	XMVECTOR vLookAt = vLook + vPos;
+	XMStoreFloat4(&m_lookAt, vLookAt);
+
+	XMMATRIX mView = XMMatrixLookAtLH(vPos, vLookAt, vUp);
+	XMStoreFloat4x4(&m_view, mView);
 }
 
-void Camera::setPosition(XMFLOAT3 p_pos)
+void Camera::setPosition(XMVECTOR p_pos)
 {
-	m_pos = XMLoadFloat3(&p_pos);
+	XMStoreFloat4(&m_pos, p_pos);
 }
 
-XMVECTOR Camera::getPosition()
+XMFLOAT4 Camera::getPosition()
 {
 	return m_pos;
 }
 
-XMVECTOR Camera::getUp()
+XMFLOAT4 Camera::getUp()
 {
 	return m_up;
 }
 
-XMMATRIX Camera::getProjMat()
+XMFLOAT4X4 Camera::getProjMat()
 {
 	return m_proj;
 }
 
-XMMATRIX Camera::getViewMat()
+XMFLOAT4X4 Camera::getViewMat()
 {
 	return m_view;
 }
 
 void Camera::moveForeward()
 {
-	m_pos += m_look * m_speed;
+	XMVECTOR vPos = XMLoadFloat4(&m_pos);
+	XMVECTOR vLook = XMLoadFloat4(&m_look);
+	vPos += vLook * m_speed;
+	XMStoreFloat4(&m_pos, vPos);
 }
 
 void Camera::moveBackward()
 {
-	m_pos += m_look * -m_speed;
+	XMVECTOR vPos = XMLoadFloat4(&m_pos);
+	XMVECTOR vLook = XMLoadFloat4(&m_look);
+	vPos += vLook * -m_speed;
+	XMStoreFloat4(&m_pos, vPos);
 }
 
 void Camera::moveLeft()
 {
-	m_pos += m_right * -m_speed;
+	XMVECTOR vPos = XMLoadFloat4(&m_pos);
+	XMVECTOR vRight = XMLoadFloat4(&m_right);
+	vPos += vRight * -m_speed;
+	XMStoreFloat4(&m_pos, vPos);
 }
 
 void Camera::moveRight()
 {
-	m_pos += m_right * m_speed;
+	XMVECTOR vPos = XMLoadFloat4(&m_pos);
+	XMVECTOR vRight = XMLoadFloat4(&m_right);
+	vPos += vRight * m_speed;
+	XMStoreFloat4(&m_pos, vPos);
 }
 
 void Camera::moveUp()
 {
-	m_pos.m128_f32[1] += m_up.m128_f32[1] * m_speed;
+	m_pos.y += m_up.y * m_speed;
 }
 
 void Camera::moveDown()
 {
-	m_pos.m128_f32[1] -= m_up.m128_f32[1] * m_speed;
+	m_pos.y -= m_up.y * m_speed;
 }
 
 
@@ -105,11 +121,15 @@ void Camera::yaw(float radians)
         return;
     }
 
-	//Do the transfrom.
-	XMMATRIX mat;
-	mat		= XMMatrixRotationAxis(m_up, -radians);
-	m_right = XMVector3TransformNormal(m_right, mat);
-	m_look	= XMVector3TransformNormal(m_look, mat);
+	//Do the transform.
+	XMVECTOR vUp = XMLoadFloat4(&m_up);
+	XMMATRIX mat= XMMatrixRotationAxis(vUp, -radians);
+	XMVECTOR vRight = XMLoadFloat4(&m_right);
+	XMVECTOR vLook = XMLoadFloat4(&m_look);
+	vRight = XMVector3TransformNormal(vRight, mat);
+	vLook = XMVector3TransformNormal(vLook, mat);
+	XMStoreFloat4(&m_right, vRight);
+	XMStoreFloat4(&m_look, vLook);
 }
 
 void Camera::pitch(float radians)
@@ -120,8 +140,13 @@ void Camera::pitch(float radians)
         return;
     }
 	//Do the transfrom.
-	XMMATRIX mat;
-	mat	= XMMatrixRotationAxis(m_right, radians);
-	m_look	= XMVector3TransformNormal(m_look, mat);
-	m_lookAt= XMVector3TransformNormal(m_up, mat);
+	XMVECTOR vRight = XMLoadFloat4(&m_right);
+	XMMATRIX mat = XMMatrixRotationAxis(vRight, radians);
+	XMVECTOR vLook = XMLoadFloat4(&m_look);
+	XMVECTOR vLookAt = XMLoadFloat4(&m_lookAt);
+	XMVECTOR vUp = XMLoadFloat4(&m_up);
+	vLook = XMVector3TransformNormal(vLook, mat);
+	vLookAt = XMVector3TransformNormal(vUp, mat);
+	XMStoreFloat4(&m_look, vLook);
+	XMStoreFloat4(&m_lookAt, vLookAt);
 }

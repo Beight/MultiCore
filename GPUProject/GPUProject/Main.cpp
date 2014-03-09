@@ -19,7 +19,7 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 	g_input = Input();
 
 	D3D.init(&g_input);
-	//g_input.init();
+	
 
 	__int64 cntsPerSec = 0;
 	QueryPerformanceFrequency((LARGE_INTEGER*)&cntsPerSec);
@@ -49,6 +49,8 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 			prevTimeStamp = currTimeStamp;
 		}
 	}
+
+	D3D.release();
 
 	return (int) msg.wParam;
 }

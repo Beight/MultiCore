@@ -1,7 +1,8 @@
 #ifndef _DIRECT3D__H
 #define _DIRECT3D__H
 
-#include "stdafx.h" 
+#include "stdafx.h"
+#include <memory>
 #include "D3DTimer.h"
 #include "ComputeHelp.h"
 #include "Input.h"
@@ -14,9 +15,9 @@
 
 struct Light
 {
-	XMVECTOR pos;
-	XMVECTOR ambient;
-	XMVECTOR diffuse;
+	XMFLOAT4 pos;
+	XMFLOAT4 ambient;
+	XMFLOAT4 diffuse;
 	float range;
 	XMFLOAT3 pad;
 };
@@ -24,8 +25,8 @@ struct Light
 
 struct Sphere
 {
-	XMVECTOR center;
-	XMVECTOR color;
+	XMFLOAT4 center;
+	XMFLOAT4 color;
 	float radius;
 	int		ID;
 	XMFLOAT2 pad;
@@ -33,11 +34,11 @@ struct Sphere
 
 struct Triangle
 {
-	XMVECTOR	pos0;
-	XMVECTOR	pos1;
-	XMVECTOR	pos2;
-	XMVECTOR	color;
-	XMVECTOR	normal;
+	XMFLOAT4	pos0;
+	XMFLOAT4	pos1;
+	XMFLOAT4	pos2;
+	XMFLOAT4	color;
+	XMFLOAT4	normal;
 	int			ID;
 	XMFLOAT3	pad;
 };
@@ -46,9 +47,9 @@ struct Triangle
 
 struct ConstBuffer
 {
-	XMVECTOR cameraPos;
-	XMMATRIX IP;
-	XMMATRIX IV;
+	XMFLOAT4 cameraPos;
+	XMFLOAT4X4 IP;
+	XMFLOAT4X4 IV;
 	Sphere sphere;
 	Sphere spherel0;
 	Triangle triangles[NROFTRIANGLES];
@@ -60,20 +61,16 @@ struct ConstBuffer
 class Direct3D
 {
 public:
-
-
-
 	Direct3D(HWND p_hwnd);
 	~Direct3D();
 
-	void init(Input* p_pInput);
+	void init(Input *p_pInput);
 	void update(float dt);
 	void draw();
-
+	void release();
 private:
 	HWND						m_hWnd;
-
-	Camera*						m_pCamera;													
+	std::shared_ptr<Camera>		m_pCamera;													
 	IDXGISwapChain*				m_SwapChain;
 	ID3D11Device*				m_Device;
 	ID3D11DeviceContext*		m_DeviceContext;
@@ -88,22 +85,19 @@ private:
 	Input*						m_pInput;
 	float						m_fps;
 	float						m_time;
-
 	Sphere						m_sphere;
 	Sphere						m_spherel0;
 	MeshTriangle				m_meshTri;
-	Triangle					m_triangles[NROFTRIANGLES];
-	
-	XMMATRIX					m_view;
-	XMMATRIX					m_proj;
-	XMMATRIX					m_IVP;
-
+	Triangle					m_triangles[NROFTRIANGLES];	
+	XMFLOAT4X4					m_view;
+	XMFLOAT4X4					m_proj;
+	XMFLOAT4X4					m_IVP;
 	Light						m_lightList[NROFLIGHTS];
 	Mesh						m_mesh;
 	ComputeBuffer				*m_meshBuffer, *m_materialBuffer;
 
 
-	void						release();
+
 };
 
 

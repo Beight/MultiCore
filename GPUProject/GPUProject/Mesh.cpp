@@ -21,8 +21,8 @@ void Mesh::init()
 void Mesh::loadObj(char* textFile)
 {
 	
-	vector<XMVECTOR> positions;
-	vector<XMVECTOR> normals;
+	vector<XMFLOAT4> positions;
+	vector<XMFLOAT4> normals;
 	vector<XMFLOAT2> texCoords;
 
 	fstream file( textFile );
@@ -52,18 +52,18 @@ void Mesh::loadObj(char* textFile)
 
 		if( prefix == "v" )
 		{
-			XMVECTOR pos;
-			lineStream >> pos.m128_f32[0] >> pos.m128_f32[1] >> pos.m128_f32[2];
-			pos.m128_f32[2] *= -1.f;
-			pos.m128_f32[3] = 1.0f;
+			XMFLOAT4 pos;
+			lineStream >> pos.x >> pos.y >> pos.z;
+			pos.z *= -1.f;
+			pos.w = 1.0f;
 			positions.push_back( pos );
 		}
 		else if( prefix == "vn" )
 		{
-			XMVECTOR normal;
-			lineStream >> normal.m128_f32[0] >> normal.m128_f32[1] >> normal.m128_f32[2];
-			normal.m128_f32[2] *= -1.f;
-			normal.m128_f32[3] = 0.0f;
+			XMFLOAT4 normal;
+			lineStream >> normal.x >> normal.y >> normal.z;
+			normal.z *= -1.f;
+			normal.w = 0.0f;
 			normals.push_back( normal );
 		}
 		else if( prefix == "vt" )
@@ -141,7 +141,7 @@ void Mesh::loadMaterial(string filename)
 		else if( prefix == "Tf" )
 		{
 			lineStream >> m_material.Tf.x >> m_material.Tf.y >> m_material.Tf.z;
-			m_material2.tf = XMVectorSet(m_material.Tf.x, m_material.Tf.y, m_material.Tf.z, 0.f);
+			m_material2.tf = XMFLOAT4(m_material.Tf.x, m_material.Tf.y, m_material.Tf.z, 0.f);
 		}
 		else if( prefix == "illum" )
 		{
@@ -151,12 +151,12 @@ void Mesh::loadMaterial(string filename)
 		else if( prefix == "Ka" )
 		{
 			lineStream >> m_material.Ka.x >> m_material.Ka.y >> m_material.Ka.z;
-			m_material2.ka = XMVectorSet(m_material.Ka.x, m_material.Ka.y, m_material.Ka.z, 0.f);
+			m_material2.ka = XMFLOAT4(m_material.Ka.x, m_material.Ka.y, m_material.Ka.z, 0.f);
 		}
 		else if( prefix == "Kd" )
 		{
 			lineStream >> m_material.Kd.x >> m_material.Kd.y >> m_material.Kd.z;
-			m_material2.kd = XMVectorSet(m_material.Kd.x, m_material.Kd.y, m_material.Kd.z, 0.f);
+			m_material2.kd = XMFLOAT4(m_material.Kd.x, m_material.Kd.y, m_material.Kd.z, 0.f);
 		}
 		else if( prefix == "Ks" )
 		{

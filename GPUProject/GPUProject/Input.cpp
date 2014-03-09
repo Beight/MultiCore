@@ -1,7 +1,11 @@
 #include "Input.h"
 
 
-Input::Input()
+Input::Input() :
+	m_pCamera(nullptr),
+	m_mouseX(0.f),
+	m_mouseY(0.f),
+	m_rid()
 {
 
 }
@@ -11,7 +15,7 @@ Input::~Input()
 
 }
 
-void Input::init(Camera* p_pCam)
+void Input::init(std::shared_ptr<Camera> p_pCam)
 {
 	m_pCamera = p_pCam;
 	//Mouse
@@ -31,8 +35,6 @@ void Input::init(Camera* p_pCam)
 		MessageBox(0, "Error Creating input device", "", MB_OK);
 		return;
 	}
-
-
 }
 
 void Input::update(LPARAM lParam)
@@ -85,5 +87,6 @@ void Input::update(LPARAM lParam)
 		m_mouseY = raw->data.mouse.lLastY;
 		m_pCamera->moveDirection(-m_mouseX, m_mouseY);
 	}
+	delete raw;
 }
 

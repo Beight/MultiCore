@@ -17,8 +17,8 @@ D3DTimer::D3DTimer(ID3D11Device* d3dDevice, ID3D11DeviceContext* d3dDeviceContex
 D3DTimer::~D3DTimer()
 {
 	if(mStart)		mStart->Release();
-	if(mStop)		mStart->Release();
-	if(mDisjoint)	mStart->Release();
+	if(mStop)		mStop->Release();
+	if(mDisjoint)	mDisjoint->Release();
 }
 
 void D3DTimer::Start()
