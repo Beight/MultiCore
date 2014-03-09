@@ -113,7 +113,7 @@ void Direct3D::init(Input *p_pInput)
 	if( FAILED(hr) )
 		return;
 
-	// Create a render target view
+	//Create a render target view
 	ID3D11Texture2D* pBackBuffer;
 	hr = m_SwapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), (LPVOID*)&pBackBuffer );
 	if( FAILED(hr) )
@@ -124,6 +124,7 @@ void Direct3D::init(Input *p_pInput)
 	if( FAILED(hr) )
 		return;
 
+	SAFE_RELEASE(pBackBuffer);
 	m_ComputeSys = new ComputeWrap(m_Device, m_DeviceContext);
 	m_ComputeShader = m_ComputeSys->CreateComputeShader(_T("Shaders/BasicCompute.fx"), NULL, "main", NULL);
 	m_Timer = new D3DTimer(m_Device, m_DeviceContext);
@@ -371,7 +372,7 @@ void Direct3D::update(float dt)
 	}
 
 	cRayBufferStruct.nrOfFaces = m_mesh.getFaces();
-	m_DeviceContext->UpdateSubresource(m_cBuffer, 0, NULL, &cRayBufferStruct, 0, 0);
+	m_DeviceContext->UpdateSubresource(m_cBuffer, 0, 0, &cRayBufferStruct, 0, 0);
 	m_DeviceContext->CSSetConstantBuffers(0, 1, &m_cBuffer);
 
 
@@ -380,7 +381,7 @@ void Direct3D::update(float dt)
 void Direct3D::draw()
 {
 	ID3D11UnorderedAccessView* uav[] = { m_BackBufferUAV };
-	m_DeviceContext->CSSetUnorderedAccessViews(0, 1, uav, NULL);
+	m_DeviceContext->CSSetUnorderedAccessViews(0, 1, uav, 0);
 	ID3D11ShaderResourceView* srv[] = { m_meshBuffer->GetResourceView(),
 										m_meshTexture,
 										m_materialBuffer->GetResourceView()
@@ -403,7 +404,7 @@ void Direct3D::draw()
 
 	uav[0] = nullptr;
 	srv[0] = nullptr;
-	m_DeviceContext->CSSetUnorderedAccessViews(0, 1, uav, NULL);
+	m_DeviceContext->CSSetUnorderedAccessViews(0, 1, uav, 0);
 	m_DeviceContext->CSSetShaderResources(0, 1, srv);
 
 
@@ -428,16 +429,15 @@ void Direct3D::release()
 	SAFE_RELEASE(m_BackBufferUAV);
 	SAFE_RELEASE(m_cBuffer);
 	SAFE_RELEASE(m_SwapChain);
-	SAFE_RELEASE(m_Device);
-	SAFE_RELEASE(m_DeviceContext);
+	SAFE_DELETE(m_ComputeSys);
+	SAFE_DELETE(m_ComputeShader);
 	SAFE_RELEASE(m_meshTexture);
 	SAFE_RELEASE(m_materialBuffer);
-
-	SAFE_DELETE(m_ComputeShader);
-	m_pCamera.reset();
-	SAFE_DELETE(m_ComputeSys);
 	SAFE_DELETE(m_meshBuffer);
+	SAFE_RELEASE(m_Device);
+	SAFE_RELEASE(m_DeviceContext);
 	SAFE_DELETE(m_Timer);
+	m_pCamera.reset();
 	m_pInput = nullptr;
 }
 

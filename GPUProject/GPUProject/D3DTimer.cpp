@@ -1,4 +1,5 @@
 #include "D3DTimer.h"
+#include "stdafx.h"
 
 D3DTimer::D3DTimer(ID3D11Device* d3dDevice, ID3D11DeviceContext* d3dDeviceContext)
 	: mDevice(d3dDevice), mDeviceContext(d3dDeviceContext)

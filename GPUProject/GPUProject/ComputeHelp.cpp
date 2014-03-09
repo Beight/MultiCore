@@ -11,15 +11,16 @@
 #endif
 
 ComputeShader::ComputeShader()
-	: mD3DDevice(NULL), mD3DDeviceContext(NULL)
+	: mD3DDevice(nullptr), mD3DDeviceContext(nullptr)
 {
 
 }
 
 ComputeShader::~ComputeShader()
 {
-	SAFE_RELEASE(mD3DDevice);
-	SAFE_RELEASE(mD3DDeviceContext);
+	SAFE_RELEASE(mShader);
+	mD3DDevice = nullptr;
+	mD3DDeviceContext = nullptr;
 }
 
 bool ComputeShader::Init(TCHAR* shaderFile, char* blobFileAppendix, char* pFunctionName, D3D10_SHADER_MACRO* pDefines,
@@ -29,8 +30,8 @@ bool ComputeShader::Init(TCHAR* shaderFile, char* blobFileAppendix, char* pFunct
 	mD3DDevice = d3dDevice;
 	mD3DDeviceContext = d3dContext;
 
-	ID3DBlob* pCompiledShader = NULL;
-	ID3DBlob* pErrorBlob = NULL;
+	ID3DBlob* pCompiledShader = nullptr;
+	ID3DBlob* pErrorBlob = nullptr;
 	
 	DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
 #if defined(DEBUG) || defined(_DEBUG)
@@ -40,8 +41,8 @@ bool ComputeShader::Init(TCHAR* shaderFile, char* blobFileAppendix, char* pFunct
 	dwShaderFlags |= D3DCOMPILE_OPTIMIZATION_LEVEL0;
 #endif
 
-	hr = D3DX11CompileFromFile(shaderFile, pDefines, NULL, pFunctionName, "cs_5_0", 
-		dwShaderFlags, NULL, NULL, &pCompiledShader, &pErrorBlob, NULL);
+	hr = D3DX11CompileFromFile(shaderFile, pDefines, 0, pFunctionName, "cs_5_0", 
+		dwShaderFlags, 0, 0, &pCompiledShader, &pErrorBlob, 0);
 
 	if (pErrorBlob)
 	{
@@ -59,7 +60,7 @@ bool ComputeShader::Init(TCHAR* shaderFile, char* blobFileAppendix, char* pFunct
 		if(hr == S_OK)
 		{
 			hr = mD3DDevice->CreateComputeShader(pCompiledShader->GetBufferPointer(),
-				pCompiledShader->GetBufferSize(), NULL, &mShader);
+				pCompiledShader->GetBufferSize(), 0, &mShader);
 		}
 	}
 
@@ -71,12 +72,12 @@ bool ComputeShader::Init(TCHAR* shaderFile, char* blobFileAppendix, char* pFunct
 
 void ComputeShader::Set()
 {
-	mD3DDeviceContext->CSSetShader( mShader, NULL, 0 );
+	mD3DDeviceContext->CSSetShader( mShader, 0, 0 );
 }
 
 void ComputeShader::Unset()
 {
-	mD3DDeviceContext->CSSetShader( NULL, NULL, 0 );
+	mD3DDeviceContext->CSSetShader( 0, 0, 0 );
 }
 
 ComputeBuffer* ComputeWrap::CreateBuffer(COMPUTE_BUFFER_TYPE uType,
