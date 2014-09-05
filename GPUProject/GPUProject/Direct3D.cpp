@@ -259,9 +259,20 @@ void Direct3D::init(Input *p_pInput)
 	m_triangles[9].pos2 = XMFLOAT4( 1.f*CUBESIZE,	-1.f*CUBESIZE, -1.f*CUBESIZE, 1.f);
 	m_triangles[9].normal = XMFLOAT4(0.f, 1.f, 0.f, 0.f);
 
+	//Front
+	m_triangles[10].pos0 = XMFLOAT4( 1.f*CUBESIZE,	-1.f*CUBESIZE,	 -1.f*CUBESIZE, 1.f);
+	m_triangles[10].pos1 = XMFLOAT4(-1.f*CUBESIZE,	-1.f*CUBESIZE,	 -1.f*CUBESIZE, 1.f);
+	m_triangles[10].pos2 = XMFLOAT4(-1.f*CUBESIZE,	1.f*CUBESIZE,	 -1.f*CUBESIZE, 1.f);
+	m_triangles[10].normal = XMFLOAT4(0.f, 0.f, 1.f, 0.f);
+
+	m_triangles[11].pos0 = XMFLOAT4( 1.f*CUBESIZE,  -1.f*CUBESIZE,	 -1.f*CUBESIZE, 1.f);
+	m_triangles[11].pos1 = XMFLOAT4(-1.f*CUBESIZE,	1.f*CUBESIZE,	 -1.f*CUBESIZE, 1.f);
+	m_triangles[11].pos2 = XMFLOAT4( 1.f*CUBESIZE,	1.f*CUBESIZE,	 -1.f*CUBESIZE, 1.f);
+	m_triangles[11].normal = XMFLOAT4(0.f, 0.f, 1.f, 0.f);
+
 	for(int i = 0; i < NROFTRIANGLES; i++)
 	{
-		m_triangles[i].color = XMFLOAT4(0.f, 1.f, 0.f, 1.f);
+		m_triangles[i].color = XMFLOAT4(0.f, 0.5f, 0.5f, 1.f);
 		m_triangles[i].ID = i;
 		m_triangles[i].pad = XMFLOAT3(0.f, 0.f, 0.f);
 	}
@@ -299,7 +310,7 @@ void Direct3D::init(Input *p_pInput)
 ///////////////////////////////////////////////////////////////////////////////////////////
 	m_mesh.loadObj("Meshi/kub.obj");
 
-	m_meshBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(MeshTriangle), m_mesh.getFaces(), true, false, m_mesh.getTriangles2(), false, 0);
+	m_meshBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(MeshTriangle), m_mesh.getFaces(), true, false, m_mesh.getTriangles2(), false, "Structured Buffer: Mesh Texture");
 	
 	D3DX11CreateShaderResourceViewFromFile(m_Device, m_mesh.getMaterial()->map_Kd.c_str(), NULL, NULL, &m_meshTexture, &hr);
 

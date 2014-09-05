@@ -9,7 +9,7 @@
 #include "Camera.h"
 #include "Mesh.h"
 
-#define NROFTRIANGLES 10
+#define NROFTRIANGLES 12
 #define NROFLIGHTS 10
 #define CUBESIZE 16
 

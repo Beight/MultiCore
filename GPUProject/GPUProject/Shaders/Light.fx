@@ -64,10 +64,3 @@ float3 PointLightR(float4 pos, float4 norm, float4 color, int materialID, Light 
 
 	return litColor*fade;
 }
-
-	int		illum;
-	float	ni;
-	float2	pad;
-	float4	kd;
-	float4	ka;
-	float4	tf;

@@ -3,10 +3,6 @@
 // Direct3D 11 Shader Model 5.0 Demo
 //--------------------------------------------------------------------------------------
 #include "Light.fx"
-static const float WIDTH = 800.0f;
-static const float HEIGHT= 800.0f;
-#define NROFTRIANGLES 10
-#define NROFLIGHTS 10
 
 RWTexture2D<float4> output : register(u0);
 StructuredBuffer<MeshTriangle> input : register(t0);
@@ -64,7 +60,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 
 	float3 finalColor = float3(0.0f, 0.0f, 0.0f);
 
-	float2 paddy = sphere.pad;
+	//float2 paddy = sphere.pad;
 	// ## SPHERE ## //
 	hit = RaySphereIntersect(r, sphere, hd.distance);
 	if(hit > -1.0f)
@@ -92,7 +88,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	for(int i = 0; i < NROFTRIANGLES; i++)
 	{
 			//padding
-			float3 paddy = triangles[i].pad + padX;
+			//float3 paddy = triangles[i].pad + padX;
 			hit = RayTriangleIntersect(r, triangles[i], hd.distance);
 			if(hit > -1.0f)
 			{
@@ -109,7 +105,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	for(i = 0; i < nrOfFaces; i++)
 	{
 		//padding
-		float paddy = input[i].pad;
+		//float paddy = input[i].pad;
 		float3 temp;
 		temp = RayTriangleIntersects(r, input[i], hd.distance);
 		hit = temp.x;
@@ -171,7 +167,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 			// ## CUBE ## //
 			for(int j = 0; j < NROFTRIANGLES; j++)
 			{
-				float3 paddy = triangles[j].pad;
+				//float3 paddy = triangles[j].pad;
 				if(bounceHit.ID != triangles[j].ID)
 				{
 					bHit = RayTriangleIntersect(bounceRay, triangles[j], bounceHit.distance);
@@ -190,7 +186,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 			for(j = 0; j < nrOfFaces; j++)
 			{
 				//padding
-				float paddy = input[j].pad;
+				//float paddy = input[j].pad;
 				if(bounceHit.ID != input[j].ID)
 				{
 					float3 temp = RayTriangleIntersects(bounceRay, input[j], bounceHit.distance);
@@ -215,7 +211,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 		}
 	}
 	
-	output[threadID.xy] = /* hd.normal;//*/ float4(finalColor, 1.0f);
+	output[threadID.xy] = /* hd.normal;//*/ saturate(float4(finalColor, 1.0f));
 }
 
 
@@ -226,7 +222,7 @@ float3 LightStage(HitData hd, Ray r)
 {
 		
 		float3 final = float3(0.f,0.f,0.f);
-		float3 paddy = lightList[0].pad;
+		//float3 paddy = lightList[0].pad;
 
 		/// ## NUMBER OF LIGHTS ## //
 		for(int i = 0; i < 2; i++)
