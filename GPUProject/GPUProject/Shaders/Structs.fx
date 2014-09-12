@@ -65,10 +65,11 @@ struct HitData
 {
 	float4	pos;
 	float4	normal;
-	float	distance;
 	float4	color;
+	float	distance;
 	int		ID;
 	int		materialID;
+	int		pad;
 };
 
 #endif

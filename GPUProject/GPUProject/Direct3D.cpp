@@ -9,12 +9,21 @@ Direct3D::Direct3D(HWND p_hwnd)
 	m_Timer(nullptr),
 	m_ComputeSys(nullptr),
 	m_ComputeShader(nullptr),
+	m_PrimaryShader(nullptr),
+	m_IntersectionShader(nullptr),
+	m_ColorShader(nullptr),
+	m_accColorBuffer(nullptr),
+	m_RayBuffer(nullptr),
+	m_HitDataBuffer(nullptr),
 	m_time(0.f),
 	m_fps(0.f),
 	m_mesh(Mesh()),
 	m_meshBuffer(nullptr),
 	m_materialBuffer(nullptr),
 	m_cBuffer(nullptr),
+	m_PrimarycBuffer(nullptr),		
+	m_IntersectioncBuffer(nullptr),	
+	m_ColorcBuffer(nullptr),		
 	m_Height(0),
 	m_Width(0),
 	m_IVP(XMFLOAT4X4()),
@@ -129,6 +138,16 @@ void Direct3D::init(Input *p_pInput)
 	m_ComputeShader = m_ComputeSys->CreateComputeShader(_T("Shaders/BasicCompute.fx"), NULL, "main", NULL);
 	m_Timer = new D3DTimer(m_Device, m_DeviceContext);
 
+	m_PrimaryShader = m_ComputeSys->CreateComputeShader(_T("Shaders/PrimaryRayStage.fx"), NULL, "main", NULL);
+	m_IntersectionShader = m_ComputeSys->CreateComputeShader(_T("Shaders/IntersectionStage.fx"), NULL, "main", NULL);
+	m_ColorShader = m_ComputeSys->CreateComputeShader(_T("Shaders/ColorStage.fx"), NULL, "main", NULL);
+
+	m_RayBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(Ray), m_Width*m_Height, true, true, nullptr, true, "Structured Buffer: RayBuffer");
+	m_HitDataBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(HitData), m_Width*m_Height, true, true, nullptr, true, "Structured Buffer: HitDataBuffer");
+	m_accColorBuffer = m_ComputeSys->CreateBuffer(STRUCTURED_BUFFER, sizeof(XMFLOAT4), m_Height*m_Width, true, true, NULL,true, "Structured Buffer:accColor");
+
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Camera
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -144,19 +163,8 @@ void Direct3D::init(Input *p_pInput)
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Constant Buffer
 ///////////////////////////////////////////////////////////////////////////////////////////
-	D3D11_BUFFER_DESC bd;
-	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	createConstantBuffers();
 
-	if(sizeof(ConstBuffer) % 16 > 0)
-		bd.ByteWidth = ( int )(( sizeof( ConstBuffer ) / 16 )  + 1) * 16;
-	else
-		bd.ByteWidth = sizeof(ConstBuffer);
-
-	bd.CPUAccessFlags = NULL;
-	bd.Usage = D3D11_USAGE_DEFAULT;
-	bd.MiscFlags = 0;
-	
-	m_Device->CreateBuffer( &bd, NULL, &m_cBuffer);
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Sphere
@@ -199,7 +207,9 @@ void Direct3D::init(Input *p_pInput)
 	m_meshTri.textureCoordinate1 = XMFLOAT2(0.f, 0.f);
 	m_meshTri.textureCoordinate2 = XMFLOAT2(0.f, 0.f);
 
-///////////////////////////////////////////////////////////////////////////////////////////
+#pragma region Triangle
+
+	///////////////////////////////////////////////////////////////////////////////////////////
 //Triangle
 ///////////////////////////////////////////////////////////////////////////////////////////
 	
@@ -276,6 +286,10 @@ void Direct3D::init(Input *p_pInput)
 		m_triangles[i].ID = i;
 		m_triangles[i].pad = XMFLOAT3(0.f, 0.f, 0.f);
 	}
+
+#pragma endregion
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Light
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -353,71 +367,87 @@ void Direct3D::update(float dt)
 		t_base += 1.f;
 	}
 
-	ConstBuffer cRayBufferStruct;
-	cRayBufferStruct.cameraPos = m_pCamera->getPosition();
-	//Inverse view matrix
-	XMMATRIX mInvView = XMLoadFloat4x4(&m_pCamera->getViewMat());
-	XMVECTOR mViewDet = XMMatrixDeterminant(mInvView);
-	mInvView = XMMatrixInverse(&mViewDet, mInvView);
-	mInvView = XMMatrixTranspose(mInvView);
-	XMStoreFloat4x4(&cRayBufferStruct.IV, mInvView);
-	//Inverse prjection matrix
-	XMMATRIX mInvProj = XMLoadFloat4x4(&m_pCamera->getProjMat());
-	XMVECTOR mProjDet = XMMatrixDeterminant(mInvProj);
-	mInvProj = XMMatrixInverse(&mProjDet, mInvProj);
-	mInvProj = XMMatrixTranspose(mInvProj);
-	XMStoreFloat4x4(&cRayBufferStruct.IP, mInvProj);
-
-	cRayBufferStruct.sphere = m_sphere;
-
-	m_spherel0.center = m_lightList[0].pos;
-	cRayBufferStruct.spherel0 = m_spherel0;
-
-	for(int i = 0; i < NROFTRIANGLES; i++)
-	{
-		cRayBufferStruct.triangles[i] = m_triangles[i];
-	}
-	for(int i = 0; i < NROFLIGHTS; i++)
-	{
-		cRayBufferStruct.lightList[i] = m_lightList[i];
-	}
-
-	cRayBufferStruct.nrOfFaces = m_mesh.getFaces();
-	m_DeviceContext->UpdateSubresource(m_cBuffer, 0, 0, &cRayBufferStruct, 0, 0);
-	m_DeviceContext->CSSetConstantBuffers(0, 1, &m_cBuffer);
-
-
+	updateConstantBuffers();
 }
 
 void Direct3D::draw()
 {
-	ID3D11UnorderedAccessView* uav[] = { m_BackBufferUAV };
-	m_DeviceContext->CSSetUnorderedAccessViews(0, 1, uav, 0);
-	ID3D11ShaderResourceView* srv[] = { m_meshBuffer->GetResourceView(),
-										m_meshTexture,
-										m_materialBuffer->GetResourceView()
-										 };
-
-	m_DeviceContext->CSSetShaderResources(0, 3, srv);
-
-	//ID3D11ShaderResourceView* srv[] = { m_meshBuffer->GetResourceView()};
-
-	//m_DeviceContext->CSSetShaderResources(0, 1, srv);
-
-	//SAFE_DELETE_ARRAY(srv);
-
-
-	m_ComputeShader->Set();
+	ID3D11UnorderedAccessView* uav[] = { m_BackBufferUAV, m_accColorBuffer->GetUnorderedAccessView() };
+	ID3D11UnorderedAccessView* RayUAV[] = {m_RayBuffer->GetUnorderedAccessView()};
+	ID3D11UnorderedAccessView* IntersectionUAV[] = {m_RayBuffer->GetUnorderedAccessView(), m_HitDataBuffer->GetUnorderedAccessView()};
+	ID3D11ShaderResourceView* ColorSRV[] = {m_HitDataBuffer->GetResourceView(), m_meshBuffer->GetResourceView(), m_materialBuffer->GetResourceView()};
+	ID3D11UnorderedAccessView* clearuav[]	= { 0,0,0,0,0,0,0 };
+	ID3D11ShaderResourceView* clearsrv[]	= { 0,0,0,0,0,0,0 };
+	
+	//Primary
+	m_DeviceContext->CSSetConstantBuffers(0, 1, &m_PrimarycBuffer);
+	m_DeviceContext->CSSetUnorderedAccessViews(0, 1, RayUAV, 0);
+	m_PrimaryShader->Set();
 	m_Timer->Start();
-	m_DeviceContext->Dispatch( 25, 25, 1 );
+	m_DeviceContext->Dispatch(32, 32, 1);
 	m_Timer->Stop();
-	m_ComputeShader->Unset();
+	m_PrimaryShader->Unset();	
+	m_DeviceContext->CSSetUnorderedAccessViews(0,1, clearuav, 0);
 
-	uav[0] = nullptr;
-	srv[0] = nullptr;
-	m_DeviceContext->CSSetUnorderedAccessViews(0, 1, uav, 0);
-	m_DeviceContext->CSSetShaderResources(0, 1, srv);
+	//Intersection
+	m_DeviceContext->CSSetConstantBuffers(0, 1, &m_IntersectioncBuffer);
+	m_DeviceContext->CSSetUnorderedAccessViews(0, 2, IntersectionUAV, 0);
+	ID3D11ShaderResourceView* srv[] = { m_meshTexture,
+										m_meshBuffer->GetResourceView(),
+										};
 
+	m_DeviceContext->CSSetShaderResources(0, 2, srv);
+
+	m_IntersectionShader->Set();
+
+	m_DeviceContext->Dispatch(32, 32, 1);
+
+	m_IntersectionShader->Unset();
+	m_DeviceContext->CSSetUnorderedAccessViews(0,2, clearuav, 0);
+	m_DeviceContext->CSSetShaderResources(0,2, clearsrv);
+
+	//Color
+	m_DeviceContext->CSSetConstantBuffers(0, 1, &m_ColorcBuffer);
+	m_DeviceContext->CSSetUnorderedAccessViews(0, 2, uav, 0);
+	m_DeviceContext->CSSetShaderResources(0, 3, ColorSRV);
+	m_ColorShader->Set();
+
+	m_DeviceContext->Dispatch(32, 32, 1);
+
+	m_ColorShader->Unset();
+	m_DeviceContext->CSSetUnorderedAccessViews(0,2, clearuav, 0);
+	m_DeviceContext->CSSetShaderResources(0,3, clearsrv);
+
+
+/*
+
+	//old
+//	m_DeviceContext->CSSetUnorderedAccessViews(0, 1, uav, 0);
+//	ID3D11ShaderResourceView* srv[] = { m_meshBuffer->GetResourceView(),
+//										m_meshTexture,
+//										m_materialBuffer->GetResourceView()
+//										 };
+//
+//	m_DeviceContext->CSSetShaderResources(0, 3, srv);
+//
+//	ID3D11ShaderResourceView* srv[] = { m_meshBuffer->GetResourceView()};
+//
+//	m_DeviceContext->CSSetShaderResources(0, 1, srv);
+//
+//	SAFE_DELETE_ARRAY(srv);
+//
+//
+//	m_ComputeShader->Set();
+//	m_Timer->Start();
+//	m_DeviceContext->Dispatch( 25, 25, 1 );
+//	m_Timer->Stop();
+//	m_ComputeShader->Unset();
+//*/
+//	/*uav[0] = nullptr;
+//	srv[0] = nullptr;
+//	m_DeviceContext->CSSetUnorderedAccessViews(0, 1, uav, 0);
+//	m_DeviceContext->CSSetShaderResources(0, 1, srv);*/
+	
 
 	if(FAILED(m_SwapChain->Present( 0, 0 )))
 		return;
@@ -435,15 +465,147 @@ void Direct3D::draw()
 	SetWindowText(m_hWnd, title);
 }
 
+void Direct3D::createConstantBuffers()
+{	D3D11_BUFFER_DESC bd;
+	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+
+	bd.CPUAccessFlags = NULL;
+	bd.Usage = D3D11_USAGE_DEFAULT;
+	bd.MiscFlags = 0;
+
+	//old
+	//if(sizeof(ConstBuffer) % 16 > 0)
+	//	bd.ByteWidth = ( int )(( sizeof( ConstBuffer ) / 16 )  + 1) * 16;
+	//else
+	//	bd.ByteWidth = sizeof(ConstBuffer);
+	//
+	//m_Device->CreateBuffer( &bd, NULL, &m_cBuffer);
+
+	//Primary
+	if(sizeof(PrimaryConstBuffer) % 16 > 0)
+		bd.ByteWidth = ( int )(( sizeof( PrimaryConstBuffer ) / 16 )  + 1) * 16;
+	else
+		bd.ByteWidth = sizeof(PrimaryConstBuffer);
+
+	m_Device->CreateBuffer( &bd, NULL, &m_PrimarycBuffer);
+
+	//Intersection
+	if(sizeof(IntersectionConstBuffer) % 16 > 0)
+		bd.ByteWidth = ( int )(( sizeof( IntersectionConstBuffer ) / 16 )  + 1) * 16;
+	else
+		bd.ByteWidth = sizeof(IntersectionConstBuffer);
+	
+	m_Device->CreateBuffer( &bd, NULL, &m_IntersectioncBuffer);
+
+	//Color
+	if(sizeof(ColorConstBuffer) % 16 > 0)
+		bd.ByteWidth = ( int )(( sizeof( ColorConstBuffer ) / 16 )  + 1) * 16;
+	else
+		bd.ByteWidth = sizeof(ColorConstBuffer);
+
+	m_Device->CreateBuffer( &bd, NULL, &m_ColorcBuffer);
+}
+
+void Direct3D::updateConstantBuffers()
+{
+	//old
+	ConstBuffer cRayBufferStruct;	
+	cRayBufferStruct.cameraPos = m_pCamera->getPosition();
+	//Inverse view matrix
+	XMMATRIX mInvView = XMLoadFloat4x4(&m_pCamera->getViewMat());
+	XMVECTOR mViewDet = XMMatrixDeterminant(mInvView);
+	mInvView = XMMatrixInverse(&mViewDet, mInvView);
+	mInvView = XMMatrixTranspose(mInvView);
+	XMStoreFloat4x4(&cRayBufferStruct.IV, mInvView);
+	//Inverse prjection matrix
+	XMMATRIX mInvProj = XMLoadFloat4x4(&m_pCamera->getProjMat());
+	XMVECTOR mProjDet = XMMatrixDeterminant(mInvProj);
+	mInvProj = XMMatrixInverse(&mProjDet, mInvProj);
+	mInvProj = XMMatrixTranspose(mInvProj);
+	XMStoreFloat4x4(&cRayBufferStruct.IP, mInvProj);
+
+	//cRayBufferStruct.sphere = m_sphere;
+
+	//m_spherel0.center = m_lightList[0].pos;
+	//cRayBufferStruct.spherel0 = m_spherel0;
+
+	//for(int i = 0; i < NROFTRIANGLES; i++)
+	//{
+	//	cRayBufferStruct.triangles[i] = m_triangles[i];
+	//}
+	//for(int i = 0; i < NROFLIGHTS; i++)
+	//{
+	//	cRayBufferStruct.lightList[i] = m_lightList[i];
+	//}
+
+	//cRayBufferStruct.nrOfFaces = m_mesh.getFaces();
+	//m_DeviceContext->UpdateSubresource(m_cBuffer, 0, 0, &cRayBufferStruct, 0, 0);
+	//m_DeviceContext->CSSetConstantBuffers(0, 1, &m_cBuffer);
+	
+	//Primary
+	PrimaryConstBuffer PCBufferStruct;
+	PCBufferStruct.cameraPos = m_pCamera->getPosition();
+	XMStoreFloat4x4(&PCBufferStruct.IV, mInvView);
+	XMStoreFloat4x4(&PCBufferStruct.IP, mInvProj);
+
+	m_DeviceContext->UpdateSubresource(m_PrimarycBuffer, 0, 0, &PCBufferStruct, 0, 0);
+	//m_DeviceContext->CSSetConstantBuffers(0, 1, &m_PrimarycBuffer);
+
+	//Intersection
+	IntersectionConstBuffer ICBufferStruct;
+	ICBufferStruct.sphere = m_sphere;
+	
+	for(int i = 0; i < NROFTRIANGLES; i++)
+	{
+		ICBufferStruct.triangles[i] = m_triangles[i];
+	}
+	ICBufferStruct.nrOfFaces = m_mesh.getFaces();
+	ICBufferStruct.firstPass = true;
+	ICBufferStruct.pad = XMFLOAT2(0.f, 0.f);
+
+	m_DeviceContext->UpdateSubresource(m_IntersectioncBuffer, 0, 0, &ICBufferStruct, 0, 0);
+	//m_DeviceContext->CSSetConstantBuffers(0, 1, &m_IntersectioncBuffer);
+	
+	//Color
+	ColorConstBuffer CCBufferStruct;
+	CCBufferStruct.sphere = m_sphere;
+
+	for(int i = 0; i < NROFTRIANGLES; i++)
+	{
+		CCBufferStruct.triangles[i] = m_triangles[i];
+	}
+	for(int i = 0; i < NROFLIGHTS; i++)
+	{
+		CCBufferStruct.lightList[i] = m_lightList[i];
+	}
+
+	CCBufferStruct.nrOfFaces = m_mesh.getFaces();
+	CCBufferStruct.firstPass = true;
+	CCBufferStruct.pad = XMFLOAT2(0.f, 0.f);
+
+	m_DeviceContext->UpdateSubresource(m_ColorcBuffer, 0, 0, &CCBufferStruct, 0, 0);
+	//m_DeviceContext->CSSetConstantBuffers(0, 1, &m_ColorcBuffer);
+}
+
+
 void Direct3D::release()
 {
 	SAFE_RELEASE(m_BackBufferUAV);
 	SAFE_RELEASE(m_cBuffer);
+	SAFE_RELEASE(m_PrimarycBuffer);
+	SAFE_RELEASE(m_IntersectioncBuffer);
+	SAFE_RELEASE(m_ColorcBuffer);
 	SAFE_RELEASE(m_SwapChain);
 	SAFE_DELETE(m_ComputeSys);
 	SAFE_DELETE(m_ComputeShader);
+	SAFE_DELETE(m_PrimaryShader);
+	SAFE_DELETE(m_IntersectionShader);
+	SAFE_DELETE(m_ColorShader);
 	SAFE_RELEASE(m_meshTexture);
 	SAFE_RELEASE(m_materialBuffer);
+	SAFE_RELEASE(m_RayBuffer);
+	SAFE_RELEASE(m_HitDataBuffer);
+	SAFE_RELEASE(m_accColorBuffer);
 	SAFE_DELETE(m_meshBuffer);
 	SAFE_RELEASE(m_Device);
 	SAFE_RELEASE(m_DeviceContext);

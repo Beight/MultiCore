@@ -18,7 +18,7 @@ cbuffer ConstBuffer
 	Triangle triangles[NROFTRIANGLES];
 	int nrOfFaces;
 	bool firstpass;
-	float2 extra;
+	float2 pad;
 };
 
 
@@ -37,6 +37,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	hd.color = float4(0.f, 1.f, 0.f, 0.f);
 	hd.ID = -1;
 	hd.materialID = -1;
+	hd.pad = 0;
 
 	if(firstpass)
 		hd.ID = -1;

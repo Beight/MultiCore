@@ -17,7 +17,7 @@ cbuffer ConstBuffer
 	Light lightList[NROFLIGHTS];
 	int nrOfFaces;
 	bool firstPass;
-	float2 extra;
+	float2 pad;
 };
 
 RWTexture2D<float4> Output : register(u0);
@@ -26,6 +26,7 @@ RWStructuredBuffer<float4> accOutput : register(u1); //Don't know what this is f
 [numthreads(32, 32, 1)]
 void main( uint3 threadID : SV_DispatchThreadID )
 {
+
 	int index = threadID.x + (threadID.y * WIDTH);
 	HitData hd = HDin[index];
 
@@ -33,7 +34,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 		accOutput[index] = float4(0.f, 0.f, 0.f, 0.f);
 
 	if(hd.ID = -1)
-		Output[threadID.xy] = float4(0.f, 0.f, 0.f, 1.f);
+		Output[threadID.xy] = float4(1.f, 0.f, 0.f, 1.f);
 	else
 	{
 
@@ -99,7 +100,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 
 		accOutput[index] += float4(final, 1.f);
 
-		Output[threadID.xy] = accOutput[index];//saturate(accOutput[index]);
+		Output[threadID.xy] = float4(0.f,1.f,0.f,0.f); //saturate(accOutput[index]);
 	}
 }
 
