@@ -36,7 +36,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	r.origin = cameraPos;
 	r.direction = rayDir;
 
-	output[threadID.x + threadID.y*WIDTH] = r;
+	output[threadID.x + (threadID.y*WIDTH)] = r;
 }
 
 #endif

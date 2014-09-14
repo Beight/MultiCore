@@ -144,7 +144,7 @@ void Direct3D::init(Input *p_pInput)
 
 	m_RayBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(Ray), m_Width*m_Height, true, true, nullptr, true, "Structured Buffer: RayBuffer");
 	m_HitDataBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(HitData), m_Width*m_Height, true, true, nullptr, true, "Structured Buffer: HitDataBuffer");
-	m_accColorBuffer = m_ComputeSys->CreateBuffer(STRUCTURED_BUFFER, sizeof(XMFLOAT4), m_Height*m_Width, true, true, NULL,true, "Structured Buffer:accColor");
+	m_accColorBuffer = m_ComputeSys->CreateBuffer(STRUCTURED_BUFFER, sizeof(XMFLOAT4), m_Height*m_Width, true, true, nullptr,true, "Structured Buffer:accColor");
 
 
 
@@ -384,7 +384,7 @@ void Direct3D::draw()
 	m_DeviceContext->CSSetUnorderedAccessViews(0, 1, RayUAV, 0);
 	m_PrimaryShader->Set();
 	m_Timer->Start();
-	m_DeviceContext->Dispatch(32, 32, 1);
+	m_DeviceContext->Dispatch(25, 25, 1);
 	m_Timer->Stop();
 	m_PrimaryShader->Unset();	
 	m_DeviceContext->CSSetUnorderedAccessViews(0,1, clearuav, 0);
@@ -400,7 +400,7 @@ void Direct3D::draw()
 
 	m_IntersectionShader->Set();
 
-	m_DeviceContext->Dispatch(32, 32, 1);
+	m_DeviceContext->Dispatch(25, 25, 1);
 
 	m_IntersectionShader->Unset();
 	m_DeviceContext->CSSetUnorderedAccessViews(0,2, clearuav, 0);
@@ -412,7 +412,7 @@ void Direct3D::draw()
 	m_DeviceContext->CSSetShaderResources(0, 3, ColorSRV);
 	m_ColorShader->Set();
 
-	m_DeviceContext->Dispatch(32, 32, 1);
+	m_DeviceContext->Dispatch(25, 25, 1);
 
 	m_ColorShader->Unset();
 	m_DeviceContext->CSSetUnorderedAccessViews(0,2, clearuav, 0);

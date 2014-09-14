@@ -29,12 +29,13 @@ void main( uint3 threadID : SV_DispatchThreadID )
 
 	int index = threadID.x + (threadID.y * WIDTH);
 	HitData hd = HDin[index];
+	
 
 	if(firstPass)
 		accOutput[index] = float4(0.f, 0.f, 0.f, 0.f);
 
-	if(hd.ID = -1)
-		Output[threadID.xy] = float4(1.f, 0.f, 0.f, 1.f);
+	if(hd.ID == -1)
+		Output[threadID.xy] = float4(0.f, 0.f, 0.f, 1.f);
 	else
 	{
 
@@ -100,7 +101,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 
 		accOutput[index] += float4(final, 1.f);
 
-		Output[threadID.xy] = float4(0.f,1.f,0.f,0.f); //saturate(accOutput[index]);
+		Output[threadID.xy] = saturate(accOutput[index]);
 	}
 }
 

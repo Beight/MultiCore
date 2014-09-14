@@ -27,7 +27,7 @@ cbuffer ConstBuffer
 [numthreads(32, 32, 1)]
 void main( uint3 threadID : SV_DispatchThreadID )
 {
-	int index = threadID.x + threadID.y * WIDTH;
+	int index = threadID.x + (threadID.y * WIDTH);
 	Ray r = Rays[index];
 
 	HitData hd;
