@@ -137,7 +137,6 @@ void Direct3D::init(Input *p_pInput)
 
 	SAFE_RELEASE(pBackBuffer);
 	m_ComputeSys = new ComputeWrap(m_Device, m_DeviceContext);
-	m_ComputeShader = m_ComputeSys->CreateComputeShader(_T("Shaders/BasicCompute.fx"), NULL, "main", NULL);
 	m_Timer = new D3DTimer(m_Device, m_DeviceContext);
 
 	m_PrimaryShader = m_ComputeSys->CreateComputeShader(_T("Shaders/PrimaryRayStage.fx"), NULL, "main", NULL);
@@ -146,7 +145,7 @@ void Direct3D::init(Input *p_pInput)
 
 	m_RayBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(Ray), m_Width*m_Height, true, true, nullptr, true, "Structured Buffer: RayBuffer");
 	m_HitDataBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(HitData), m_Width*m_Height, true, true, nullptr, true, "Structured Buffer: HitDataBuffer");
-	m_FinalColorBuffer = m_ComputeSys->CreateBuffer(STRUCTURED_BUFFER, sizeof(XMFLOAT4), m_Height*m_Width, true, true, nullptr,true, "Structured Buffer:accColor");
+	m_FinalColorBuffer = m_ComputeSys->CreateBuffer(STRUCTURED_BUFFER, sizeof(XMFLOAT4), m_Height*m_Width, true, true, nullptr,true, "Structured Buffer:FinalColorBuffer");
 
 
 
@@ -176,38 +175,6 @@ void Direct3D::init(Input *p_pInput)
 	m_sphere.color = XMFLOAT4(1.f, 0.f, 0.f, 1.f);
 	m_sphere.pad = XMFLOAT2(0.f, 0.f);
 	m_sphere.ID = -2;
-
-///////////////////////////////////////////////////////////////////////////////////////////
-//Sphere 2 light
-///////////////////////////////////////////////////////////////////////////////////////////
-	m_spherel0.center = XMFLOAT4(0.f, 0.f, -20.f, 1.f);
-	m_spherel0.radius = 1.f;
-	m_spherel0.color = XMFLOAT4(1.f, 0.f, 0.f, 1.f);
-	m_spherel0.pad = XMFLOAT2(0.f, 0.f);
-	m_spherel0.ID = -5;
-
-///////////////////////////////////////////////////////////////////////////////////////////
-//Mesh Triangle
-///////////////////////////////////////////////////////////////////////////////////////////
-	m_meshTri = MeshTriangle();
-	m_meshTri.pos0 = XMFLOAT4( 1.f, -1.f, 1.f, 1.f);
-	m_meshTri.pos1 = XMFLOAT4(-1.f, -1.f, 1.f, 1.f);
-	m_meshTri.pos2 = XMFLOAT4(-1.f, 1.f, 1.f, 1.f);
-
-	m_meshTri.ID = 72;
-	XMVECTOR vP0 = XMLoadFloat4(&m_meshTri.pos0);
-	XMVECTOR vP1 = XMLoadFloat4(&m_meshTri.pos1);
-	XMVECTOR vP2 = XMLoadFloat4(&m_meshTri.pos2);
-
-	XMVECTOR vE1 = vP1 - vP0;
-	XMVECTOR vE2 = vP2 - vP0;
-	XMVECTOR vNormal = XMVector3Cross(vE1, vE2);
-	vNormal = XMVector4Normalize(vNormal);
-	XMStoreFloat4(&m_meshTri.normal, vNormal);
-	
-	m_meshTri.textureCoordinate0 = XMFLOAT2(0.f, 0.f);
-	m_meshTri.textureCoordinate1 = XMFLOAT2(0.f, 0.f);
-	m_meshTri.textureCoordinate2 = XMFLOAT2(0.f, 0.f);
 
 #pragma region Cube
 
@@ -331,16 +298,6 @@ void Direct3D::init(Input *p_pInput)
 	D3DX11CreateShaderResourceViewFromFile(m_Device, m_mesh.getMaterial()->map_Kd.c_str(), NULL, NULL, &m_meshTexture, &hr);
 
 	m_materialBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(Material2), 1, true, false, &m_mesh.getMaterial2(), false, 0);
-
-	/*m_meshBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(MeshTriangle), 1, true, false, &m_meshTri, false, 0);*/
-
-///////////////////////////////////////////////////////////////////////////////////////////
-// Debug
-///////////////////////////////////////////////////////////////////////////////////////////
-	//ID3D11Debug* debug;
-	//m_Device->QueryInterface(__uuidof(ID3D11Debug), (void**)&debug);
-	//debug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
-	//SAFE_RELEASE(debug);
 }
 
 void Direct3D::update(float dt)
@@ -432,36 +389,6 @@ void Direct3D::draw()
 		}
 	}
 
-/*
-
-	//old
-//	m_DeviceContext->CSSetUnorderedAccessViews(0, 1, uav, 0);
-//	ID3D11ShaderResourceView* srv[] = { m_meshBuffer->GetResourceView(),
-//										m_meshTexture,
-//										m_materialBuffer->GetResourceView()
-//										 };
-//
-//	m_DeviceContext->CSSetShaderResources(0, 3, srv);
-//
-//	ID3D11ShaderResourceView* srv[] = { m_meshBuffer->GetResourceView()};
-//
-//	m_DeviceContext->CSSetShaderResources(0, 1, srv);
-//
-//	SAFE_DELETE_ARRAY(srv);
-//
-//
-//	m_ComputeShader->Set();
-//	m_Timer->Start();
-//	m_DeviceContext->Dispatch( 25, 25, 1 );
-//	m_Timer->Stop();
-//	m_ComputeShader->Unset();
-//*/
-//	/*uav[0] = nullptr;
-//	srv[0] = nullptr;
-//	m_DeviceContext->CSSetUnorderedAccessViews(0, 1, uav, 0);
-//	m_DeviceContext->CSSetShaderResources(0, 1, srv);*/
-	
-
 	if(FAILED(m_SwapChain->Present( 0, 0 )))
 		return;
 
@@ -485,14 +412,6 @@ void Direct3D::createConstantBuffers()
 	bd.CPUAccessFlags = NULL;
 	bd.Usage = D3D11_USAGE_DEFAULT;
 	bd.MiscFlags = 0;
-
-	//old
-	//if(sizeof(ConstBuffer) % 16 > 0)
-	//	bd.ByteWidth = ( int )(( sizeof( ConstBuffer ) / 16 )  + 1) * 16;
-	//else
-	//	bd.ByteWidth = sizeof(ConstBuffer);
-	//
-	//m_Device->CreateBuffer( &bd, NULL, &m_cBuffer);
 
 	//Primary
 	if(sizeof(PrimaryConstBuffer) % 16 > 0)
@@ -529,52 +448,31 @@ void Direct3D::createConstantBuffers()
 
 void Direct3D::updateConstantBuffers()
 {
+	//First pass constant buffer update
 	m_FirstPassStruct.firstPass = true;
 	m_DeviceContext->UpdateSubresource(m_FirstPassCBuffer, 0, 0, &m_FirstPassStruct, 0, 0);
 
-	//old
-	ConstBuffer cRayBufferStruct;	
-	cRayBufferStruct.cameraPos = m_pCamera->getPosition();
+	//Primary Constant buffer
+	PrimaryConstBuffer PCBufferStruct;
+	PCBufferStruct.cameraPos = m_pCamera->getPosition();
+	
 	//Inverse view matrix
 	XMMATRIX mInvView = XMLoadFloat4x4(&m_pCamera->getViewMat());
 	XMVECTOR mViewDet = XMMatrixDeterminant(mInvView);
 	mInvView = XMMatrixInverse(&mViewDet, mInvView);
 	mInvView = XMMatrixTranspose(mInvView);
-	XMStoreFloat4x4(&cRayBufferStruct.IV, mInvView);
-	//Inverse prjection matrix
+	XMStoreFloat4x4(&PCBufferStruct.IV, mInvView);
+	
+	//Inverse projection matrix
 	XMMATRIX mInvProj = XMLoadFloat4x4(&m_pCamera->getProjMat());
 	XMVECTOR mProjDet = XMMatrixDeterminant(mInvProj);
 	mInvProj = XMMatrixInverse(&mProjDet, mInvProj);
 	mInvProj = XMMatrixTranspose(mInvProj);
-	XMStoreFloat4x4(&cRayBufferStruct.IP, mInvProj);
-
-	//cRayBufferStruct.sphere = m_sphere;
-
-	//m_spherel0.center = m_lightList[0].pos;
-	//cRayBufferStruct.spherel0 = m_spherel0;
-
-	//for(int i = 0; i < NROFTRIANGLES; i++)
-	//{
-	//	cRayBufferStruct.triangles[i] = m_triangles[i];
-	//}
-	//for(int i = 0; i < NROFLIGHTS; i++)
-	//{
-	//	cRayBufferStruct.lightList[i] = m_lightList[i];
-	//}
-
-	//cRayBufferStruct.nrOfFaces = m_mesh.getFaces();
-	//m_DeviceContext->UpdateSubresource(m_cBuffer, 0, 0, &cRayBufferStruct, 0, 0);
-	//m_DeviceContext->CSSetConstantBuffers(0, 1, &m_cBuffer);
-	
-	//Primary
-	PrimaryConstBuffer PCBufferStruct;
-	PCBufferStruct.cameraPos = m_pCamera->getPosition();
-	XMStoreFloat4x4(&PCBufferStruct.IV, mInvView);
 	XMStoreFloat4x4(&PCBufferStruct.IP, mInvProj);
 
 	m_DeviceContext->UpdateSubresource(m_PrimaryCBuffer, 0, 0, &PCBufferStruct, 0, 0);
 
-	//Intersection
+	//Intersection constant buffer
 	IntersectionConstBuffer ICBufferStruct;
 	ICBufferStruct.sphere = m_sphere;
 	
@@ -587,7 +485,7 @@ void Direct3D::updateConstantBuffers()
 
 	m_DeviceContext->UpdateSubresource(m_IntersectionCBuffer, 0, 0, &ICBufferStruct, 0, 0);
 	
-	//Color
+	//Color constant buffer
 	ColorConstBuffer CCBufferStruct;
 	CCBufferStruct.sphere = m_sphere;
 

@@ -47,12 +47,10 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	else
 		hd.ID = Output[index].ID;
 
-
-	float hit = 0;
 	// ## SPHERE ## //
 	if(hd.ID != sphere.ID)
 	{
-		hit = RaySphereIntersect(r, sphere, hd.distance);
+		float hit = RaySphereIntersect(r, sphere, hd.distance);
 		if(hit > -1.0f)
 		{
 			hd.pos = r.origin + r.direction * hit;
@@ -63,16 +61,13 @@ void main( uint3 threadID : SV_DispatchThreadID )
 			hd.materialID = -1;
 		}
 	}
-	//					
+
 	// ## CUBE ## // 
-	
 	for(int i = 0; i < NROFTRIANGLES; i++)
 	{
 			if(hd.ID != triangles[i].ID)
 			{
-				//padding
-				//float3 paddy = triangles[i].pad + padX;
-				hit = RayTriangleIntersect(r, triangles[i], hd.distance);
+				float hit = RayTriangleIntersect(r, triangles[i], hd.distance);
 				if(hit > -1.0f)
 				{
 					hd.pos = r.origin + r.direction * hit;
@@ -90,17 +85,14 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	{
 		if(hd.ID != MeshTriangles[i].ID)
 		{
-			//padding
-			//float paddy = input[i].pad;
-			float3 temp = RayTriangleIntersects(r, MeshTriangles[i], hd.distance);
-			hit = temp.x;
-			if(hit > -1.0f)
+			float3 hit = RayTriangleIntersects(r, MeshTriangles[i], hd.distance);
+			if(hit.x > -1.0f)
 			{
-				hd.pos = r.origin + r.direction * hit;
-				hd.normal = normalize(MeshTriangles[i].normal);
-				hd.color = MeshTexture[temp.yz*512.f];
+				hd.pos = r.origin + r.direction * hit.x;
+				hd.normal = MeshTriangles[i].normal;
+				hd.color = MeshTexture[hit.yz*512.f];
 				hd.ID = MeshTriangles[i].ID;
-				hd.distance = hit;
+				hd.distance = hit.x;
 				hd.materialID = 1;
 			}
 		}
