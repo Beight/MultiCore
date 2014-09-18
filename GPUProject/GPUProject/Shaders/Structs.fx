@@ -31,24 +31,14 @@ struct Triangle
 	float4	pos0;
 	float4	pos1;
 	float4	pos2;
-	float4	color;
-	float4	normal;
-	int		ID;
-	float3	pad;
-};
-
-struct MeshTriangle
-{
-	float4	pos0;
-	float4	pos1;
-	float4	pos2;
 	float2	textureCoordinate0;
 	float2	textureCoordinate1;
 	float2	textureCoordinate2;
 	int		ID;
 	float	pad;
+	float4	color;
 	float4	normal;
-
+	
 };
 
 struct Material

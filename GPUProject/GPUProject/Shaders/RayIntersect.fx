@@ -39,46 +39,7 @@ float RaySphereIntersect(Ray p_ray, Sphere p_sphere, float p_dist)
 	return -1.0f;
 }
 
-float RayTriangleIntersect(Ray p_ray, Triangle p_tri, float p_dist)
-{
-	float distanceDelta = 0.001f;
-	float l_t;
-
-	float4 e1 = p_tri.pos1 - p_tri.pos0;
-	float4 e2 = p_tri.pos2 - p_tri.pos0;
-	float3 q = cross(p_ray.direction.xyz, e2.xyz);
-	float a = dot(e1.xyz, q);
-	if(a > -0.00001f && a < 0.00001f)
-	{
-		//miss
-		return -1.0f;
-	}
-
-	float f = 1/a;
-	float4 s = p_ray.origin - p_tri.pos0;
-	float u = f *(dot(s.xyz, q));
-	if(u < 0.0f)
-	{
-		//miss
-		return -1.0f;
-	}
-	float3 r = cross(s.xyz, e1.xyz);
-	float v = f * (dot(p_ray.direction.xyz, r));
-	if(v < 0.0f || (u + v) > 1.0f)
-	{
-		//miss
-		return -1.0f;
-	}
-	l_t = f * (dot(e2.xyz, r));
-	
-	if((l_t < p_dist && l_t > 0.0f) || (p_dist < 0.0f && l_t > distanceDelta))
-	{		
-		return l_t;
-	}
-	return -1.0f;
-}
-
-float3 RayTriangleIntersects(Ray p_ray, MeshTriangle p_tri, float p_dist)
+float3 RayTriangleIntersect(Ray p_ray, Triangle p_tri, float p_dist)
 {
 	float distanceDelta = 0.001f;
 	float l_t;

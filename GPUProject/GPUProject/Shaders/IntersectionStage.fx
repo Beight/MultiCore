@@ -10,7 +10,7 @@
 RWStructuredBuffer<Ray> Rays : register(u0);
 RWStructuredBuffer<HitData> Output : register(u1);
 Texture2D MeshTexture : register(t0);
-StructuredBuffer<MeshTriangle> MeshTriangles : register(t1);
+StructuredBuffer<Triangle> MeshTriangles : register(t1);
 
 cbuffer ConstBuffer : register(b0)
 {
@@ -23,6 +23,7 @@ cbuffer ConstBuffer : register(b0)
 cbuffer FirstPass : register (b1)
 {
 	bool firstpass;
+	float3 firstpad;
 };
 
 
@@ -41,6 +42,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	hd.ID = -1;
 	hd.materialID = -1;
 	hd.pad = 0;
+	int tempID = -1;
 
 	if(firstpass)
 		hd.ID = -1;
@@ -57,7 +59,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 			hd.normal = normalize(hd.pos - sphere.center);
 			hd.color = sphere.color;
 			hd.distance = hit;
-			hd.ID = sphere.ID;
+			tempID = sphere.ID;
 			hd.materialID = -1;
 		}
 	}
@@ -65,38 +67,44 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	// ## CUBE ## // 
 	for(int i = 0; i < NROFTRIANGLES; i++)
 	{
-			if(hd.ID != triangles[i].ID)
-			{
-				float hit = RayTriangleIntersect(r, triangles[i], hd.distance);
-				if(hit > -1.0f)
-				{
-					hd.pos = r.origin + r.direction * hit;
-					hd.normal = triangles[i].normal;
-					hd.color = triangles[i].color;					
-					hd.ID = triangles[i].ID;
-					hd.distance = hit;
-					hd.materialID = -1;
-				}
-			}
-	}
-
-	// ## MESH ## //
-	for(i = 0; i < nrOfFaces; i++)
-	{
-		if(hd.ID != MeshTriangles[i].ID)
+		if(hd.ID != triangles[i].ID)
 		{
-			float3 hit = RayTriangleIntersects(r, MeshTriangles[i], hd.distance);
+			float3 hit = RayTriangleIntersect(r, triangles[i], hd.distance);
 			if(hit.x > -1.0f)
 			{
 				hd.pos = r.origin + r.direction * hit.x;
-				hd.normal = MeshTriangles[i].normal;
+				hd.normal = triangles[i].normal;
+				hd.color = triangles[i].color;					
+				tempID = triangles[i].ID;
+				hd.distance = hit.x;
+				hd.materialID = -1;
+			}
+		}
+	}
+
+	// ## MESH ## //
+	for(int j = 0; j < nrOfFaces; j++)
+	{
+		if(hd.ID != MeshTriangles[j].ID)
+		{
+			float3 hit = RayTriangleIntersect(r, MeshTriangles[j], hd.distance);
+			if(hit.x > -1.0f)
+			{
+				hd.pos = r.origin + r.direction * hit.x;
+				hd.normal = MeshTriangles[j].normal;
 				hd.color = MeshTexture[hit.yz*512.f];
-				hd.ID = MeshTriangles[i].ID;
+				tempID = MeshTriangles[j].ID;
 				hd.distance = hit.x;
 				hd.materialID = 1;
 			}
 		}
 	}
+
+	if(firstpass)
+		hd.ID = tempID;
+	
+	if(tempID != -1)
+		hd.ID = tempID;
 
 	Output[index] = hd;
 

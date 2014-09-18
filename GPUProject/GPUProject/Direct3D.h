@@ -47,7 +47,7 @@ private:
 	float						m_time;
 	Sphere						m_sphere;
 	Sphere						m_spherel0;
-	MeshTriangle				m_meshTri;
+	Triangle				m_meshTri;
 	Triangle					m_triangles[NROFTRIANGLES];	
 	XMFLOAT4X4					m_view;
 	XMFLOAT4X4					m_proj;

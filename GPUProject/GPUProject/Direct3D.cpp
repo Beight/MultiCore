@@ -30,7 +30,7 @@ Direct3D::Direct3D(HWND p_hwnd)
 	m_IVP(XMFLOAT4X4()),
 	m_lightList(),
 	m_meshTexture(nullptr),
-	m_meshTri(MeshTriangle()),
+	m_meshTri(Triangle()),
 	m_pCamera(nullptr),
 	m_pInput(nullptr),
 	m_sphere(Sphere()),
@@ -253,7 +253,10 @@ void Direct3D::init(Input *p_pInput)
 	{
 		m_triangles[i].color = XMFLOAT4(0.f, 0.5f, 0.5f, 1.f);
 		m_triangles[i].ID = i;
-		m_triangles[i].pad = XMFLOAT3(0.f, 0.f, 0.f);
+		m_triangles[i].pad = 0.f;
+		m_triangles[i].textureCoordinate0 = XMFLOAT2(0.f, 0.f);
+		m_triangles[i].textureCoordinate1 = XMFLOAT2(0.f, 0.f);
+		m_triangles[i].textureCoordinate2 = XMFLOAT2(0.f, 0.f);
 	}
 
 #pragma endregion
@@ -293,7 +296,7 @@ void Direct3D::init(Input *p_pInput)
 ///////////////////////////////////////////////////////////////////////////////////////////
 	m_mesh.loadObj("Meshi/kub.obj");
 
-	m_meshBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(MeshTriangle), m_mesh.getFaces(), true, false, m_mesh.getTriangles2(), false, "Structured Buffer: Mesh Texture");
+	m_meshBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(Triangle), m_mesh.getFaces(), true, false, m_mesh.getTriangles2(), false, "Structured Buffer: Mesh Texture");
 	
 	D3DX11CreateShaderResourceViewFromFile(m_Device, m_mesh.getMaterial()->map_Kd.c_str(), NULL, NULL, &m_meshTexture, &hr);
 
@@ -368,7 +371,7 @@ void Direct3D::draw()
 		m_IntersectionShader->Unset();
 		m_DeviceContext->CSSetUnorderedAccessViews(0,2, clearuav, 0);
 		m_DeviceContext->CSSetShaderResources(0,2, clearsrv);
-
+		
 		//Color
 		ID3D11Buffer *CCB[] = {m_ColorCBuffer, m_FirstPassCBuffer};
 		m_DeviceContext->CSSetConstantBuffers(0, 2, CCB);

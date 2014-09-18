@@ -6,21 +6,9 @@
 #include <fstream>
 #include <sstream>
 #include <DirectXMath.h>
+#include "Structs.h"
 
 using namespace DirectX;
-
-struct MeshTriangle
-{
-	XMFLOAT4	pos0;
-	XMFLOAT4	pos1;
-	XMFLOAT4	pos2;
-	XMFLOAT2	textureCoordinate0;
-	XMFLOAT2	textureCoordinate1;
-	XMFLOAT2	textureCoordinate2;
-	int			ID;
-	float		pad;
-	XMFLOAT4	normal;
-};
 
 struct Material
 {
@@ -78,17 +66,17 @@ public:
 	~Mesh();
 	void init();
 	void loadObj(char* textFile);
-	std::vector<MeshTriangle>* getTriangles();
+	std::vector<Triangle>* getTriangles();
 	Material* getMaterial();
 	int getFaces();
-	MeshTriangle* getTriangles2();
+	Triangle* getTriangles2();
 	Material2 getMaterial2();
 private:
 	int m_nrOfFaces;
 	void loadMaterial(std::string filename);
 	Material m_material;
 	Material2 m_material2;
-	std::vector<MeshTriangle> m_meshTriangles;
+	std::vector<Triangle> m_meshTriangles;
 
 };
 

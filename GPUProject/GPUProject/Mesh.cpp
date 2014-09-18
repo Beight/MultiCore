@@ -77,7 +77,7 @@ void Mesh::loadObj(char* textFile)
 		{
 			m_nrOfFaces++;
 			unsigned int iPosition, iTexCoord, iNormal;
-			MeshTriangle vertex;
+			Triangle vertex;
 			char slash;
 	
 			lineStream >> iPosition >> slash >> iTexCoord >> slash >> iNormal;
@@ -96,6 +96,7 @@ void Mesh::loadObj(char* textFile)
 			m_meshTriangles.push_back( vertex );
 			id++;
 			vertex.pad = 1.0f;
+			vertex.color = XMFLOAT4(0.f, 0.f, 0.f, 0.f);
 		}
 	}
 	m_meshTriangles.shrink_to_fit();
@@ -178,12 +179,12 @@ void Mesh::loadMaterial(string filename)
 	file.close();
 }
 
-vector<MeshTriangle>* Mesh::getTriangles()
+vector<Triangle>* Mesh::getTriangles()
 {
 	return &m_meshTriangles;
 }
 
-MeshTriangle* Mesh::getTriangles2()
+Triangle* Mesh::getTriangles2()
 {
 	return &m_meshTriangles[0];
 }

@@ -7,7 +7,7 @@
 #include "Light.fx"
 
 StructuredBuffer<HitData> HDin : register(t0);
-StructuredBuffer<MeshTriangle> MeshTriangles : register(t1);
+StructuredBuffer<Triangle> MeshTriangles : register(t1);
 StructuredBuffer<Material> material : register (t2);
 
 cbuffer ConstBuffer : register (b0)
@@ -22,6 +22,7 @@ cbuffer ConstBuffer : register (b0)
 cbuffer FirstPass : register (b1)
 {
 	bool firstPass;
+	float3 firstpad;
 };
 
 RWTexture2D<float4> Output : register(u0);
@@ -30,7 +31,6 @@ RWStructuredBuffer<float4> FinalColorBuffer : register(u1);
 [numthreads(32, 32, 1)]
 void main( uint3 threadID : SV_DispatchThreadID )
 {
-
 	int index = threadID.x + (threadID.y * WIDTH);
 	HitData hd = HDin[index];
 	
@@ -44,14 +44,12 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	{
 
 		float3 final = float3(0.f, 0.f, 0.f);
-		//float3 paddy = lightList[0].pad;
 
 		/// ## NUMBER OF LIGHTS ## //
 		for(int i = 0; i < 3; i++)
 		{	
 			float3 color = float3(0.0f, 0.0f, 0.0f);
 			Ray lightRay;
-			float hit = -1.0f;
 			HitData lightHit;
 			lightHit.distance = -1.0f;
 			lightRay.origin = hd.pos;
@@ -60,7 +58,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 			// ## SPHERE ## //
 			if(hd.ID != sphere.ID)
 			{
-				hit = RaySphereIntersect(lightRay, sphere, hd.distance);
+				float hit = RaySphereIntersect(lightRay, sphere, hd.distance);
 				if(hit > -1.0f)
 				{
 					lightHit.distance = hit;
@@ -71,33 +69,32 @@ void main( uint3 threadID : SV_DispatchThreadID )
 			{
 				if(hd.ID != triangles[j].ID)
 				{
-					hit = RayTriangleIntersect(lightRay, triangles[j], hd.distance);
-					if(hit > -1.0f)
+					float3 hit = RayTriangleIntersect(lightRay, triangles[j], hd.distance);
+					if(hit.x > -1.0f)
 					{
-						lightHit.distance = hit;
+						lightHit.distance = hit.x;
 					}
 				}
 			}
 			// ## MESH ## //
-			for(j = 0; j < nrOfFaces; j++)
+			for(int k = 0; k < nrOfFaces; k++)
 			{
-				if(hd.ID != MeshTriangles[j].ID)
+				if(hd.ID != MeshTriangles[k].ID)
 				{
-					float3 temp = RayTriangleIntersects(lightRay, MeshTriangles[j], hd.distance);
-					if(temp.x > -1.0f)
+					float3 hit = RayTriangleIntersect(lightRay, MeshTriangles[k], hd.distance);
+					if(hit.x > -1.0f)
 					{
-						lightHit.distance = temp.x;
+						lightHit.distance = hit.x;
 					}
 				}
 			}
-			//float3 diff = MeshTexture.Sample(DiffuseMap, ;
 			if(lightHit.distance > 0.0001f && lightLength > lightHit.distance)
 			{
-				color = (PointLightR(hd.pos, hd.normal, hd.color, hd.materialID, lightList[i], material[0]) * 0.5f);//, diff)*0.5f);
+				color = (PointLightR(hd.pos, hd.normal, hd.color, hd.materialID, lightList[i], material[0]) * 0.5f);
 				
 			}	
 			else 
-				color = PointLightR(hd.pos, hd.normal, hd.color, hd.materialID, lightList[i], material[0]);//, diff);
+				color = PointLightR(hd.pos, hd.normal, hd.color, hd.materialID, lightList[i], material[0]);
 		
 
 			final += color;
