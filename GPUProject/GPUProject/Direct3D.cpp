@@ -12,7 +12,7 @@ Direct3D::Direct3D(HWND p_hwnd)
 	m_PrimaryShader(nullptr),
 	m_IntersectionShader(nullptr),
 	m_ColorShader(nullptr),
-	m_accColorBuffer(nullptr),
+	m_FinalColorBuffer(nullptr),
 	m_RayBuffer(nullptr),
 	m_HitDataBuffer(nullptr),
 	m_time(0.f),
@@ -21,9 +21,10 @@ Direct3D::Direct3D(HWND p_hwnd)
 	m_meshBuffer(nullptr),
 	m_materialBuffer(nullptr),
 	m_cBuffer(nullptr),
-	m_PrimarycBuffer(nullptr),		
-	m_IntersectioncBuffer(nullptr),	
-	m_ColorcBuffer(nullptr),		
+	m_PrimaryCBuffer(nullptr),		
+	m_IntersectionCBuffer(nullptr),	
+	m_ColorCBuffer(nullptr),
+	m_FirstPassCBuffer(nullptr),
 	m_Height(0),
 	m_Width(0),
 	m_IVP(XMFLOAT4X4()),
@@ -36,7 +37,8 @@ Direct3D::Direct3D(HWND p_hwnd)
 	m_spherel0(Sphere()),
 	m_triangles(),
 	m_view(XMFLOAT4X4()),
-	m_proj(XMFLOAT4X4())
+	m_proj(XMFLOAT4X4()),
+	m_FirstPassStruct()
 {}
 
 Direct3D::~Direct3D()
@@ -144,7 +146,7 @@ void Direct3D::init(Input *p_pInput)
 
 	m_RayBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(Ray), m_Width*m_Height, true, true, nullptr, true, "Structured Buffer: RayBuffer");
 	m_HitDataBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(HitData), m_Width*m_Height, true, true, nullptr, true, "Structured Buffer: HitDataBuffer");
-	m_accColorBuffer = m_ComputeSys->CreateBuffer(STRUCTURED_BUFFER, sizeof(XMFLOAT4), m_Height*m_Width, true, true, nullptr,true, "Structured Buffer:accColor");
+	m_FinalColorBuffer = m_ComputeSys->CreateBuffer(STRUCTURED_BUFFER, sizeof(XMFLOAT4), m_Height*m_Width, true, true, nullptr,true, "Structured Buffer:accColor");
 
 
 
@@ -372,7 +374,7 @@ void Direct3D::update(float dt)
 
 void Direct3D::draw()
 {
-	ID3D11UnorderedAccessView* uav[] = { m_BackBufferUAV, m_accColorBuffer->GetUnorderedAccessView() };
+	ID3D11UnorderedAccessView* uav[] = { m_BackBufferUAV, m_FinalColorBuffer->GetUnorderedAccessView() };
 	ID3D11UnorderedAccessView* RayUAV[] = {m_RayBuffer->GetUnorderedAccessView()};
 	ID3D11UnorderedAccessView* IntersectionUAV[] = {m_RayBuffer->GetUnorderedAccessView(), m_HitDataBuffer->GetUnorderedAccessView()};
 	ID3D11ShaderResourceView* ColorSRV[] = {m_HitDataBuffer->GetResourceView(), m_meshBuffer->GetResourceView(), m_materialBuffer->GetResourceView()};
@@ -380,7 +382,7 @@ void Direct3D::draw()
 	ID3D11ShaderResourceView* clearsrv[]	= { 0,0,0,0,0,0,0 };
 	
 	//Primary
-	m_DeviceContext->CSSetConstantBuffers(0, 1, &m_PrimarycBuffer);
+	m_DeviceContext->CSSetConstantBuffers(0, 1, &m_PrimaryCBuffer);
 	m_DeviceContext->CSSetUnorderedAccessViews(0, 1, RayUAV, 0);
 	m_PrimaryShader->Set();
 	m_Timer->Start();
@@ -389,35 +391,46 @@ void Direct3D::draw()
 	m_PrimaryShader->Unset();	
 	m_DeviceContext->CSSetUnorderedAccessViews(0,1, clearuav, 0);
 
-	//Intersection
-	m_DeviceContext->CSSetConstantBuffers(0, 1, &m_IntersectioncBuffer);
-	m_DeviceContext->CSSetUnorderedAccessViews(0, 2, IntersectionUAV, 0);
-	ID3D11ShaderResourceView* srv[] = { m_meshTexture,
-										m_meshBuffer->GetResourceView(),
-										};
+	int NrBounces = 5;
+	for(int i = 0; i < NrBounces; i++)
+	{
+		//Intersection
+		ID3D11Buffer *ICB[] = {m_IntersectionCBuffer, m_FirstPassCBuffer};
+		m_DeviceContext->CSSetConstantBuffers(0, 2, ICB);
+		m_DeviceContext->CSSetUnorderedAccessViews(0, 2, IntersectionUAV, 0);
+		ID3D11ShaderResourceView* srv[] = { m_meshTexture,
+											m_meshBuffer->GetResourceView(),
+											};
 
-	m_DeviceContext->CSSetShaderResources(0, 2, srv);
+		m_DeviceContext->CSSetShaderResources(0, 2, srv);
 
-	m_IntersectionShader->Set();
+		m_IntersectionShader->Set();
 
-	m_DeviceContext->Dispatch(25, 25, 1);
+		m_DeviceContext->Dispatch(25, 25, 1);
 
-	m_IntersectionShader->Unset();
-	m_DeviceContext->CSSetUnorderedAccessViews(0,2, clearuav, 0);
-	m_DeviceContext->CSSetShaderResources(0,2, clearsrv);
+		m_IntersectionShader->Unset();
+		m_DeviceContext->CSSetUnorderedAccessViews(0,2, clearuav, 0);
+		m_DeviceContext->CSSetShaderResources(0,2, clearsrv);
 
-	//Color
-	m_DeviceContext->CSSetConstantBuffers(0, 1, &m_ColorcBuffer);
-	m_DeviceContext->CSSetUnorderedAccessViews(0, 2, uav, 0);
-	m_DeviceContext->CSSetShaderResources(0, 3, ColorSRV);
-	m_ColorShader->Set();
+		//Color
+		ID3D11Buffer *CCB[] = {m_ColorCBuffer, m_FirstPassCBuffer};
+		m_DeviceContext->CSSetConstantBuffers(0, 2, CCB);
+		m_DeviceContext->CSSetUnorderedAccessViews(0, 2, uav, 0);
+		m_DeviceContext->CSSetShaderResources(0, 3, ColorSRV);
+		m_ColorShader->Set();
 
-	m_DeviceContext->Dispatch(25, 25, 1);
+		m_DeviceContext->Dispatch(25, 25, 1);
 
-	m_ColorShader->Unset();
-	m_DeviceContext->CSSetUnorderedAccessViews(0,2, clearuav, 0);
-	m_DeviceContext->CSSetShaderResources(0,3, clearsrv);
+		m_ColorShader->Unset();
+		m_DeviceContext->CSSetUnorderedAccessViews(0,2, clearuav, 0);
+		m_DeviceContext->CSSetShaderResources(0,3, clearsrv);
 
+		if(m_FirstPassStruct.firstPass)
+		{
+			m_FirstPassStruct.firstPass = false;
+			m_DeviceContext->UpdateSubresource(m_FirstPassCBuffer, 0, 0, &m_FirstPassStruct, 0, 0);
+		}
+	}
 
 /*
 
@@ -487,7 +500,7 @@ void Direct3D::createConstantBuffers()
 	else
 		bd.ByteWidth = sizeof(PrimaryConstBuffer);
 
-	m_Device->CreateBuffer( &bd, NULL, &m_PrimarycBuffer);
+	m_Device->CreateBuffer( &bd, NULL, &m_PrimaryCBuffer);
 
 	//Intersection
 	if(sizeof(IntersectionConstBuffer) % 16 > 0)
@@ -495,7 +508,7 @@ void Direct3D::createConstantBuffers()
 	else
 		bd.ByteWidth = sizeof(IntersectionConstBuffer);
 	
-	m_Device->CreateBuffer( &bd, NULL, &m_IntersectioncBuffer);
+	m_Device->CreateBuffer( &bd, NULL, &m_IntersectionCBuffer);
 
 	//Color
 	if(sizeof(ColorConstBuffer) % 16 > 0)
@@ -503,11 +516,22 @@ void Direct3D::createConstantBuffers()
 	else
 		bd.ByteWidth = sizeof(ColorConstBuffer);
 
-	m_Device->CreateBuffer( &bd, NULL, &m_ColorcBuffer);
+	m_Device->CreateBuffer( &bd, NULL, &m_ColorCBuffer);
+
+	//First pass
+	if(sizeof(FirstPassConstBuffer) % 16 > 0)
+		bd.ByteWidth = ( int )(( sizeof( FirstPassConstBuffer ) / 16 )  + 1) * 16;
+	else
+		bd.ByteWidth = sizeof(FirstPassConstBuffer);
+
+	m_Device->CreateBuffer( &bd, NULL, &m_FirstPassCBuffer);
 }
 
 void Direct3D::updateConstantBuffers()
 {
+	m_FirstPassStruct.firstPass = true;
+	m_DeviceContext->UpdateSubresource(m_FirstPassCBuffer, 0, 0, &m_FirstPassStruct, 0, 0);
+
 	//old
 	ConstBuffer cRayBufferStruct;	
 	cRayBufferStruct.cameraPos = m_pCamera->getPosition();
@@ -548,8 +572,7 @@ void Direct3D::updateConstantBuffers()
 	XMStoreFloat4x4(&PCBufferStruct.IV, mInvView);
 	XMStoreFloat4x4(&PCBufferStruct.IP, mInvProj);
 
-	m_DeviceContext->UpdateSubresource(m_PrimarycBuffer, 0, 0, &PCBufferStruct, 0, 0);
-	//m_DeviceContext->CSSetConstantBuffers(0, 1, &m_PrimarycBuffer);
+	m_DeviceContext->UpdateSubresource(m_PrimaryCBuffer, 0, 0, &PCBufferStruct, 0, 0);
 
 	//Intersection
 	IntersectionConstBuffer ICBufferStruct;
@@ -560,11 +583,9 @@ void Direct3D::updateConstantBuffers()
 		ICBufferStruct.triangles[i] = m_triangles[i];
 	}
 	ICBufferStruct.nrOfFaces = m_mesh.getFaces();
-	ICBufferStruct.firstPass = true;
-	ICBufferStruct.pad = XMFLOAT2(0.f, 0.f);
+	ICBufferStruct.pad = XMFLOAT3(0.f, 0.f, 0.f);
 
-	m_DeviceContext->UpdateSubresource(m_IntersectioncBuffer, 0, 0, &ICBufferStruct, 0, 0);
-	//m_DeviceContext->CSSetConstantBuffers(0, 1, &m_IntersectioncBuffer);
+	m_DeviceContext->UpdateSubresource(m_IntersectionCBuffer, 0, 0, &ICBufferStruct, 0, 0);
 	
 	//Color
 	ColorConstBuffer CCBufferStruct;
@@ -580,11 +601,9 @@ void Direct3D::updateConstantBuffers()
 	}
 
 	CCBufferStruct.nrOfFaces = m_mesh.getFaces();
-	CCBufferStruct.firstPass = true;
-	CCBufferStruct.pad = XMFLOAT2(0.f, 0.f);
+	CCBufferStruct.pad = XMFLOAT3(0.f, 0.f, 0.f);
 
-	m_DeviceContext->UpdateSubresource(m_ColorcBuffer, 0, 0, &CCBufferStruct, 0, 0);
-	//m_DeviceContext->CSSetConstantBuffers(0, 1, &m_ColorcBuffer);
+	m_DeviceContext->UpdateSubresource(m_ColorCBuffer, 0, 0, &CCBufferStruct, 0, 0);
 }
 
 
@@ -592,9 +611,10 @@ void Direct3D::release()
 {
 	SAFE_RELEASE(m_BackBufferUAV);
 	SAFE_RELEASE(m_cBuffer);
-	SAFE_RELEASE(m_PrimarycBuffer);
-	SAFE_RELEASE(m_IntersectioncBuffer);
-	SAFE_RELEASE(m_ColorcBuffer);
+	SAFE_RELEASE(m_PrimaryCBuffer);
+	SAFE_RELEASE(m_IntersectionCBuffer);
+	SAFE_RELEASE(m_ColorCBuffer);
+	SAFE_RELEASE(m_FirstPassCBuffer);
 	SAFE_RELEASE(m_SwapChain);
 	SAFE_DELETE(m_ComputeSys);
 	SAFE_DELETE(m_ComputeShader);
@@ -605,7 +625,7 @@ void Direct3D::release()
 	SAFE_RELEASE(m_materialBuffer);
 	SAFE_RELEASE(m_RayBuffer);
 	SAFE_RELEASE(m_HitDataBuffer);
-	SAFE_RELEASE(m_accColorBuffer);
+	SAFE_RELEASE(m_FinalColorBuffer);
 	SAFE_DELETE(m_meshBuffer);
 	SAFE_RELEASE(m_Device);
 	SAFE_RELEASE(m_DeviceContext);

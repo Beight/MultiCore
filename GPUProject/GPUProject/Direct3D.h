@@ -28,9 +28,10 @@ private:
 	ID3D11Device				*m_Device;
 	ID3D11DeviceContext			*m_DeviceContext;
 	ID3D11Buffer				*m_cBuffer;											
-	ID3D11Buffer				*m_PrimarycBuffer;											
-	ID3D11Buffer				*m_IntersectioncBuffer;											
-	ID3D11Buffer				*m_ColorcBuffer;			
+	ID3D11Buffer				*m_PrimaryCBuffer;											
+	ID3D11Buffer				*m_IntersectionCBuffer;											
+	ID3D11Buffer				*m_ColorCBuffer;			
+	ID3D11Buffer				*m_FirstPassCBuffer;
 	ID3D11UnorderedAccessView	*m_BackBufferUAV;  // compute output
 	ID3D11ShaderResourceView	*m_meshTexture;												
 	ComputeWrap					*m_ComputeSys;
@@ -57,8 +58,8 @@ private:
 	ComputeBuffer				*m_materialBuffer;
 	ComputeBuffer				*m_RayBuffer;
 	ComputeBuffer				*m_HitDataBuffer;
-	ComputeBuffer				*m_accColorBuffer;
-
+	ComputeBuffer				*m_FinalColorBuffer;
+	FirstPassConstBuffer		m_FirstPassStruct;
 
 
 };

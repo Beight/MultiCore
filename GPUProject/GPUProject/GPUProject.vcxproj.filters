@@ -76,9 +76,17 @@
     <FxCompile Include="Shaders\Light.fx">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\ColorStage.fx" />
-    <FxCompile Include="Shaders\IntersectionStage.fx" />
-    <FxCompile Include="Shaders\PrimaryRayStage.fx" />
-    <FxCompile Include="Shaders\Structs.fx" />
+    <FxCompile Include="Shaders\ColorStage.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\IntersectionStage.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\PrimaryRayStage.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\Structs.fx">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

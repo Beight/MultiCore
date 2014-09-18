@@ -12,15 +12,18 @@ RWStructuredBuffer<HitData> Output : register(u1);
 Texture2D MeshTexture : register(t0);
 StructuredBuffer<MeshTriangle> MeshTriangles : register(t1);
 
-cbuffer ConstBuffer
+cbuffer ConstBuffer : register(b0)
 {
 	Sphere sphere;
 	Triangle triangles[NROFTRIANGLES];
 	int nrOfFaces;
-	bool firstpass;
-	float2 pad;
+	float3 pad;
 };
 
+cbuffer FirstPass : register (b1)
+{
+	bool firstpass;
+};
 
 
 

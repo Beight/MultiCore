@@ -63,8 +63,7 @@ struct IntersectionConstBuffer
 	Sphere sphere;
 	Triangle triangles[NROFTRIANGLES];
 	int nrOfFaces;
-	bool firstPass;
-	XMFLOAT2 pad;
+	XMFLOAT3 pad;
 };
 
 struct ColorConstBuffer
@@ -73,8 +72,13 @@ struct ColorConstBuffer
 	Triangle triangles[NROFTRIANGLES];
 	Light lightList[NROFLIGHTS];
 	int nrOfFaces;
+	XMFLOAT3 pad;
+};
+
+struct FirstPassConstBuffer
+{
 	bool firstPass;
-	XMFLOAT2 pad;
+	//XMFLOAT3 pad;
 };
 
 //old Constant buffer

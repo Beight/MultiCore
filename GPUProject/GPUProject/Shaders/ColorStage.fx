@@ -10,18 +10,22 @@ StructuredBuffer<HitData> HDin : register(t0);
 StructuredBuffer<MeshTriangle> MeshTriangles : register(t1);
 StructuredBuffer<Material> material : register (t2);
 
-cbuffer ConstBuffer
+cbuffer ConstBuffer : register (b0)
 {
 	Sphere sphere;
 	Triangle triangles[NROFTRIANGLES];
 	Light lightList[NROFLIGHTS];
 	int nrOfFaces;
+	float3 pad;
+};
+
+cbuffer FirstPass : register (b1)
+{
 	bool firstPass;
-	float2 pad;
 };
 
 RWTexture2D<float4> Output : register(u0);
-RWStructuredBuffer<float4> accOutput : register(u1); //Don't know what this is for.......
+RWStructuredBuffer<float4> FinalColorBuffer : register(u1);
 
 [numthreads(32, 32, 1)]
 void main( uint3 threadID : SV_DispatchThreadID )
@@ -32,7 +36,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	
 
 	if(firstPass)
-		accOutput[index] = float4(0.f, 0.f, 0.f, 0.f);
+		FinalColorBuffer[index] = float4(0.f, 0.f, 0.f, 0.f);
 
 	if(hd.ID == -1)
 		Output[threadID.xy] = float4(0.f, 0.f, 0.f, 1.f);
@@ -43,7 +47,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 		//float3 paddy = lightList[0].pad;
 
 		/// ## NUMBER OF LIGHTS ## //
-		for(int i = 0; i < 2; i++)
+		for(int i = 0; i < 3; i++)
 		{	
 			float3 color = float3(0.0f, 0.0f, 0.0f);
 			Ray lightRay;
@@ -54,7 +58,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 			lightRay.direction = normalize(lightList[i].pos - hd.pos);
 			float lightLength = length(lightList[i].pos.xyz - hd.pos.xyz);
 			// ## SPHERE ## //
-			if(hd.ID != -2)
+			if(hd.ID != sphere.ID)
 			{
 				hit = RaySphereIntersect(lightRay, sphere, hd.distance);
 				if(hit > -1.0f)
@@ -99,9 +103,9 @@ void main( uint3 threadID : SV_DispatchThreadID )
 			final += color;
 		}
 
-		accOutput[index] += float4(final, 1.f);
+		FinalColorBuffer[index] += float4(final, 1.f);
 
-		Output[threadID.xy] = saturate(accOutput[index]);
+		Output[threadID.xy] = saturate(FinalColorBuffer[index]);
 	}
 }
 
