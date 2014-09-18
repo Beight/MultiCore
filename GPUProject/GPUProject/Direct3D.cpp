@@ -209,10 +209,10 @@ void Direct3D::init(Input *p_pInput)
 	m_meshTri.textureCoordinate1 = XMFLOAT2(0.f, 0.f);
 	m_meshTri.textureCoordinate2 = XMFLOAT2(0.f, 0.f);
 
-#pragma region Triangle
+#pragma region Cube
 
-	///////////////////////////////////////////////////////////////////////////////////////////
-//Triangle
+///////////////////////////////////////////////////////////////////////////////////////////
+//Cube
 ///////////////////////////////////////////////////////////////////////////////////////////
 	
 	
@@ -391,7 +391,7 @@ void Direct3D::draw()
 	m_PrimaryShader->Unset();	
 	m_DeviceContext->CSSetUnorderedAccessViews(0,1, clearuav, 0);
 
-	int NrBounces = 5;
+	int NrBounces = 2;
 	for(int i = 0; i < NrBounces; i++)
 	{
 		//Intersection

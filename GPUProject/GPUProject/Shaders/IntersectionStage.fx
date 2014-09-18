@@ -47,53 +47,62 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	else
 		hd.ID = Output[index].ID;
 
+
+	float hit = 0;
 	// ## SPHERE ## //
-	float hit = RaySphereIntersect(r, sphere, hd.distance);
-
-	if(hit > -1.0f)
+	if(hd.ID != sphere.ID)
 	{
-		hd.pos = r.origin + r.direction * hit;
-		hd.normal = normalize(hd.pos - sphere.center);
-		hd.color = sphere.color;
-		hd.distance = hit;
-		hd.ID = sphere.ID;
-		hd.materialID = -1;
+		hit = RaySphereIntersect(r, sphere, hd.distance);
+		if(hit > -1.0f)
+		{
+			hd.pos = r.origin + r.direction * hit;
+			hd.normal = normalize(hd.pos - sphere.center);
+			hd.color = sphere.color;
+			hd.distance = hit;
+			hd.ID = sphere.ID;
+			hd.materialID = -1;
+		}
 	}
-
 	//					
 	// ## CUBE ## // 
+	
 	for(int i = 0; i < NROFTRIANGLES; i++)
 	{
-			//padding
-			//float3 paddy = triangles[i].pad + padX;
-			hit = RayTriangleIntersect(r, triangles[i], hd.distance);
-			if(hit > -1.0f)
+			if(hd.ID != triangles[i].ID)
 			{
-				hd.pos = r.origin + r.direction * hit;
-				hd.normal = triangles[i].normal;
-				hd.color = triangles[i].color;					
-				hd.ID = triangles[i].ID;
-				hd.distance = hit;
-				hd.materialID = -1;
+				//padding
+				//float3 paddy = triangles[i].pad + padX;
+				hit = RayTriangleIntersect(r, triangles[i], hd.distance);
+				if(hit > -1.0f)
+				{
+					hd.pos = r.origin + r.direction * hit;
+					hd.normal = triangles[i].normal;
+					hd.color = triangles[i].color;					
+					hd.ID = triangles[i].ID;
+					hd.distance = hit;
+					hd.materialID = -1;
+				}
 			}
 	}
 
 	// ## MESH ## //
 	for(i = 0; i < nrOfFaces; i++)
 	{
-		//padding
-		//float paddy = input[i].pad;
-		float3 temp;
-		temp = RayTriangleIntersects(r, MeshTriangles[i], hd.distance);
-		hit = temp.x;
-		if(hit > -1.0f)
+		if(hd.ID != MeshTriangles[i].ID)
 		{
-			hd.pos = r.origin + r.direction * hit;
-			hd.normal = normalize(MeshTriangles[i].normal);
-			hd.color = MeshTexture[temp.yz*512.f];
-			hd.ID = MeshTriangles[i].ID;
-			hd.distance = hit;
-			hd.materialID = 1;
+			//padding
+			//float paddy = input[i].pad;
+			float3 temp = RayTriangleIntersects(r, MeshTriangles[i], hd.distance);
+			hit = temp.x;
+			if(hit > -1.0f)
+			{
+				hd.pos = r.origin + r.direction * hit;
+				hd.normal = normalize(MeshTriangles[i].normal);
+				hd.color = MeshTexture[temp.yz*512.f];
+				hd.ID = MeshTriangles[i].ID;
+				hd.distance = hit;
+				hd.materialID = 1;
+			}
 		}
 	}
 

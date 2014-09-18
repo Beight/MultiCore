@@ -92,7 +92,7 @@ void Mesh::loadObj(char* textFile)
 			lineStream >> iPosition >> slash >> iTexCoord >> slash >> iNormal;
 			vertex.pos2		= positions	[ iPosition - 1 ];
 			vertex.textureCoordinate2 = texCoords	[ iTexCoord - 1 ];
-			vertex.ID = id;
+			vertex.ID = id + 20;
 			m_meshTriangles.push_back( vertex );
 			id++;
 			vertex.pad = 1.0f;
