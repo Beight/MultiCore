@@ -22,8 +22,8 @@ cbuffer ConstBuffer : register(b0)
 
 cbuffer FirstPass : register (b1)
 {
-	bool firstpass;
-	float3 firstpad;
+	//bool firstpass;
+	float4 firstpass;
 };
 
 
@@ -44,10 +44,22 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	hd.pad = 0;
 	int tempID = -1;
 
-	if(firstpass)
+	if(firstpass.x == 1.f)
+	{
+		hd.pos = float4(0.f, 0.f, 0.f, 0.f);
+		hd.normal = float4(0.f, 0.f, 0.f, 0.f);
+		hd.distance = -1.0;
+		hd.color = float4(0.f, 1.f, 0.f, 0.f);
 		hd.ID = -1;
+		hd.materialID = -1;
+		hd.pad = 0;
+	}
 	else
-		hd.ID = Output[index].ID;
+	{
+		hd = Output[index];
+		hd.distance = -1;
+
+	}
 
 	// ## SPHERE ## //
 	if(hd.ID != sphere.ID)
@@ -100,12 +112,13 @@ void main( uint3 threadID : SV_DispatchThreadID )
 		}
 	}
 
-	if(firstpass)
+	if(firstpass.x == 1.f)
 		hd.ID = tempID;
-	
-	if(tempID != -1)
-		hd.ID = tempID;
-
+	else
+	{
+		if(tempID != -1)
+			hd.ID = tempID;
+	}
 	Output[index] = hd;
 
 	if(hd.ID != -1)

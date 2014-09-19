@@ -153,7 +153,7 @@ void Direct3D::init(Input *p_pInput)
 //Camera
 ///////////////////////////////////////////////////////////////////////////////////////////
 	m_pCamera = std::shared_ptr<Camera>(new Camera);
-	XMVECTOR cameraPos = XMVectorSet(0.f, 0.f, -20.f, 0.f);
+	XMVECTOR cameraPos = XMVectorSet(0.f, 0.f, -10.f, 0.f);
 	XMVECTOR cameraDir = XMVectorSet(0.f, 0.f, 1.f, 0.f);
 	XMVECTOR cameraUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
 	m_pCamera->init(cameraPos, cameraUp, cameraDir, (float)m_Width, (float)m_Height);
@@ -301,6 +301,8 @@ void Direct3D::init(Input *p_pInput)
 	D3DX11CreateShaderResourceViewFromFile(m_Device, m_mesh.getMaterial()->map_Kd.c_str(), NULL, NULL, &m_meshTexture, &hr);
 
 	m_materialBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(Material2), 1, true, false, &m_mesh.getMaterial2(), false, 0);
+
+	m_FirstPassStruct.firstPass =  XMFLOAT4(1.f, 0.f, 0.f, 0.f);
 }
 
 void Direct3D::update(float dt)
@@ -355,6 +357,7 @@ void Direct3D::draw()
 	for(int i = 0; i < NrBounces; i++)
 	{
 		//Intersection
+		m_DeviceContext->UpdateSubresource(m_FirstPassCBuffer, 0, 0, &m_FirstPassStruct, 0, 0);
 		ID3D11Buffer *ICB[] = {m_IntersectionCBuffer, m_FirstPassCBuffer};
 		m_DeviceContext->CSSetConstantBuffers(0, 2, ICB);
 		m_DeviceContext->CSSetUnorderedAccessViews(0, 2, IntersectionUAV, 0);
@@ -385,12 +388,15 @@ void Direct3D::draw()
 		m_DeviceContext->CSSetUnorderedAccessViews(0,2, clearuav, 0);
 		m_DeviceContext->CSSetShaderResources(0,3, clearsrv);
 
-		if(m_FirstPassStruct.firstPass)
+		if(m_FirstPassStruct.firstPass.x == 1.f)
 		{
-			m_FirstPassStruct.firstPass = false;
+			m_FirstPassStruct.firstPass.x = 0.f;
 			m_DeviceContext->UpdateSubresource(m_FirstPassCBuffer, 0, 0, &m_FirstPassStruct, 0, 0);
+			
 		}
 	}
+	m_FirstPassStruct.firstPass.x = 1.f;
+	m_DeviceContext->UpdateSubresource(m_FirstPassCBuffer, 0, 0, &m_FirstPassStruct, 0, 0);
 
 	if(FAILED(m_SwapChain->Present( 0, 0 )))
 		return;
@@ -445,16 +451,17 @@ void Direct3D::createConstantBuffers()
 		bd.ByteWidth = ( int )(( sizeof( FirstPassConstBuffer ) / 16 )  + 1) * 16;
 	else
 		bd.ByteWidth = sizeof(FirstPassConstBuffer);
-
+	//bd.Usage = D3D11_USAGE_DYNAMIC;
+	//bd.CPUAccessFlags |= D3D11_CPU_ACCESS_WRITE;
 	m_Device->CreateBuffer( &bd, NULL, &m_FirstPassCBuffer);
 }
 
 void Direct3D::updateConstantBuffers()
 {
 	//First pass constant buffer update
-	m_FirstPassStruct.firstPass = true;
-	m_DeviceContext->UpdateSubresource(m_FirstPassCBuffer, 0, 0, &m_FirstPassStruct, 0, 0);
 
+
+	m_DeviceContext->CSSetConstantBuffers(0, 1, &m_FirstPassCBuffer);
 	//Primary Constant buffer
 	PrimaryConstBuffer PCBufferStruct;
 	PCBufferStruct.cameraPos = m_pCamera->getPosition();
@@ -474,7 +481,6 @@ void Direct3D::updateConstantBuffers()
 	XMStoreFloat4x4(&PCBufferStruct.IP, mInvProj);
 
 	m_DeviceContext->UpdateSubresource(m_PrimaryCBuffer, 0, 0, &PCBufferStruct, 0, 0);
-
 	//Intersection constant buffer
 	IntersectionConstBuffer ICBufferStruct;
 	ICBufferStruct.sphere = m_sphere;
@@ -487,7 +493,6 @@ void Direct3D::updateConstantBuffers()
 	ICBufferStruct.pad = XMFLOAT3(0.f, 0.f, 0.f);
 
 	m_DeviceContext->UpdateSubresource(m_IntersectionCBuffer, 0, 0, &ICBufferStruct, 0, 0);
-	
 	//Color constant buffer
 	ColorConstBuffer CCBufferStruct;
 	CCBufferStruct.sphere = m_sphere;

@@ -21,8 +21,8 @@ cbuffer ConstBuffer : register (b0)
 
 cbuffer FirstPass : register (b1)
 {
-	bool firstPass;
-	float3 firstpad;
+	//bool firstPass;
+	float4 firstPass;
 };
 
 RWTexture2D<float4> Output : register(u0);
@@ -34,8 +34,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	int index = threadID.x + (threadID.y * WIDTH);
 	HitData hd = HDin[index];
 	
-
-	if(firstPass)
+	if(firstPass.x == 1.f)
 		FinalColorBuffer[index] = float4(0.f, 0.f, 0.f, 0.f);
 
 	if(hd.ID == -1)

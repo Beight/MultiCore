@@ -80,8 +80,8 @@ struct ColorConstBuffer
 
 struct FirstPassConstBuffer
 {
-	bool firstPass;
-	XMFLOAT3 pad;
+	//bool firstPass;
+	XMFLOAT4 firstPass;
 };
 
 //old Constant buffer
