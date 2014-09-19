@@ -22,8 +22,7 @@ cbuffer ConstBuffer : register(b0)
 
 cbuffer FirstPass : register (b1)
 {
-	//bool firstpass;
-	float4 firstpass;
+	int firstpass;
 };
 
 
@@ -35,30 +34,22 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	Ray r = Rays[index];
 
 	HitData hd;
-	hd.pos = float4(0.f, 0.f, 0.f, 0.f);
-	hd.normal = float4(0.f, 0.f, 0.f, 0.f);
-	hd.distance = -1.0;
-	hd.color = float4(0.f, 1.f, 0.f, 0.f);
-	hd.ID = -1;
-	hd.materialID = -1;
-	hd.pad = 0;
 	int tempID = -1;
 
-	if(firstpass.x == 1.f)
+	if(firstpass == 1)
 	{
 		hd.pos = float4(0.f, 0.f, 0.f, 0.f);
 		hd.normal = float4(0.f, 0.f, 0.f, 0.f);
 		hd.distance = -1.0;
 		hd.color = float4(0.f, 1.f, 0.f, 0.f);
 		hd.ID = -1;
+		hd.rayPower = 1.f;
 		hd.materialID = -1;
-		hd.pad = 0;
 	}
 	else
 	{
 		hd = Output[index];
 		hd.distance = -1;
-
 	}
 
 	// ## SPHERE ## //
@@ -112,22 +103,21 @@ void main( uint3 threadID : SV_DispatchThreadID )
 		}
 	}
 
-	if(firstpass.x == 1.f)
+	if(firstpass == 1)
 		hd.ID = tempID;
-	else
-	{
-		if(tempID != -1)
-			hd.ID = tempID;
-	}
+
+	if(tempID != -1)
+		hd.ID = tempID;
+
 	Output[index] = hd;
 
 	if(hd.ID != -1)
 	{
 		float4 bounceDir = reflect(r.direction, hd.normal);
-		//bounceDir = normalize(bounceDir); //Slow operation might not be needed.
 		r.origin = hd.pos;
 		r.direction = bounceDir;
 		Rays[index] = r;
+		Output[index].rayPower *= 0.7f;
 	}
 }
 

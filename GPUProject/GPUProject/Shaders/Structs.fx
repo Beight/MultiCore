@@ -59,7 +59,7 @@ struct HitData
 	float	distance;
 	int		ID;
 	int		materialID;
-	int		pad;
+	float	rayPower;
 };
 
 #endif

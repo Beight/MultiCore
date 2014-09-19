@@ -21,8 +21,7 @@ cbuffer ConstBuffer : register (b0)
 
 cbuffer FirstPass : register (b1)
 {
-	//bool firstPass;
-	float4 firstPass;
+	int firstPass;
 };
 
 RWTexture2D<float4> Output : register(u0);
@@ -34,7 +33,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 	int index = threadID.x + (threadID.y * WIDTH);
 	HitData hd = HDin[index];
 	
-	if(firstPass.x == 1.f)
+	if(firstPass == 1)
 		FinalColorBuffer[index] = float4(0.f, 0.f, 0.f, 0.f);
 
 	if(hd.ID == -1)
@@ -54,6 +53,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 			lightRay.origin = hd.pos;
 			lightRay.direction = normalize(lightList[i].pos - hd.pos);
 			float lightLength = length(lightList[i].pos.xyz - hd.pos.xyz);
+
 			// ## SPHERE ## //
 			if(hd.ID != sphere.ID)
 			{
@@ -99,7 +99,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 			final += color;
 		}
 
-		FinalColorBuffer[index] += float4(final, 1.f);
+		FinalColorBuffer[index] += float4(final, 1.f)* hd.rayPower;
 
 		Output[threadID.xy] = saturate(FinalColorBuffer[index]);
 	}

@@ -302,7 +302,7 @@ void Direct3D::init(Input *p_pInput)
 
 	m_materialBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(Material2), 1, true, false, &m_mesh.getMaterial2(), false, 0);
 
-	m_FirstPassStruct.firstPass =  XMFLOAT4(1.f, 0.f, 0.f, 0.f);
+	m_FirstPassStruct.firstPass = 1;
 }
 
 void Direct3D::update(float dt)
@@ -353,7 +353,7 @@ void Direct3D::draw()
 	m_PrimaryShader->Unset();	
 	m_DeviceContext->CSSetUnorderedAccessViews(0,1, clearuav, 0);
 
-	int NrBounces = 2;
+	int NrBounces = 4;
 	for(int i = 0; i < NrBounces; i++)
 	{
 		//Intersection
@@ -388,15 +388,13 @@ void Direct3D::draw()
 		m_DeviceContext->CSSetUnorderedAccessViews(0,2, clearuav, 0);
 		m_DeviceContext->CSSetShaderResources(0,3, clearsrv);
 
-		if(m_FirstPassStruct.firstPass.x == 1.f)
+		if(m_FirstPassStruct.firstPass == 1)
 		{
-			m_FirstPassStruct.firstPass.x = 0.f;
+			m_FirstPassStruct.firstPass = 0;
 			m_DeviceContext->UpdateSubresource(m_FirstPassCBuffer, 0, 0, &m_FirstPassStruct, 0, 0);
 			
 		}
 	}
-	m_FirstPassStruct.firstPass.x = 1.f;
-	m_DeviceContext->UpdateSubresource(m_FirstPassCBuffer, 0, 0, &m_FirstPassStruct, 0, 0);
 
 	if(FAILED(m_SwapChain->Present( 0, 0 )))
 		return;
@@ -451,15 +449,14 @@ void Direct3D::createConstantBuffers()
 		bd.ByteWidth = ( int )(( sizeof( FirstPassConstBuffer ) / 16 )  + 1) * 16;
 	else
 		bd.ByteWidth = sizeof(FirstPassConstBuffer);
-	//bd.Usage = D3D11_USAGE_DYNAMIC;
-	//bd.CPUAccessFlags |= D3D11_CPU_ACCESS_WRITE;
 	m_Device->CreateBuffer( &bd, NULL, &m_FirstPassCBuffer);
 }
 
 void Direct3D::updateConstantBuffers()
 {
-	//First pass constant buffer update
-
+	//First pass constant buffer update	
+	m_FirstPassStruct.firstPass = 1;
+	m_DeviceContext->UpdateSubresource(m_FirstPassCBuffer, 0, 0, &m_FirstPassStruct, 0, 0);
 
 	m_DeviceContext->CSSetConstantBuffers(0, 1, &m_FirstPassCBuffer);
 	//Primary Constant buffer

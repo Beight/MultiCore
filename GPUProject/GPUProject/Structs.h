@@ -18,7 +18,7 @@ struct HitData
 	float		distance;
 	int			ID;
 	int			materialID;
-	int			pad;
+	float		rayPower;
 };
 
 struct Light
@@ -80,20 +80,5 @@ struct ColorConstBuffer
 
 struct FirstPassConstBuffer
 {
-	//bool firstPass;
-	XMFLOAT4 firstPass;
-};
-
-//old Constant buffer
-struct ConstBuffer
-{
-	XMFLOAT4 cameraPos;
-	XMFLOAT4X4 IP;
-	XMFLOAT4X4 IV;
-	Sphere sphere;
-	Sphere spherel0;
-	Triangle triangles[NROFTRIANGLES];
-	Light lightList[NROFLIGHTS];
-	int nrOfFaces;
-	XMFLOAT3 pad;
+	int firstPass;
 };
