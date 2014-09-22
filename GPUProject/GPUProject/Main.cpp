@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "Constants.h"
 #include "Direct3D.h"
 #include "Input.h"
 
@@ -42,7 +43,12 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 			__int64 currTimeStamp = 0;
 			QueryPerformanceCounter((LARGE_INTEGER*)&currTimeStamp);
 			float dt = (currTimeStamp - prevTimeStamp) * secsPerCnt;
-
+			POINT tempSize;
+			tempSize.x = (LONG)(WIDTH * 0.5f);
+			tempSize.y = (LONG)(HEIGHT * 0.5f);
+			ClientToScreen(g_hWnd, &tempSize);
+			SetCursorPos(tempSize.x, tempSize.y);
+			ShowCursor(false);
 			//render
 			D3D.update(dt);
 			D3D.draw();
@@ -117,7 +123,7 @@ HRESULT InitWindow( HINSTANCE hInstance, int nCmdShow )
 
 	// Create window
 	 
-	RECT rc = { 0, 0, 800, 800 };
+	RECT rc = { 0, 0, WIDTH, HEIGHT };
 	AdjustWindowRect( &rc, WS_OVERLAPPEDWINDOW, FALSE );
 	
 	if(!(g_hWnd = CreateWindow(

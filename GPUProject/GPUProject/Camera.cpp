@@ -32,6 +32,36 @@ void Camera::update()
 
 	XMMATRIX mView = XMMatrixLookAtLH(vPos, vLookAt, vUp);
 	XMStoreFloat4x4(&m_view, mView);
+
+
+	if(GetAsyncKeyState('W'))
+	{
+		XMVECTOR pos = XMLoadFloat4(&m_pos) + (XMLoadFloat4(&m_look)*m_speed);
+		XMStoreFloat4(&m_pos, pos);
+	}
+	if (GetAsyncKeyState('S'))
+	{
+		XMVECTOR pos = XMLoadFloat4(&m_pos) + (XMLoadFloat4(&m_look)*-m_speed);
+		XMStoreFloat4(&m_pos, pos);
+	}
+	if (GetAsyncKeyState('A'))
+	{
+		XMVECTOR pos = XMLoadFloat4(&m_pos) + (XMLoadFloat4(&m_right)*-m_speed);
+		XMStoreFloat4(&m_pos, pos);
+	}
+	if (GetAsyncKeyState('D'))
+	{
+		XMVECTOR pos = XMLoadFloat4(&m_pos) + (XMLoadFloat4(&m_right)*m_speed);
+		XMStoreFloat4(&m_pos, pos);
+	}
+	if (GetAsyncKeyState(VK_SPACE))
+	{
+		m_pos.y += m_up.y * m_speed;
+	}
+	if (GetAsyncKeyState(VK_SHIFT))
+	{
+		m_pos.y -= m_up.y * m_speed;
+	}
 }
 
 void Camera::setPosition(XMVECTOR p_pos)

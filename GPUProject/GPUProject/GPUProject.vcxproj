@@ -89,6 +89,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="ComputeHelp.h" />
+    <ClInclude Include="Constants.h" />
     <ClInclude Include="D3DTimer.h" />
     <ClInclude Include="Direct3D.h" />
     <ClInclude Include="Input.h" />

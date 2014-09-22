@@ -52,34 +52,6 @@ void Input::update(LPARAM lParam)
 
 	RAWINPUT* raw = (RAWINPUT*)lpb;
 
-	if(raw->header.dwType == RIM_TYPEKEYBOARD)
-	{
-		USHORT keyCode = raw->data.keyboard.VKey;
-		switch(keyCode)
-		{
-			case 'W':
-				m_pCamera->moveForeward();
-				break;
-			case 'S':
-				m_pCamera->moveBackward();
-				break;
-			case 'A':
-				m_pCamera->moveLeft();
-				break;
-			case 'D':
-				m_pCamera->moveRight();
-				break;
-			case 17:
-				m_pCamera->moveDown();
-				break;
-			case VK_SPACE:
-				m_pCamera->moveUp();
-				break;
-	
-		}
-		
-	}
-
 	if(raw->header.dwType == RIM_TYPEMOUSE)
 	{
 		raw->data.mouse.usFlags = MOUSE_MOVE_RELATIVE;

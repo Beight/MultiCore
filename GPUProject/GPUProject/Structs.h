@@ -1,7 +1,7 @@
 #pragma once
 #define NROFTRIANGLES 12
 #define NROFLIGHTS 10
-#define CUBESIZE 16
+#define CUBESIZE 32
 #include "stdafx.h"
 
 struct Ray
