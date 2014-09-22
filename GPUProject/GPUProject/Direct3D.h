@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "Mesh.h"
 #include "Structs.h"
+#include "DataTable.h"
 
 class Direct3D
 {
@@ -60,7 +61,7 @@ private:
 	ComputeBuffer				*m_HitDataBuffer;
 	ComputeBuffer				*m_FinalColorBuffer;
 	FirstPassConstBuffer		m_FirstPassStruct;
-
+	DataTable					m_DataTable;
 
 };
 

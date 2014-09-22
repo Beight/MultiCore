@@ -303,6 +303,13 @@ void Direct3D::init(Input *p_pInput)
 	m_materialBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(Material2), 1, true, false, &m_mesh.getMaterial2(), false, 0);
 
 	m_FirstPassStruct.firstPass = 1;
+
+
+	std::vector<std::string> headers;
+	headers.push_back("Primary Ray Stage");
+	headers.push_back("Intersection Stage");
+	headers.push_back("Color Stage");
+	m_DataTable = DataTable(headers);
 }
 
 void Direct3D::update(float dt)
@@ -353,6 +360,8 @@ void Direct3D::draw()
 	m_PrimaryShader->Unset();	
 	m_DeviceContext->CSSetUnorderedAccessViews(0,1, clearuav, 0);
 
+	m_Timer->GetTime();
+
 	int NrBounces = 4;
 	for(int i = 0; i < NrBounces; i++)
 	{
@@ -366,11 +375,11 @@ void Direct3D::draw()
 											};
 
 		m_DeviceContext->CSSetShaderResources(0, 2, srv);
-
+		
 		m_IntersectionShader->Set();
-
+		m_Timer->Start();
 		m_DeviceContext->Dispatch(25, 25, 1);
-
+		m_Timer->Stop();
 		m_IntersectionShader->Unset();
 		m_DeviceContext->CSSetUnorderedAccessViews(0,2, clearuav, 0);
 		m_DeviceContext->CSSetShaderResources(0,2, clearsrv);
@@ -381,9 +390,9 @@ void Direct3D::draw()
 		m_DeviceContext->CSSetUnorderedAccessViews(0, 2, uav, 0);
 		m_DeviceContext->CSSetShaderResources(0, 3, ColorSRV);
 		m_ColorShader->Set();
-
+		m_Timer->Start();
 		m_DeviceContext->Dispatch(25, 25, 1);
-
+		m_Timer->Stop();
 		m_ColorShader->Unset();
 		m_DeviceContext->CSSetUnorderedAccessViews(0,2, clearuav, 0);
 		m_DeviceContext->CSSetShaderResources(0,3, clearsrv);

@@ -81,6 +81,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ComputeHelp.cpp" />
     <ClCompile Include="D3DTimer.cpp" />
+    <ClCompile Include="DataTable.cpp" />
     <ClCompile Include="Direct3D.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -91,6 +92,7 @@
     <ClInclude Include="ComputeHelp.h" />
     <ClInclude Include="Constants.h" />
     <ClInclude Include="D3DTimer.h" />
+    <ClInclude Include="DataTable.h" />
     <ClInclude Include="Direct3D.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Mesh.h" />
