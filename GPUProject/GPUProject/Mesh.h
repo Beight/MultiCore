@@ -1,5 +1,4 @@
-#ifndef MESH_H
-#define MESH_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -79,5 +78,3 @@ private:
 	std::vector<Triangle> m_meshTriangles;
 
 };
-
-#endif //

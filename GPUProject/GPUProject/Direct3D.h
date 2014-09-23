@@ -2,6 +2,7 @@
 #define _DIRECT3D__H
 
 #include <memory>
+#include <cstdlib>
 #include "D3DTimer.h"
 #include "ComputeHelp.h"
 #include "Input.h"
@@ -42,6 +43,7 @@ private:
 	ComputeShader				*m_ColorShader;
 	int							m_Width;
 	int							m_Height;
+	int							m_Row;
 	D3DTimer					*m_Timer;
 	Input						*m_pInput;
 	float						m_fps;
@@ -62,7 +64,6 @@ private:
 	ComputeBuffer				*m_FinalColorBuffer;
 	FirstPassConstBuffer		m_FirstPassStruct;
 	DataTable					m_DataTable;
-
 };
 
 

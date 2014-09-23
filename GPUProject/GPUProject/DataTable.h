@@ -13,6 +13,7 @@ private:
 
 public:
 	DataTable(const std::vector<std::string>& p_Headers);
+	DataTable(){};
 	void recordValue(unsigned int p_Column, unsigned int p_Row, std::string p_Value);
-	void DataTable::printCSV(std::ostream& p_Out)
+	void DataTable::printCSV(std::ostream& p_Out);
 };

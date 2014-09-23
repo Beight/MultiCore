@@ -27,6 +27,7 @@ Direct3D::Direct3D(HWND p_hwnd)
 	m_FirstPassCBuffer(nullptr),
 	m_Height(0),
 	m_Width(0),
+	m_Row(0),
 	m_IVP(XMFLOAT4X4()),
 	m_lightList(),
 	m_meshTexture(nullptr),
@@ -266,24 +267,13 @@ void Direct3D::init(Input *p_pInput)
 //Light
 ///////////////////////////////////////////////////////////////////////////////////////////
 
-	//Staticly adding light pos
-	m_lightList[0].pos = XMFLOAT4(0.f,	0.f, -2000.f, 1.f);
-	m_lightList[1].pos = XMFLOAT4(10.f, 10.f, -20.f, 1.f);
-	m_lightList[2].pos = XMFLOAT4(10.f, -10.f, -20.f, 1.f);
-
-	//Spinning outside
-	m_lightList[3].pos = XMFLOAT4(-10.f, 10.f, -20.f, 1.f);
-	m_lightList[4].pos = XMFLOAT4(0.f,	-5.f, -50.f, 1.f);
-	m_lightList[5].pos = XMFLOAT4(25.f, 5.f, -50.f, 1.f); 
-
-	//Extra light inside
-	m_lightList[6].pos = XMFLOAT4(30.f, 0.f, -50.f, 1.f);
-	m_lightList[7].pos = XMFLOAT4(-5.f, 30.f,	-50.f, 1.f);
-	m_lightList[8].pos = XMFLOAT4(0.f,	-30.f, -50.f, 1.f);
-	m_lightList[9].pos = XMFLOAT4(-30.f, 0.f,	-50.f, 1.f);
-
+	std::srand(10);
 	for(int i = 0; i < NROFLIGHTS; i++)
 	{
+		float rx = ((float)(std::rand() %  64)) - 32;
+		float ry = ((float)(std::rand() %  64)) - 32;
+		float rz = ((float)(std::rand() %  64)) - 32;
+		m_lightList[i].pos		= XMFLOAT4( rx,	ry, rz, 1.f);
 		m_lightList[i].ambient  = XMFLOAT4(0.15f, 0.15f, 0.15f, 1.f);
 		m_lightList[i].diffuse  = XMFLOAT4(0.15f, 0.15f, 0.15f, 1.f);
 		m_lightList[i].range	= 75.f;
@@ -333,7 +323,7 @@ void Direct3D::update(float dt)
 	if(m_time - t_base >= 1.f)
 	{
 		frameCnt /= 1;
-		m_fps = frameCnt;
+		m_fps = (float)frameCnt;
 		frameCnt = 0;
 		t_base += 1.f;
 	}
@@ -356,14 +346,19 @@ void Direct3D::draw()
 	m_PrimaryShader->Set();
 	m_Timer->Start();
 	m_DeviceContext->Dispatch(25, 25, 1);
+	m_DeviceContext->Flush();
 	m_Timer->Stop();
 	m_PrimaryShader->Unset();	
 	m_DeviceContext->CSSetUnorderedAccessViews(0,1, clearuav, 0);
 
-	m_Timer->GetTime();
+	m_DataTable.recordValue(0, m_Row, std::to_string(m_Timer->GetTime()));
 
-	int NrBounces = 4;
-	for(int i = 0; i < NrBounces; i++)
+	
+	double intersectionTime = 0.0;
+	double colorTime = 0.0;
+
+	//int NrBounces = NROFBOUNCES;
+	for(int i = 0; i < NROFBOUNCES+1; i++)
 	{
 		//Intersection
 		m_DeviceContext->UpdateSubresource(m_FirstPassCBuffer, 0, 0, &m_FirstPassStruct, 0, 0);
@@ -379,11 +374,15 @@ void Direct3D::draw()
 		m_IntersectionShader->Set();
 		m_Timer->Start();
 		m_DeviceContext->Dispatch(25, 25, 1);
+		m_DeviceContext->Flush();
 		m_Timer->Stop();
 		m_IntersectionShader->Unset();
 		m_DeviceContext->CSSetUnorderedAccessViews(0,2, clearuav, 0);
 		m_DeviceContext->CSSetShaderResources(0,2, clearsrv);
 		
+		intersectionTime += m_Timer->GetTime();
+
+
 		//Color
 		ID3D11Buffer *CCB[] = {m_ColorCBuffer, m_FirstPassCBuffer};
 		m_DeviceContext->CSSetConstantBuffers(0, 2, CCB);
@@ -392,10 +391,14 @@ void Direct3D::draw()
 		m_ColorShader->Set();
 		m_Timer->Start();
 		m_DeviceContext->Dispatch(25, 25, 1);
+		m_DeviceContext->Flush();
 		m_Timer->Stop();
 		m_ColorShader->Unset();
 		m_DeviceContext->CSSetUnorderedAccessViews(0,2, clearuav, 0);
 		m_DeviceContext->CSSetShaderResources(0,3, clearsrv);
+
+		colorTime += m_Timer->GetTime();
+
 
 		if(m_FirstPassStruct.firstPass == 1)
 		{
@@ -404,6 +407,10 @@ void Direct3D::draw()
 			
 		}
 	}
+
+	m_DataTable.recordValue(1, m_Row, std::to_string(intersectionTime/((double)NROFBOUNCES+1.0)));
+	m_DataTable.recordValue(2, m_Row, std::to_string(colorTime/((double)NROFBOUNCES+1.0)));
+	m_Row++;
 
 	if(FAILED(m_SwapChain->Present( 0, 0 )))
 		return;
@@ -521,6 +528,7 @@ void Direct3D::updateConstantBuffers()
 
 void Direct3D::release()
 {
+	m_DataTable.printCSV(std::ofstream("TimeTable.csv"));
 	SAFE_RELEASE(m_BackBufferUAV);
 	SAFE_RELEASE(m_cBuffer);
 	SAFE_RELEASE(m_PrimaryCBuffer);

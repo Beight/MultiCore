@@ -123,7 +123,7 @@ HRESULT InitWindow( HINSTANCE hInstance, int nCmdShow )
 
 	// Create window
 	 
-	RECT rc = { 0, 0, WIDTH, HEIGHT };
+	RECT rc = { 0, 0, (LONG)WIDTH, (LONG)HEIGHT };
 	AdjustWindowRect( &rc, WS_OVERLAPPEDWINDOW, FALSE );
 	
 	if(!(g_hWnd = CreateWindow(
