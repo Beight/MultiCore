@@ -99,7 +99,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 			final += color;
 		}
 
-		FinalColorBuffer[index] += float4(final, 1.f)* hd.rayPower;
+		FinalColorBuffer[index] += float4(final, 0.f) * hd.rayPower * (1.f - REFLECTIVITY);
 
 		Output[threadID.xy] = saturate(FinalColorBuffer[index]);
 	}

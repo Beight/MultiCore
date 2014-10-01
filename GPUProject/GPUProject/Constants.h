@@ -9,5 +9,6 @@ static const float WIDTH = 800.0f;
 static const float HEIGHT= 800.0f;
 #define NROFLIGHTS 10
 #define NROFBOUNCES 3
+#define REFLECTIVITY 0.5f
 
 #endif 

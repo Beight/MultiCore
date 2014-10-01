@@ -117,7 +117,8 @@ void main( uint3 threadID : SV_DispatchThreadID )
 		r.origin = hd.pos;
 		r.direction = bounceDir;
 		Rays[index] = r;
-		Output[index].rayPower *= 0.7f;
+		if(firstpass != 1)
+		Output[index].rayPower *= REFLECTIVITY;
 	}
 }
 
