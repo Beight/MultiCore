@@ -16,7 +16,7 @@ static const float HEIGHT= 768.0f;
 
 #define THREADGROUPSX 256
 #define THREADGROUPSY 192
-#define	THREADGROUPSZ 64
+#define	THREADGROUPSZ 1
 
 #define NUMTHREADSX 4
 #define NUMTHREADSY 4

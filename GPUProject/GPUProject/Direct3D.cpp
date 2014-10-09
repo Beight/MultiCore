@@ -155,8 +155,8 @@ void Direct3D::init(Input *p_pInput)
 //Camera
 ///////////////////////////////////////////////////////////////////////////////////////////
 	m_pCamera = std::shared_ptr<Camera>(new Camera);
-	XMVECTOR cameraPos = XMVectorSet(0.f, 0.f, -10.f, 0.f);
-	XMVECTOR cameraDir = XMVectorSet(0.f, 0.f, 1.f, 0.f);
+	XMVECTOR cameraPos = XMVectorSet(-10.f, 10.f, -10.f, 0.f);
+	XMVECTOR cameraDir = XMVectorSet(1.f, -1.f, 1.f, 0.f);
 	XMVECTOR cameraUp = XMVectorSet(0.f, 1.f, 0.f, 0.f);
 	m_pCamera->init(cameraPos, cameraUp, cameraDir, (float)m_Width, (float)m_Height);
 
