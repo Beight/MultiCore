@@ -44,7 +44,7 @@ void main( uint3 threadID : SV_DispatchThreadID )
 		float3 final = float3(0.f, 0.f, 0.f);
 
 		/// ## NUMBER OF LIGHTS ## //
-		for(int i = 0; i < g_NrofLights; i++)
+		for(int i = 0; i < NROFLIGHTS; i++)
 		{	
 			float3 color = float3(0.0f, 0.0f, 0.0f);
 			Ray lightRay;

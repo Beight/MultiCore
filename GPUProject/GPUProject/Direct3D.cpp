@@ -329,36 +329,6 @@ void Direct3D::update(float dt)
 		t_base += 1.f;
 	}
 
-	if(GetAsyncKeyState('1'))
-	{
-		g_NrofLights = 1;
-	}
-	if(GetAsyncKeyState('2'))
-	{
-		g_NrofLights = 5;
-	}
-	if(GetAsyncKeyState('3'))
-	{
-		g_NrofLights = 10;
-	}
-
-	if(GetAsyncKeyState('4'))
-	{
-		g_NrofBounces = 0;
-	}
-	if(GetAsyncKeyState('5'))
-	{
-		g_NrofBounces = 1;
-	}
-	if(GetAsyncKeyState('6'))
-	{
-		g_NrofBounces = 5;
-	}
-	if(GetAsyncKeyState('7'))
-	{
-		g_NrofBounces = 10;
-	}
-
 	updateConstantBuffers();
 }
 
@@ -389,7 +359,7 @@ void Direct3D::draw()
 	double colorTime = 0.0;
 
 	//int NrBounces = NROFBOUNCES;
-	for(int i = 0; i < g_NrofBounces+1; i++)
+	for(int i = 0; i < NROFBOUNCES+1; i++)
 	{
 		//Intersection
 		m_DeviceContext->UpdateSubresource(m_FirstPassCBuffer, 0, 0, &m_FirstPassStruct, 0, 0);
@@ -439,8 +409,8 @@ void Direct3D::draw()
 		}
 	}
 
-	m_DataTable.recordValue(1, m_Row, std::to_string(intersectionTime/((double)g_NrofBounces+1.0)));
-	m_DataTable.recordValue(2, m_Row, std::to_string(colorTime/((double)g_NrofBounces+1.0)));
+	m_DataTable.recordValue(1, m_Row, std::to_string(intersectionTime/((double)NROFBOUNCES+1.0)));
+	m_DataTable.recordValue(2, m_Row, std::to_string(colorTime/((double)NROFBOUNCES+1.0)));
 	m_Row++;
 
 	if(FAILED(m_SwapChain->Present( 0, 0 )))
