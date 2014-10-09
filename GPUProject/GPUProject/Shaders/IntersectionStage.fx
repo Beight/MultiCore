@@ -27,7 +27,7 @@ cbuffer FirstPass : register (b1)
 
 
 
-[numthreads(32, 32, 1)]
+[numthreads(NUMTHREADSX, NUMTHREADSY, NUMTHREADSZ)]
 void main( uint3 threadID : SV_DispatchThreadID )
 {
 	int index = threadID.x + (threadID.y * WIDTH);

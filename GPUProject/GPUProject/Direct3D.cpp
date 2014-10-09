@@ -40,7 +40,8 @@ Direct3D::Direct3D(HWND p_hwnd)
 	m_view(XMFLOAT4X4()),
 	m_proj(XMFLOAT4X4()),
 	m_FirstPassStruct()
-{}
+{
+}
 
 Direct3D::~Direct3D()
 {
@@ -274,7 +275,7 @@ void Direct3D::init(Input *p_pInput)
 		float ry = ((float)(std::rand() %  64)) - 32;
 		float rz = ((float)(std::rand() %  64)) - 32;
 		m_lightList[i].pos		= XMFLOAT4( rx,	ry, rz, 1.f);
-		m_lightList[i].ambient  = XMFLOAT4(0.15f, 0.15f, 0.15f, 1.f);
+		m_lightList[i].ambient  = XMFLOAT4(0.5f, 0.5f, 0.5f, 1.f);
 		m_lightList[i].diffuse  = XMFLOAT4(0.15f, 0.15f, 0.15f, 1.f);
 		m_lightList[i].range	= 75.f;
 		m_lightList[i].pad		= XMFLOAT3(0.f, 0.f, 0.f);
@@ -328,6 +329,36 @@ void Direct3D::update(float dt)
 		t_base += 1.f;
 	}
 
+	if(GetAsyncKeyState('1'))
+	{
+		g_NrofLights = 1;
+	}
+	if(GetAsyncKeyState('2'))
+	{
+		g_NrofLights = 5;
+	}
+	if(GetAsyncKeyState('3'))
+	{
+		g_NrofLights = 10;
+	}
+
+	if(GetAsyncKeyState('4'))
+	{
+		g_NrofBounces = 0;
+	}
+	if(GetAsyncKeyState('5'))
+	{
+		g_NrofBounces = 1;
+	}
+	if(GetAsyncKeyState('6'))
+	{
+		g_NrofBounces = 5;
+	}
+	if(GetAsyncKeyState('7'))
+	{
+		g_NrofBounces = 10;
+	}
+
 	updateConstantBuffers();
 }
 
@@ -345,7 +376,7 @@ void Direct3D::draw()
 	m_DeviceContext->CSSetUnorderedAccessViews(0, 1, RayUAV, 0);
 	m_PrimaryShader->Set();
 	m_Timer->Start();
-	m_DeviceContext->Dispatch(25, 25, 1);
+	m_DeviceContext->Dispatch(THREADGROUPSX, THREADGROUPSY, THREADGROUPSZ);
 	m_DeviceContext->Flush();
 	m_Timer->Stop();
 	m_PrimaryShader->Unset();	
@@ -358,7 +389,7 @@ void Direct3D::draw()
 	double colorTime = 0.0;
 
 	//int NrBounces = NROFBOUNCES;
-	for(int i = 0; i < NROFBOUNCES+1; i++)
+	for(int i = 0; i < g_NrofBounces+1; i++)
 	{
 		//Intersection
 		m_DeviceContext->UpdateSubresource(m_FirstPassCBuffer, 0, 0, &m_FirstPassStruct, 0, 0);
@@ -373,7 +404,7 @@ void Direct3D::draw()
 		
 		m_IntersectionShader->Set();
 		m_Timer->Start();
-		m_DeviceContext->Dispatch(25, 25, 1);
+		m_DeviceContext->Dispatch(THREADGROUPSX, THREADGROUPSY, THREADGROUPSZ);
 		m_DeviceContext->Flush();
 		m_Timer->Stop();
 		m_IntersectionShader->Unset();
@@ -390,7 +421,7 @@ void Direct3D::draw()
 		m_DeviceContext->CSSetShaderResources(0, 3, ColorSRV);
 		m_ColorShader->Set();
 		m_Timer->Start();
-		m_DeviceContext->Dispatch(25, 25, 1);
+		m_DeviceContext->Dispatch(THREADGROUPSX, THREADGROUPSY, THREADGROUPSZ);
 		m_DeviceContext->Flush();
 		m_Timer->Stop();
 		m_ColorShader->Unset();
@@ -408,8 +439,8 @@ void Direct3D::draw()
 		}
 	}
 
-	m_DataTable.recordValue(1, m_Row, std::to_string(intersectionTime/((double)NROFBOUNCES+1.0)));
-	m_DataTable.recordValue(2, m_Row, std::to_string(colorTime/((double)NROFBOUNCES+1.0)));
+	m_DataTable.recordValue(1, m_Row, std::to_string(intersectionTime/((double)g_NrofBounces+1.0)));
+	m_DataTable.recordValue(2, m_Row, std::to_string(colorTime/((double)g_NrofBounces+1.0)));
 	m_Row++;
 
 	if(FAILED(m_SwapChain->Present( 0, 0 )))

@@ -1,0 +1,188 @@
+Test Res 800X800
+
+Test numBounces
+--------------------------------
+VARIABLES
+numTG(25,25,1); numTs(32,32,1)
+numB: 0
+numL: 1
+triangles(12 + 12)
+Sphere: 1
+---------
+TIME
+average PrimaryStage:
+average IntersectionStage:
+average ColorStage:
+--------------------------------
+
+--------------------------------
+VARIABLES
+numTG(25,25,1); numTs(32,32,1)
+numB: 1
+numL: 1
+triangles(12 + 12)
+Sphere: 1
+---------
+TIME
+average PrimaryStage:
+average IntersectionStage:
+average ColorStage:
+--------------------------------
+
+--------------------------------
+VARIABLES
+numTG(25,25,1); numTs(32,32,1)
+numB: 5
+numL: 1
+triangles(12 + 12)
+Sphere: 1
+---------
+TIME
+average PrimaryStage:
+average IntersectionStage:
+average ColorStage:
+--------------------------------
+
+/Test numLights
+--------------------------------
+VARIABLES
+numTG(25,25,1); numTs(32,32,1)
+numB: 10
+numL: 1
+triangles(12 + 12)
+Sphere: 1
+---------
+TIME
+average PrimaryStage:
+average IntersectionStage:
+average ColorStage:
+--------------------------------
+
+--------------------------------
+VARIABLES
+numTG(25,25,1); numTs(32,32,1)
+numB: 10
+numL: 5
+triangles(12 + 12)
+Sphere: 1
+---------
+TIME
+average PrimaryStage:
+average IntersectionStage:
+average ColorStage:
+--------------------------------
+
+--------------------------------
+VARIABLES
+numTG(25,25,1); numTs(32,32,1)
+numB: 10
+numL: 10
+triangles(12 + 12)
+Sphere: 1
+---------
+TIME
+average PrimaryStage:
+average IntersectionStage:
+average ColorStage:
+--------------------------------
+
+Test numTriangles
+--------------------------------
+VARIABLES
+numTG(25,25,1); numTs(32,32,1)
+numB: 5
+numL: 5
+triangles(12 + 12)
+Sphere: 1
+---------
+TIME
+average PrimaryStage:
+average IntersectionStage:
+average ColorStage:
+--------------------------------
+
+--------------------------------
+VARIABLES
+numTG(25,25,1); numTs(32,32,1)
+numB: 5
+numL: 5
+triangles(12 + 24)
+Sphere: 1
+---------
+TIME
+average PrimaryStage:
+average IntersectionStage:
+average ColorStage:
+--------------------------------
+
+--------------------------------
+VARIABLES
+numTG(25,25,1); numTs(32,32,1)
+numB: 5
+numL: 5
+triangles(12 + 48)
+Sphere: 1
+---------
+TIME
+average PrimaryStage:
+average IntersectionStage:
+average ColorStage:
+--------------------------------
+
+Test Threads
+--------------------------------
+VARIABLES
+numTG(25,25,1); numTs(32,32,1)
+numB: 5
+numL: 5
+triangles(12 + 12)
+Sphere: 1
+---------
+TIME
+average PrimaryStage:
+average IntersectionStage:
+average ColorStage:
+--------------------------------
+
+--------------------------------
+VARIABLES
+numTG(50,50,1); numTs(16,16,1)
+numB: 5
+numL: 5
+triangles(12 + 12)
+Sphere: 1
+---------
+TIME
+average PrimaryStage:
+average IntersectionStage:
+average ColorStage:
+--------------------------------
+
+--------------------------------
+VARIABLES
+numTG(100,100,1); numTs(8,8,1)
+numB: 5
+numL: 5
+triangles(12 + 12)
+Sphere: 1
+---------
+TIME
+average PrimaryStage:
+average IntersectionStage:
+average ColorStage:
+--------------------------------
+
+--------------------------------
+VARIABLES
+numTG(400,400,1); numTs(2,2,1)
+numB: 5
+numL: 5
+triangles(12 + 12)
+Sphere: 1
+---------
+TIME
+average PrimaryStage:
+average IntersectionStage:
+average ColorStage:
+--------------------------------
+

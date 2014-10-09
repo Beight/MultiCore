@@ -16,7 +16,7 @@ cbuffer ConstBuffer
 };
 
 
-[numthreads(32, 32, 1)]
+[numthreads(NUMTHREADSX, NUMTHREADSY, NUMTHREADSZ)]
 void main( uint3 threadID : SV_DispatchThreadID )
 {
 	Ray r;
