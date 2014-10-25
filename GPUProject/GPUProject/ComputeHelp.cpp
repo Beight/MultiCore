@@ -11,7 +11,7 @@
 #endif
 
 ComputeShader::ComputeShader()
-	: mD3DDevice(nullptr), mD3DDeviceContext(nullptr)
+	: mD3DDevice(nullptr), mD3DDeviceContext(nullptr), mShader(nullptr)
 {
 
 }

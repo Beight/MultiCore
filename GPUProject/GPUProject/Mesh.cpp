@@ -179,12 +179,7 @@ void Mesh::loadMaterial(string filename)
 	file.close();
 }
 
-vector<Triangle>* Mesh::getTriangles()
-{
-	return &m_meshTriangles;
-}
-
-Triangle* Mesh::getTriangles2()
+Triangle* Mesh::getTriangles()
 {
 	return &m_meshTriangles[0];
 }

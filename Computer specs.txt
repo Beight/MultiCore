@@ -1,0 +1,8 @@
+Intel core i7-3770 3.40 ghz
+16 GB RAM
+
+AMD Sapphire Radeon HD 6950
+Memory: GDDR5 2GB
+Memory clock: 1250MHz
+Core clock: 800MHz
+Driver: Catalyst 14.9

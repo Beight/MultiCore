@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "Constants.h"
 #include "Direct3D.h"
 #include "Input.h"

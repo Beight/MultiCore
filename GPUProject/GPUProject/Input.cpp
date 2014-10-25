@@ -4,8 +4,7 @@
 Input::Input() :
 	m_pCamera(nullptr),
 	m_mouseX(0.f),
-	m_mouseY(0.f),
-	m_rid()
+	m_mouseY(0.f)
 {
 
 }
@@ -55,8 +54,8 @@ void Input::update(LPARAM lParam)
 	if(raw->header.dwType == RIM_TYPEMOUSE)
 	{
 		raw->data.mouse.usFlags = MOUSE_MOVE_RELATIVE;
-		m_mouseX = raw->data.mouse.lLastX;
-		m_mouseY = raw->data.mouse.lLastY;
+		m_mouseX = (float)raw->data.mouse.lLastX;
+		m_mouseY = (float)raw->data.mouse.lLastY;
 		m_pCamera->moveDirection(-m_mouseX, m_mouseY);
 	}
 	delete raw;

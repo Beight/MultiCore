@@ -31,11 +31,9 @@ Direct3D::Direct3D(HWND p_hwnd)
 	m_IVP(XMFLOAT4X4()),
 	m_lightList(),
 	m_meshTexture(nullptr),
-	m_meshTri(Triangle()),
 	m_pCamera(nullptr),
 	m_pInput(nullptr),
 	m_sphere(Sphere()),
-	m_spherel0(Sphere()),
 	m_triangles(),
 	m_view(XMFLOAT4X4()),
 	m_proj(XMFLOAT4X4()),
@@ -141,9 +139,9 @@ void Direct3D::init(Input *p_pInput)
 	m_ComputeSys = new ComputeWrap(m_Device, m_DeviceContext);
 	m_Timer = new D3DTimer(m_Device, m_DeviceContext);
 
-	m_PrimaryShader = m_ComputeSys->CreateComputeShader(_T("Shaders/PrimaryRayStage.fx"), NULL, "main", NULL);
-	m_IntersectionShader = m_ComputeSys->CreateComputeShader(_T("Shaders/IntersectionStage.fx"), NULL, "main", NULL);
-	m_ColorShader = m_ComputeSys->CreateComputeShader(_T("Shaders/ColorStage.fx"), NULL, "main", NULL);
+	m_PrimaryShader = m_ComputeSys->CreateComputeShader("shaders/primaryraystage.fx", NULL, "main", NULL);
+	m_IntersectionShader = m_ComputeSys->CreateComputeShader("shaders/intersectionstage.fx", NULL, "main", NULL);
+	m_ColorShader = m_ComputeSys->CreateComputeShader("shaders/colorstage.fx", NULL, "main", NULL);
 
 	m_RayBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(Ray), m_Width*m_Height, true, true, nullptr, true, "Structured Buffer: RayBuffer");
 	m_HitDataBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(HitData), m_Width*m_Height, true, true, nullptr, true, "Structured Buffer: HitDataBuffer");
@@ -287,7 +285,7 @@ void Direct3D::init(Input *p_pInput)
 ///////////////////////////////////////////////////////////////////////////////////////////
 	m_mesh.loadObj("Meshi/kub.obj");
 
-	m_meshBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(Triangle), m_mesh.getFaces(), true, false, m_mesh.getTriangles2(), false, "Structured Buffer: Mesh Texture");
+	m_meshBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(Triangle), m_mesh.getFaces(), true, false, m_mesh.getTriangles(), false, "Structured Buffer: Mesh Texture");
 	
 	D3DX11CreateShaderResourceViewFromFile(m_Device, m_mesh.getMaterial()->map_Kd.c_str(), NULL, NULL, &m_meshTexture, &hr);
 
@@ -423,8 +421,8 @@ void Direct3D::draw()
 	sprintf_s(
 		title,
 		sizeof(title),
-		"DirectCompute DEMO - Dispatch time: %f. CameraPos X: %f, Y: %f, Z: %f, fps: %f",
-		m_Timer->GetTime(), camPos.x, camPos.y, camPos.z, m_fps
+		"DirectCompute DEMO - Dispatch time: %f. fps: %f",
+		m_Timer->GetTime(), m_fps
 	);
 	SetWindowText(m_hWnd, title);
 }

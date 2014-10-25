@@ -10,9 +10,9 @@ triangles(12 + 12)
 Sphere: 1
 ---------
 TIME
-average PrimaryStage:
-average IntersectionStage:
-average ColorStage:
+average PrimaryStage: 0,24266
+average IntersectionStage: 2,4046
+average ColorStage: 3,06487
 --------------------------------
 
 --------------------------------
@@ -24,9 +24,9 @@ triangles(12 + 12)
 Sphere: 1
 ---------
 TIME
-average PrimaryStage:
-average IntersectionStage:
-average ColorStage:
+average PrimaryStage: 0,24273
+average IntersectionStage: 2,44528
+average ColorStage: 3,05162
 --------------------------------
 
 --------------------------------
@@ -38,9 +38,9 @@ triangles(12 + 12)
 Sphere: 1
 ---------
 TIME
-average PrimaryStage:
-average IntersectionStage:
-average ColorStage:
+average PrimaryStage: 0,24314
+average IntersectionStage: 2,4766
+average ColorStage: 3,05668
 --------------------------------
 
 /Test numLights
@@ -53,9 +53,9 @@ triangles(12 + 12)
 Sphere: 1
 ---------
 TIME
-average PrimaryStage:
-average IntersectionStage:
-average ColorStage:
+average PrimaryStage: 0,24305
+average IntersectionStage: 2,50405
+average ColorStage: 3,07263
 --------------------------------
 
 --------------------------------
@@ -67,9 +67,9 @@ triangles(12 + 12)
 Sphere: 1
 ---------
 TIME
-average PrimaryStage:
-average IntersectionStage:
-average ColorStage:
+average PrimaryStage: 0,24312
+average IntersectionStage: 2,50016
+average ColorStage: 170,50801
 --------------------------------
 
 --------------------------------
@@ -81,9 +81,9 @@ triangles(12 + 12)
 Sphere: 1
 ---------
 TIME
-average PrimaryStage:
-average IntersectionStage:
-average ColorStage:
+average PrimaryStage: 0,24377
+average IntersectionStage: 2,5021
+average ColorStage: 341,14951
 --------------------------------
 
 Test numTriangles
@@ -139,9 +139,9 @@ triangles(12 + 12)
 Sphere: 1
 ---------
 TIME
-average PrimaryStage:
-average IntersectionStage:
-average ColorStage:
+average PrimaryStage: 0,24325
+average IntersectionStage: 2,47825
+average ColorStage: 169,16201
 --------------------------------
 
 --------------------------------
@@ -153,9 +153,9 @@ triangles(12 + 12)
 Sphere: 1
 ---------
 TIME
-average PrimaryStage:
-average IntersectionStage:
-average ColorStage:
+average PrimaryStage: 0,25129
+average IntersectionStage: 2,33916
+average ColorStage: 9,8997
 --------------------------------
 
 --------------------------------
@@ -167,9 +167,9 @@ triangles(12 + 12)
 Sphere: 1
 ---------
 TIME
-average PrimaryStage:
-average IntersectionStage:
-average ColorStage:
+average PrimaryStage: 0,21693
+average IntersectionStage: 2,67515
+average ColorStage: 10,15618
 --------------------------------
 
 --------------------------------
@@ -181,8 +181,8 @@ triangles(12 + 12)
 Sphere: 1
 ---------
 TIME
-average PrimaryStage:
-average IntersectionStage:
-average ColorStage:
+average PrimaryStage: 1,63729
+average IntersectionStage: 36,52415
+average ColorStage: 155,42276
 --------------------------------
 

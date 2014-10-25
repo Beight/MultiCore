@@ -1,5 +1,4 @@
-#ifndef _DIRECT3D__H
-#define _DIRECT3D__H
+#pragma once
 
 #include <memory>
 #include <cstdlib>
@@ -49,8 +48,6 @@ private:
 	float						m_fps;
 	float						m_time;
 	Sphere						m_sphere;
-	Sphere						m_spherel0;
-	Triangle				m_meshTri;
 	Triangle					m_triangles[NROFTRIANGLES];	
 	XMFLOAT4X4					m_view;
 	XMFLOAT4X4					m_proj;
@@ -65,6 +62,3 @@ private:
 	FirstPassConstBuffer		m_FirstPassStruct;
 	DataTable					m_DataTable;
 };
-
-
-#endif

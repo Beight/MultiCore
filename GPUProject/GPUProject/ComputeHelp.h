@@ -1,19 +1,7 @@
 #pragma once
 
-#include <d3dcommon.h>
-#include <d3d11.h>
-#include <d3dcompiler.h>
-#include <d3dx11.h>
 #include <tchar.h>
-
-
-#ifndef SAFE_RELEASE
-#define SAFE_RELEASE(p)      { if (p) { (p)->Release(); (p)=nullptr; } }
-#endif
-
-#ifndef SAFE_DELETE
-#define SAFE_DELETE(p)      { if (p) { delete (p); (p)=nullptr; } }
-#endif
+#include "stdafx.h"
 
 enum COMPUTE_BUFFER_TYPE
 {

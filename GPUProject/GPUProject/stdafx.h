@@ -1,6 +1,6 @@
-#ifndef _STDAFX__H
-#define _STDAFX__H
+#pragma once
 
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <d3dcommon.h>
 #include <D3D11.h>
@@ -65,7 +65,3 @@ using namespace DirectX;
 #define myDumpMemoryLeaks()
 #endif 
 //////////////////////////////////////////////////////////////////////////
-
-
-
-#endif

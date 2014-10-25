@@ -1,9 +1,5 @@
-#ifndef _CAMERA__H
-#define _CAMERA__H
-
+#pragma once
 #include "stdafx.h"
-
-
 
 class Camera
 {
@@ -45,5 +41,3 @@ private:
 	void pitch(float p_radians);
 
 };
-
-#endif

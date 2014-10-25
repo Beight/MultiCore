@@ -1,5 +1,4 @@
-#ifndef _INPUT__H
-#define _INPUT__H
+#pragma once
 
 #include <Windows.h>
 #include <memory>
@@ -18,7 +17,3 @@ private:
 	float m_mouseY;
 	std::shared_ptr<Camera> m_pCamera;
 };
-
-
-
-#endif

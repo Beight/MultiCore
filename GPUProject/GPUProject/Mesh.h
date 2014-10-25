@@ -65,10 +65,9 @@ public:
 	~Mesh();
 	void init();
 	void loadObj(char* textFile);
-	std::vector<Triangle>* getTriangles();
 	Material* getMaterial();
 	int getFaces();
-	Triangle* getTriangles2();
+	Triangle* getTriangles();
 	Material2 getMaterial2();
 private:
 	int m_nrOfFaces;
