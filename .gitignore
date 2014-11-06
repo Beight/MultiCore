@@ -213,3 +213,4 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 GPUProject/GPUProject/*.csv
+GPUProject/GPUProject/logFile.txt

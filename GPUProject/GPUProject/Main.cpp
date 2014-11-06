@@ -1,7 +1,8 @@
 #include "Constants.h"
 #include "Direct3D.h"
 #include "Input.h"
-
+#include "Logger.h"
+#include <iostream>
 
 HWND				g_hWnd;
 Input				g_input;
@@ -11,11 +12,19 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 
 int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow )
 {
+	std::ofstream logFile("logFile.txt", std::ofstream::trunc);
+
+	Logger::addOutput(Logger::Level::DEBUG_L, logFile);
+	Logger::addOutput(Logger::Level::INFO, std::cout);
 
 	if( FAILED( InitWindow( hInstance, nCmdShow ) ) )
-		return 0;
+	{
+		Logger::log(Logger::Level::ERROR_L, "Initializing window failed!");
+		return -1;
+	}
 
 	Direct3D D3D(g_hWnd);
+	Logger::log(Logger::Level::INFO, "Initializing input...");
 	g_input = Input();
 
 	D3D.init(&g_input);
@@ -27,7 +36,7 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 
 	__int64 prevTimeStamp = 0;
 	QueryPerformanceCounter((LARGE_INTEGER*)&prevTimeStamp);
-
+	Logger::log(Logger::Level::INFO, "Initializing complete starting program");
 	// Main message loop
 	MSG msg = {0};
 	while(WM_QUIT != msg.message)
@@ -56,7 +65,7 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 	}
 
 	D3D.release();
-
+	logFile.close();
 	return (int) msg.wParam;
 }
 
@@ -103,6 +112,8 @@ LRESULT CALLBACK WndProc( HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam 
 
 HRESULT InitWindow( HINSTANCE hInstance, int nCmdShow )
 {
+	Logger::log(Logger::Level::INFO, "Initializing window...");
+
 	// Register class
 	WNDCLASSEX wcex;
 	wcex.cbSize = sizeof(WNDCLASSEX); 
@@ -142,6 +153,6 @@ HRESULT InitWindow( HINSTANCE hInstance, int nCmdShow )
 	}
 
 	ShowWindow( g_hWnd, nCmdShow );
-
+	
 	return S_OK;
 }

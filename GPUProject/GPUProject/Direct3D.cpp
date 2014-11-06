@@ -1,4 +1,5 @@
 #include "Direct3D.h"
+#include "Logger.h"
 
 Direct3D::Direct3D(HWND p_hwnd)
 	: m_hWnd(p_hwnd),
@@ -46,6 +47,8 @@ Direct3D::~Direct3D()
 
 void Direct3D::init(Input *p_pInput)
 {
+	Logger::log(Logger::Level::INFO, "Initializing Direct3D...");
+
 	HRESULT hr = S_OK;;
 	m_pInput = p_pInput;
 	
@@ -67,7 +70,6 @@ void Direct3D::init(Input *p_pInput)
 		D3D_DRIVER_TYPE_REFERENCE,
 	};
 	UINT numDriverTypes = sizeof(driverTypes) / sizeof(driverTypes[0]);
-
 	DXGI_SWAP_CHAIN_DESC sd;
 	ZeroMemory( &sd, sizeof(sd) );
 	sd.BufferCount = 1;
@@ -121,36 +123,48 @@ void Direct3D::init(Input *p_pInput)
 		}
 	}
 	if( FAILED(hr) )
+	{
+		Logger::log(Logger::Level::ERROR_L, "Initialization of Direct3D failed! Could not create Device and swapchain!" );
 		return;
+	}
 
 	//Create a render target view
 	ID3D11Texture2D* pBackBuffer;
 	hr = m_SwapChain->GetBuffer( 0, __uuidof( ID3D11Texture2D ), (LPVOID*)&pBackBuffer );
 	if( FAILED(hr) )
+	{
+		Logger::log(Logger::Level::ERROR_L, "Initialization of Direct3D failed! Could get buffer from swapchain!");
 		return;
+	}
 
 	// create shader unordered access view on back buffer for compute shader to write into texture
 	hr = m_Device->CreateUnorderedAccessView( pBackBuffer, NULL, &m_BackBufferUAV );
 	if( FAILED(hr) )
+	{
+		Logger::log(Logger::Level::ERROR_L, "Initialization of Direct3D failed! Could create UAV!");
 		return;
+	}
 
 	SAFE_RELEASE(pBackBuffer);
 	m_ComputeSys = new ComputeWrap(m_Device, m_DeviceContext);
 	m_Timer = new D3DTimer(m_Device, m_DeviceContext);
-
+	Logger::log(Logger::Level::INFO, "Initializing compute shaders...");
 	m_PrimaryShader = m_ComputeSys->CreateComputeShader("shaders/primaryraystage.fx", NULL, "main", NULL);
 	m_IntersectionShader = m_ComputeSys->CreateComputeShader("shaders/intersectionstage.fx", NULL, "main", NULL);
 	m_ColorShader = m_ComputeSys->CreateComputeShader("shaders/colorstage.fx", NULL, "main", NULL);
 
+	Logger::log(Logger::Level::INFO, "Initializing structured buffers...");
 	m_RayBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(Ray), m_Width*m_Height, true, true, nullptr, true, "Structured Buffer: RayBuffer");
 	m_HitDataBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(HitData), m_Width*m_Height, true, true, nullptr, true, "Structured Buffer: HitDataBuffer");
 	m_FinalColorBuffer = m_ComputeSys->CreateBuffer(STRUCTURED_BUFFER, sizeof(XMFLOAT4), m_Height*m_Width, true, true, nullptr,true, "Structured Buffer:FinalColorBuffer");
 
 
 
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Camera
 ///////////////////////////////////////////////////////////////////////////////////////////
+	Logger::log(Logger::Level::INFO, "Initializing camera...");
 	m_pCamera = std::shared_ptr<Camera>(new Camera);
 	XMVECTOR cameraPos = XMVectorSet(-10.f, 10.f, -10.f, 0.f);
 	XMVECTOR cameraDir = XMVectorSet(1.f, -1.f, 1.f, 0.f);
@@ -163,12 +177,14 @@ void Direct3D::init(Input *p_pInput)
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Constant Buffer
 ///////////////////////////////////////////////////////////////////////////////////////////
+	Logger::log(Logger::Level::INFO, "Initializing constant buffers...");
 	createConstantBuffers();
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Sphere
 ///////////////////////////////////////////////////////////////////////////////////////////
+	Logger::log(Logger::Level::INFO, "Initializing volumes...");
 	m_sphere.center = XMFLOAT4(10.f, 0.f, 0.f, 1.f);
 	m_sphere.radius = 2.f;
 	m_sphere.color = XMFLOAT4(1.f, 0.f, 0.f, 1.f);
@@ -264,7 +280,7 @@ void Direct3D::init(Input *p_pInput)
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Light
 ///////////////////////////////////////////////////////////////////////////////////////////
-
+	Logger::log(Logger::Level::INFO, "Initializing lights...");
 	std::srand(10);
 	for(int i = 0; i < NROFLIGHTS; i++)
 	{
@@ -282,6 +298,7 @@ void Direct3D::init(Input *p_pInput)
 ///////////////////////////////////////////////////////////////////////////////////////////
 //Mesh
 ///////////////////////////////////////////////////////////////////////////////////////////
+	Logger::log(Logger::Level::INFO, "Parsing obj...");
 	m_mesh.loadObj("Meshi/kub.obj");
 
 	m_meshBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(Triangle), m_mesh.getFaces(), true, false, m_mesh.getTriangles(), false, "Structured Buffer: Mesh Texture");
@@ -524,6 +541,7 @@ void Direct3D::updateConstantBuffers()
 
 void Direct3D::release()
 {
+	Logger::log(Logger::Level::INFO, "Shutting down Direct3D");
 	m_DataTable.printCSV(std::ofstream("TimeTable.csv"));
 	SAFE_RELEASE(m_BackBufferUAV);
 	SAFE_RELEASE(m_cBuffer);

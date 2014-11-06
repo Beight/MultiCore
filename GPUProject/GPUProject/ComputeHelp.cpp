@@ -1,5 +1,6 @@
 #include "ComputeHelp.h"
 #include <cstdio>
+#include "Logger.h"
 
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "dxguid.lib") 
@@ -46,6 +47,7 @@ bool ComputeShader::Init(TCHAR* shaderFile, char* blobFileAppendix, char* pFunct
 
 	if (pErrorBlob)
 	{
+		Logger::log(Logger::Level::ERROR_L, (char*)pErrorBlob->GetBufferPointer());
 		OutputDebugStringA((char*)pErrorBlob->GetBufferPointer());
 	}
 
@@ -116,6 +118,7 @@ ComputeBuffer* ComputeWrap::CreateBuffer(COMPUTE_BUFFER_TYPE uType,
 ID3D11Buffer* ComputeWrap::CreateStructuredBuffer(UINT uElementSize, UINT uCount,
 									bool bSRV, bool bUAV, VOID* pInitData)
 {
+	
     ID3D11Buffer* pBufOut = NULL;
 
     D3D11_BUFFER_DESC desc;
@@ -129,17 +132,19 @@ ID3D11Buffer* ComputeWrap::CreateStructuredBuffer(UINT uElementSize, UINT uCount
 	desc.ByteWidth = bufferSize < 16 ? 16 : bufferSize;
     desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
     desc.StructureByteStride = uElementSize;
-
+	HRESULT hr = S_OK;
     if ( pInitData )
     {
         D3D11_SUBRESOURCE_DATA InitData;
         InitData.pSysMem = pInitData;
-		mD3DDevice->CreateBuffer( &desc, &InitData, &pBufOut);
+		hr = mD3DDevice->CreateBuffer( &desc, &InitData, &pBufOut);
     }
 	else
 	{
-		mD3DDevice->CreateBuffer(&desc, NULL, &pBufOut);
+		hr = mD3DDevice->CreateBuffer(&desc, NULL, &pBufOut);
 	}
+	if(FAILED(hr))
+		Logger::log(Logger::Level::ERROR_L, (char*)hr);
 
 	return pBufOut;
 }
@@ -153,17 +158,19 @@ ID3D11Buffer* ComputeWrap::CreateRawBuffer(UINT uSize, VOID* pInitData)
     desc.BindFlags = D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_INDEX_BUFFER | D3D11_BIND_VERTEX_BUFFER;
     desc.ByteWidth = uSize;
     desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_ALLOW_RAW_VIEWS;
-
+	HRESULT hr = S_OK;
     if ( pInitData )
     {
         D3D11_SUBRESOURCE_DATA InitData;
         InitData.pSysMem = pInitData;
-        mD3DDevice->CreateBuffer(&desc, &InitData, &pBufOut);
+        hr = mD3DDevice->CreateBuffer(&desc, &InitData, &pBufOut);
     }
 	else
 	{
-        mD3DDevice->CreateBuffer(&desc, NULL, &pBufOut);
+        hr = mD3DDevice->CreateBuffer(&desc, NULL, &pBufOut);
 	}
+	if(FAILED(hr))
+		Logger::log(Logger::Level::ERROR_L, (char*)hr);
 
 	return pBufOut;
 }
@@ -199,8 +206,10 @@ ID3D11ShaderResourceView* ComputeWrap::CreateBufferSRV(ID3D11Buffer* pBuffer)
 		return NULL;
 	}
 
-    mD3DDevice->CreateShaderResourceView(pBuffer, &desc, &pSRVOut);
-
+    HRESULT hr = mD3DDevice->CreateShaderResourceView(pBuffer, &desc, &pSRVOut);
+	if(FAILED(hr))
+		Logger::log(Logger::Level::ERROR_L, (char*)hr);
+	
 	return pSRVOut;
 }
 
@@ -235,7 +244,9 @@ ID3D11UnorderedAccessView* ComputeWrap::CreateBufferUAV(ID3D11Buffer* pBuffer)
 		return NULL;
 	}
     
-	mD3DDevice->CreateUnorderedAccessView(pBuffer, &desc, &pUAVOut);
+	HRESULT hr = mD3DDevice->CreateUnorderedAccessView(pBuffer, &desc, &pUAVOut);
+	if(FAILED(hr))
+		Logger::log(Logger::Level::ERROR_L, (char*)hr);
 
 	return pUAVOut;
 }
@@ -252,7 +263,9 @@ ID3D11Buffer* ComputeWrap::CreateStagingBuffer(UINT uSize)
     desc.BindFlags = 0;
     desc.MiscFlags = 0;
     
-	mD3DDevice->CreateBuffer(&desc, NULL, &debugbuf);
+	HRESULT hr = mD3DDevice->CreateBuffer(&desc, NULL, &debugbuf);
+	if(FAILED(hr))
+		Logger::log(Logger::Level::ERROR_L, (char*)hr);
 
     return debugbuf;
 }
@@ -330,9 +343,10 @@ ID3D11Texture2D* ComputeWrap::CreateTextureResource(DXGI_FORMAT dxFormat,
 	data.pSysMem = pInitData;
 	data.SysMemPitch = uRowPitch;
 
-	if(FAILED(mD3DDevice->CreateTexture2D( &desc, pInitData ? &data : NULL, &pTexture )))
+	HRESULT hr = mD3DDevice->CreateTexture2D( &desc, pInitData ? &data : NULL, &pTexture );
+	if(FAILED(hr))
 	{
-
+		Logger::log(Logger::Level::ERROR_L, (char*)hr);
 	}
 
 	return pTexture;
@@ -352,9 +366,10 @@ ID3D11ShaderResourceView* ComputeWrap::CreateTextureSRV(ID3D11Texture2D* pTextur
 	viewDesc.Format					= td.Format;
 	viewDesc.ViewDimension			= D3D11_SRV_DIMENSION_TEXTURE2D;
 	viewDesc.Texture2D.MipLevels	= td.MipLevels;
-
-	if(FAILED(mD3DDevice->CreateShaderResourceView(pTexture, &viewDesc, &pSRV)))
+	HRESULT hr = mD3DDevice->CreateShaderResourceView(pTexture, &viewDesc, &pSRV);
+	if(FAILED(hr))
 	{
+		Logger::log(Logger::Level::ERROR_L, (char*)hr);
 		//MessageBox(0, "Unable to create shader resource view", "Error!", 0);
 	}
 
@@ -365,7 +380,9 @@ ID3D11UnorderedAccessView* ComputeWrap::CreateTextureUAV(ID3D11Texture2D* pTextu
 {
 	ID3D11UnorderedAccessView* pUAV = NULL;
 
-	mD3DDevice->CreateUnorderedAccessView( pTexture, NULL, &pUAV );
+	HRESULT hr = mD3DDevice->CreateUnorderedAccessView( pTexture, NULL, &pUAV );
+	if(FAILED(hr))
+		Logger::log(Logger::Level::ERROR_L, (char*)hr);
 	pTexture->Release();
 
 	return pUAV;
@@ -382,8 +399,9 @@ ID3D11Texture2D* ComputeWrap::CreateStagingTexture(ID3D11Texture2D* pTexture)
     desc.BindFlags = 0;
     desc.MiscFlags = 0;
     
-	mD3DDevice->CreateTexture2D(&desc, NULL, &pStagingTex);
-
+	HRESULT hr = mD3DDevice->CreateTexture2D(&desc, NULL, &pStagingTex);
+	if(FAILED(hr))
+		Logger::log(Logger::Level::ERROR_L, (char*)hr);
     return pStagingTex;
 }
 
@@ -399,22 +417,25 @@ ID3D11Buffer* ComputeWrap::CreateConstantBuffer(UINT uSize, VOID* pInitData, cha
 	cbDesc.MiscFlags = 0;
 	cbDesc.StructureByteStride = 0;
 	cbDesc.Usage = D3D11_USAGE_DEFAULT;
-
+	HRESULT hr = S_OK;
     if(pInitData)
     {
         D3D11_SUBRESOURCE_DATA InitData;
         InitData.pSysMem = pInitData;
-        mD3DDevice->CreateBuffer(&cbDesc, &InitData, &pBuffer);
+        hr = mD3DDevice->CreateBuffer(&cbDesc, &InitData, &pBuffer);
     }
 	else
 	{
-        mD3DDevice->CreateBuffer(&cbDesc, NULL, &pBuffer);
+        hr = mD3DDevice->CreateBuffer(&cbDesc, NULL, &pBuffer);
 	}
 
 	if(debugName && pBuffer)
 	{
 		SetDebugName(pBuffer, debugName);
 	}
+
+	if(FAILED(hr))
+		Logger::log(Logger::Level::ERROR_L, (char*)hr);
 
 	return pBuffer;
 }
