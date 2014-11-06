@@ -129,7 +129,6 @@ void Mesh::loadMaterial(string filename)
 		if( prefix == "Ni" )
 		{
 			lineStream >> m_material.Ni;
-			m_material2.ni = m_material.Ni;
 		}
 		else if( prefix == "d" )
 		{
@@ -142,22 +141,18 @@ void Mesh::loadMaterial(string filename)
 		else if( prefix == "Tf" )
 		{
 			lineStream >> m_material.Tf.x >> m_material.Tf.y >> m_material.Tf.z;
-			m_material2.tf = XMFLOAT4(m_material.Tf.x, m_material.Tf.y, m_material.Tf.z, 0.f);
 		}
 		else if( prefix == "illum" )
 		{
 			lineStream >> m_material.illum;
-			m_material2.illum = m_material.illum;
 		}
 		else if( prefix == "Ka" )
 		{
 			lineStream >> m_material.Ka.x >> m_material.Ka.y >> m_material.Ka.z;
-			m_material2.ka = XMFLOAT4(m_material.Ka.x, m_material.Ka.y, m_material.Ka.z, 0.f);
 		}
 		else if( prefix == "Kd" )
 		{
 			lineStream >> m_material.Kd.x >> m_material.Kd.y >> m_material.Kd.z;
-			m_material2.kd = XMFLOAT4(m_material.Kd.x, m_material.Kd.y, m_material.Kd.z, 0.f);
 		}
 		else if( prefix == "Ks" )
 		{
@@ -192,9 +187,4 @@ Material* Mesh::getMaterial()
 int Mesh::getFaces()
 {
 	return m_nrOfFaces;
-}
-
-Material2 Mesh::getMaterial2()
-{
-	return m_material2;
 }

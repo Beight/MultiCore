@@ -9,15 +9,9 @@ struct Light
 	float3 pad;
 };
 
-float3 PointLightR(float4 pos, float4 norm, float4 color, int materialID, Light L, Material m)
+float3 PointLightR(float4 pos, float4 norm, float4 color, Light L)
 {
 	float3 litColor = float3(0.0f, 0.0f, 0.0f);
-	int		i;
-	float	ni;
-	float2	pad;
-	float4	kd; 
-	float4	ka; 
-	float4	tf; 
 
 	//The vector from surface to the light
 	float3 lightVec = L.pos.xyz - pos.xyz;
@@ -28,16 +22,7 @@ float3 PointLightR(float4 pos, float4 norm, float4 color, int materialID, Light 
 	float3 ambient = L.ambient.xyz;
 	float3 diffuse = L.diffuse.xyz;
 	float shininess = 10;
-	if(materialID != -1)
-	{
-		diffuse *= color.xyz;
-		i = m.illum;
-		ni = m.ni;
-		pad = m.pad;
-		kd = m.kd;
-		ka = m.ka;
-		tf = m.tf;
-	}
+
 	//the distance deom surface to light
 	float d = length(lightVec);
 	float fade;

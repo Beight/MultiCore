@@ -44,7 +44,6 @@ void main( uint3 threadID : SV_DispatchThreadID )
 		hd.color = float4(0.f, 1.f, 0.f, 0.f);
 		hd.ID = -1;
 		hd.rayPower = 1.f;
-		hd.materialID = -1;
 	}
 	else
 	{
@@ -63,7 +62,6 @@ void main( uint3 threadID : SV_DispatchThreadID )
 			hd.color = sphere.color;
 			hd.distance = hit;
 			tempID = sphere.ID;
-			hd.materialID = -1;
 		}
 	}
 
@@ -80,7 +78,6 @@ void main( uint3 threadID : SV_DispatchThreadID )
 				hd.color = triangles[i].color;					
 				tempID = triangles[i].ID;
 				hd.distance = hit.x;
-				hd.materialID = -1;
 			}
 		}
 	}
@@ -98,7 +95,6 @@ void main( uint3 threadID : SV_DispatchThreadID )
 				hd.color = MeshTexture[hit.yz*512.f];
 				tempID = MeshTriangles[j].ID;
 				hd.distance = hit.x;
-				hd.materialID = 1;
 			}
 		}
 	}

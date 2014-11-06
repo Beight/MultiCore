@@ -42,22 +42,6 @@ struct Material
 };
 
 
-struct Material2
-{
-	int	illum;
-	float   ni;
-	XMFLOAT2  pad;
-	XMFLOAT4 kd;
-	XMFLOAT4 ka;
-	XMFLOAT4 tf;
-
-	Material2()
-	{
-		pad = XMFLOAT2(0.f, 0.f);
-	}
-};
-
-
 class Mesh
 {
 public:
@@ -68,12 +52,10 @@ public:
 	Material* getMaterial();
 	int getFaces();
 	Triangle* getTriangles();
-	Material2 getMaterial2();
 private:
 	int m_nrOfFaces;
 	void loadMaterial(std::string filename);
 	Material m_material;
-	Material2 m_material2;
 	std::vector<Triangle> m_meshTriangles;
 
 };

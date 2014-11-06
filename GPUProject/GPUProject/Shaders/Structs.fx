@@ -39,16 +39,6 @@ struct Triangle
 	
 };
 
-struct Material
-{
-	int		illum;
-	float	ni;
-	float2	pad;
-	float4	kd;
-	float4	ka;
-	float4	tf;
-};
-
 struct HitData
 {
 	float4	pos;
@@ -56,7 +46,6 @@ struct HitData
 	float4	color;
 	float	distance;
 	int		ID;
-	int		materialID;
 	float	rayPower;
 };
 

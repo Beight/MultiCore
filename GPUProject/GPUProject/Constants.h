@@ -6,20 +6,20 @@
 
 
 //Variables we change on for the tests
-static const float WIDTH = 1024.0f;
-static const float HEIGHT= 768.0f;
+static const float WIDTH = 800.0f;
+static const float HEIGHT= 800.0f;
 
 
 #define NROFBOUNCES 5
 #define NROFLIGHTS 5
 
 
-#define THREADGROUPSX 256
-#define THREADGROUPSY 192
+#define THREADGROUPSX 50
+#define THREADGROUPSY 50
 #define	THREADGROUPSZ 1
 
-#define NUMTHREADSX 4
-#define NUMTHREADSY 4
+#define NUMTHREADSX 16
+#define NUMTHREADSY 16
 #define NUMTHREADSZ 1
 
 //Variables we can change

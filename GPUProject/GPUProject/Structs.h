@@ -17,7 +17,6 @@ struct HitData
 	XMFLOAT4	color;
 	float		distance;
 	int			ID;
-	int			materialID;
 	float		rayPower;
 };
 

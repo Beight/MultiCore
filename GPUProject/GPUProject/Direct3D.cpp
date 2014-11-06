@@ -19,7 +19,6 @@ Direct3D::Direct3D(HWND p_hwnd)
 	m_fps(0.f),
 	m_mesh(Mesh()),
 	m_meshBuffer(nullptr),
-	m_materialBuffer(nullptr),
 	m_cBuffer(nullptr),
 	m_PrimaryCBuffer(nullptr),		
 	m_IntersectionCBuffer(nullptr),	
@@ -289,8 +288,6 @@ void Direct3D::init(Input *p_pInput)
 	
 	D3DX11CreateShaderResourceViewFromFile(m_Device, m_mesh.getMaterial()->map_Kd.c_str(), NULL, NULL, &m_meshTexture, &hr);
 
-	m_materialBuffer = m_ComputeSys->CreateBuffer( STRUCTURED_BUFFER, sizeof(Material2), 1, true, false, &m_mesh.getMaterial2(), false, 0);
-
 	m_FirstPassStruct.firstPass = 1;
 
 
@@ -335,7 +332,7 @@ void Direct3D::draw()
 	ID3D11UnorderedAccessView* uav[] = { m_BackBufferUAV, m_FinalColorBuffer->GetUnorderedAccessView() };
 	ID3D11UnorderedAccessView* RayUAV[] = {m_RayBuffer->GetUnorderedAccessView()};
 	ID3D11UnorderedAccessView* IntersectionUAV[] = {m_RayBuffer->GetUnorderedAccessView(), m_HitDataBuffer->GetUnorderedAccessView()};
-	ID3D11ShaderResourceView* ColorSRV[] = {m_HitDataBuffer->GetResourceView(), m_meshBuffer->GetResourceView(), m_materialBuffer->GetResourceView()};
+	ID3D11ShaderResourceView* ColorSRV[] = {m_HitDataBuffer->GetResourceView(), m_meshBuffer->GetResourceView()};
 	ID3D11UnorderedAccessView* clearuav[]	= { 0,0,0,0,0,0,0 };
 	ID3D11ShaderResourceView* clearsrv[]	= { 0,0,0,0,0,0,0 };
 	
@@ -386,7 +383,7 @@ void Direct3D::draw()
 		ID3D11Buffer *CCB[] = {m_ColorCBuffer, m_FirstPassCBuffer};
 		m_DeviceContext->CSSetConstantBuffers(0, 2, CCB);
 		m_DeviceContext->CSSetUnorderedAccessViews(0, 2, uav, 0);
-		m_DeviceContext->CSSetShaderResources(0, 3, ColorSRV);
+		m_DeviceContext->CSSetShaderResources(0, 2, ColorSRV);
 		m_ColorShader->Set();
 		m_Timer->Start();
 		m_DeviceContext->Dispatch(THREADGROUPSX, THREADGROUPSY, THREADGROUPSZ);
@@ -541,7 +538,6 @@ void Direct3D::release()
 	SAFE_DELETE(m_IntersectionShader);
 	SAFE_DELETE(m_ColorShader);
 	SAFE_RELEASE(m_meshTexture);
-	SAFE_RELEASE(m_materialBuffer);
 	SAFE_RELEASE(m_RayBuffer);
 	SAFE_RELEASE(m_HitDataBuffer);
 	SAFE_RELEASE(m_FinalColorBuffer);

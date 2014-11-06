@@ -8,7 +8,6 @@
 
 StructuredBuffer<HitData> HDin : register(t0);
 StructuredBuffer<Triangle> MeshTriangles : register(t1);
-StructuredBuffer<Material> material : register (t2);
 
 cbuffer ConstBuffer : register (b0)
 {
@@ -89,11 +88,11 @@ void main( uint3 threadID : SV_DispatchThreadID )
 			}
 			if(lightHit.distance > 0.0001f && lightLength > lightHit.distance)
 			{
-				color = (PointLightR(hd.pos, hd.normal, hd.color, hd.materialID, lightList[i], material[0]) * 0.5f);
+				color = (PointLightR(hd.pos, hd.normal, hd.color, lightList[i]) * 0.5f);
 				
 			}	
 			else 
-				color = PointLightR(hd.pos, hd.normal, hd.color, hd.materialID, lightList[i], material[0]);
+				color = PointLightR(hd.pos, hd.normal, hd.color, lightList[i]);
 		
 
 			final += color;
