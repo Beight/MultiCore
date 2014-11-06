@@ -6,8 +6,8 @@
 
 
 //Variables we change on for the tests
-static const float WIDTH = 800.0f;
-static const float HEIGHT= 800.0f;
+#define WIDTH 800.0f
+#define HEIGHT 800.0f
 
 
 #define NROFBOUNCES 5
